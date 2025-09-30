@@ -97,7 +97,7 @@ export const createHealthCheckHandler = (
         ...response,
         responseTime,
         timestamp: new Date().toISOString(),
-        version: '1.0.7', // Plugin version
+        version: '1.0.11',
       })
     } catch (_error) {
       // Handle health check error
@@ -177,7 +177,7 @@ export const createDetailedHealthCheckHandler = (
           ok: isTypesenseHealthy,
           version: 'unknown',
         },
-        version: '1.0.7',
+        version: '1.0.11',
       }
 
       // Add error details if unhealthy
@@ -201,7 +201,7 @@ export const createDetailedHealthCheckHandler = (
         error: _error instanceof Error ? _error.message : 'Unknown error',
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        version: '1.0.7',
+        version: '1.0.11',
       }
 
       return Response.json(errorResponse, { status: 500 })

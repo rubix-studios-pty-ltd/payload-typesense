@@ -792,10 +792,12 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
               themeConfig.config.enableShadows !== false
                 ? themeConfig.theme.shadows.shadowLg
                 : 'none',
+            boxSizing: 'border-box',
+            display: 'flex',
             left: '0',
-            marginTop: '4px',
+            marginTop: '10px',
             maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
-            overflowY: 'auto',
+            overflow: 'hidden',
             position: 'absolute',
             right: '0',
             top: '100%',
@@ -806,7 +808,11 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           }}
         >
           <div
-            className={`${resultsClassName}`}
+            className={`relative ${resultsClassName}`}
+            style={{
+              minHeight: 0,
+              overflowY: 'auto',
+            }}
           >
             {error && (renderError ? renderError(error) : defaultRenderError(error))}
 
@@ -820,9 +826,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                 {results.hits.length > 0 ? (
                   <div
                     className={`${resultsListClassName}`}
-                    style={{
-                      padding: '8px 0',
-                    }}
                   >
                     {results.hits.map((result, index) =>
                       renderResult ? renderResult(result, index) : defaultRenderResult(result, index),
