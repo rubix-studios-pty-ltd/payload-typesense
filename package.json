@@ -53,7 +53,10 @@
     "clean": "rimraf -g {dist,*.tsbuildinfo}",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "prepublishOnly": "pnpm clean && pnpm build"
+    "update": "pnpm update --latest && pnpm install && pnpm prune && pnpm dedupe",
+    "release:patch": "pnpm clean && pnpm build && pnpm version patch -m \"chore(release): %s\" && pnpm publish --access public",
+    "release:minor": "pnpm clean && pnpm build && pnpm version minor -m \"chore(release): %s\" && pnpm publish --access public",
+    "release:major": "pnpm clean && pnpm build && pnpm version major -m \"chore(release): %s\" && pnpm publish --access public"
   },
   "devDependencies": {
     "@payloadcms/eslint-config": "3.28.0",
