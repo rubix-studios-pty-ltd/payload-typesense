@@ -59,10 +59,6 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    */
   renderResultsHeader?: (found: number, searchTime: number) => React.ReactNode
   /**
-   * Custom CSS class for results container
-   */
-  resultContainerClassName?: string
-  /**
    * Custom CSS class for individual result items
    */
   resultItemClassName?: string
@@ -70,6 +66,10 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    * Custom CSS class for the results container
    */
   resultsClassName?: string
+  /**
+   * Custom CSS class for results container
+   */
+  resultsContainerClassName?: string
   /**
    * Show loading state
    */
@@ -98,7 +98,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   errorClassName = '',
   inputClassName = '',
   inputWrapperClassName = '',
-  loadingClassName = '',
   minQueryLength = 2,
   noResultsClassName = '',
   onResultClick,
@@ -108,13 +107,12 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   placeholder = 'Search...',
   renderError,
   renderInput,
-  renderLoading: _renderLoading,
   renderNoResults,
   renderResult,
   renderResultsHeader,
-  resultContainerClassName = '',
   resultItemClassName = '',
   resultsClassName = '',
+  resultsContainerClassName = '',
   resultsHeaderClassName = '',
   resultsListClassName = '',
   showLoading = true,
@@ -334,7 +332,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
 
     return (
       <div
-        className={`${resultContainerClassName}`}
+        className={`${resultsContainerClassName}`}
       >
         <div
           className={`${themeConfig.classes.resultItem} ${resultItemClassName}`}
@@ -576,34 +574,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     </div>
   )
 
-  const _defaultRenderLoading = () => (
-    <div
-      className={`${loadingClassName}`}
-      style={{
-        alignItems: 'center',
-        color: themeConfig.theme.colors.loadingText,
-        display: 'flex',
-        fontFamily: themeConfig.theme.typography.fontFamily,
-        fontSize: themeConfig.theme.typography.fontSizeSm,
-        gap: '12px',
-        justifyContent: 'center',
-        padding: '24px',
-      }}
-    >
-      <div
-        style={{
-          animation: `spin 1s linear infinite`,
-          border: `2px solid ${themeConfig.theme.colors.inputBorder}`,
-          borderRadius: '50%',
-          borderTop: `2px solid ${themeConfig.theme.colors.inputBorderFocus}`,
-          height: '20px',
-          width: '20px',
-        }}
-      />
-      <span>Searching...</span>
-    </div>
-  )
-
   const defaultRenderError = (error: string) => (
     <div
       className={`${errorClassName}`}
@@ -809,59 +779,63 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
 
       {isOpen && (
         <div
-          className={`${resultsClassName}`}
-          ref={resultsRef}
-          style={{
-            backgroundColor: themeConfig.theme.colors.resultsBackground,
-            border: `1px solid ${themeConfig.theme.colors.resultsBorder}`,
-            borderRadius:
-              themeConfig.config.enableRoundedCorners !== false
-                ? themeConfig.theme.spacing.resultsBorderRadius
-                : '0',
-            boxShadow:
-              themeConfig.config.enableShadows !== false
-                ? themeConfig.theme.shadows.shadowLg
-                : 'none',
-            left: '0',
-            marginTop: '4px',
-            maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
-            overflowY: 'auto',
-            position: 'absolute',
-            right: '0',
-            top: '100%',
-            zIndex: 1000,
-            ...(themeConfig.config.enableAnimations !== false && {
-              animation: `slideDown ${themeConfig.theme.animations.animationNormal} ${themeConfig.theme.animations.easeOut}`,
-            }),
-          }}
+          className={`${resultsContainerClassName}`}
         >
-          {error && (renderError ? renderError(error) : defaultRenderError(error))}
+          <div
+            className={`${resultsClassName}`}
+            ref={resultsRef}
+            style={{
+              backgroundColor: themeConfig.theme.colors.resultsBackground,
+              border: `1px solid ${themeConfig.theme.colors.resultsBorder}`,
+              borderRadius:
+                themeConfig.config.enableRoundedCorners !== false
+                  ? themeConfig.theme.spacing.resultsBorderRadius
+                  : '0',
+              boxShadow:
+                themeConfig.config.enableShadows !== false
+                  ? themeConfig.theme.shadows.shadowLg
+                  : 'none',
+              left: '0',
+              marginTop: '4px',
+              maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
+              overflowY: 'auto',
+              position: 'absolute',
+              right: '0',
+              top: '100%',
+              zIndex: 1000,
+              ...(themeConfig.config.enableAnimations !== false && {
+                animation: `slideDown ${themeConfig.theme.animations.animationNormal} ${themeConfig.theme.animations.easeOut}`,
+              }),
+            }}
+          >
+            {error && (renderError ? renderError(error) : defaultRenderError(error))}
 
-          {!error && results && (
-            <>
-              {showResultCount &&
-                (renderResultsHeader
-                  ? renderResultsHeader(results.found, results.search_time_ms)
-                  : defaultRenderResultsHeader(results.found, results.search_time_ms))}
+            {!error && results && (
+              <>
+                {showResultCount &&
+                  (renderResultsHeader
+                    ? renderResultsHeader(results.found, results.search_time_ms)
+                    : defaultRenderResultsHeader(results.found, results.search_time_ms))}
 
-              {results.hits.length > 0 ? (
-                <div
-                  className={`${resultsListClassName}`}
-                  style={{
-                    padding: '8px 0',
-                  }}
-                >
-                  {results.hits.map((result, index) =>
-                    renderResult ? renderResult(result, index) : defaultRenderResult(result, index),
-                  )}
-                </div>
-              ) : renderNoResults ? (
-                renderNoResults(query)
-              ) : (
-                defaultRenderNoResults(query)
-              )}
-            </>
-          )}
+                {results.hits.length > 0 ? (
+                  <div
+                    className={`${resultsListClassName}`}
+                    style={{
+                      padding: '8px 0',
+                    }}
+                  >
+                    {results.hits.map((result, index) =>
+                      renderResult ? renderResult(result, index) : defaultRenderResult(result, index),
+                    )}
+                  </div>
+                ) : renderNoResults ? (
+                  renderNoResults(query)
+                ) : (
+                  defaultRenderNoResults(query)
+                )}
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
