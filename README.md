@@ -105,10 +105,10 @@ function PostSearch() {
 ## Components
 
 - **`HeadlessSearchInput`** - Single component supporting all search patterns:
-  - **Single Collection**: `collection="posts"` - Direct API calls for optimal performance
-  - **Multiple Collections**: `collections={['posts', 'products']}` - Smart filtering with universal search
-  - **Universal Search**: No collection props - Search across all collections
-  - **Complete UI Control**: Customizable rendering with comprehensive theme system
+- **Single Collection**: `collection="posts"` - Direct API calls for optimal performance
+- **Multiple Collections**: `collections={['posts', 'products']}` - Smart filtering with universal search
+- **Universal Search**: No collection props - Search across all collections
+- **Complete UI Control**: Customizable rendering with comprehensive theme system
 
 ## Theme System
 
