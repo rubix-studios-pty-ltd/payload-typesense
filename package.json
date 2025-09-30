@@ -1,0 +1,95 @@
+{
+  "name": "@rubixstudios/typesense",
+  "version": "1.0.1",
+  "description": "Production-ready search plugin that integrates Typesense with Payload CMS, providing lightning-fast, typo-tolerant search capabilities with real-time synchronization and a comprehensive theme system.",
+  "license": "MIT",
+  "author": "Rubix Studios <hello@rubixstudios.com.au> (https://rubixstudios.com.au)",
+  "homepage": "https://rubixstudios.com.au",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rubix-studios-pty-ltd/payload-typesense.git",
+    "directory": "packages/payload-typesense"
+  },
+  "bugs": {
+    "url": "https://github.com/rubix-studios-pty-ltd/payload-typesense/issues"
+  },
+  "maintainers": [
+    {
+      "name": "Rubix Studios",
+      "email": "hello@rubixstudios.com.au",
+      "url": "https://rubixstudios.com.au"
+    }
+  ],
+  "type": "module",
+  "keywords": [
+    "payload",
+    "payloadcms",
+    "typesense",
+    "search",
+    "plugin",
+    "cms",
+    "headless",
+    "typescript",
+    "react",
+    "nextjs"
+  ],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm build:types && pnpm build:swc",
+    "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
+    "build:types": "tsc -p tsconfig.json",
+    "clean": "rimraf -g {dist,*.tsbuildinfo}",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepublishOnly": "pnpm clean && pnpm build"
+  },
+  "devDependencies": {
+    "@payloadcms/eslint-config": "3.28.0",
+    "@payloadcms/ui": "3.57.0",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
+    "@types/node": "^24.6.0",
+    "@types/react": "19.1.15",
+    "eslint": "^9.36.0",
+    "next": "15.5.4",
+    "payload": "3.57.0",
+    "rimraf": "6.0.1",
+    "typescript": "5.9.2"
+  },
+  "peerDependencies": {
+    "payload": "^3.28.1"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/",
+    "exports": {
+      ".": {
+        "import": "./dist/index.js",
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts"
+  },
+  "dependencies": {
+    "typesense": "^2.1.0",
+    "zod": "^4.1.11"
+  },
+  "packageManager": "pnpm@10.17.1"
+}

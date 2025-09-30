@@ -1,0 +1,63 @@
+# Source files
+src/
+dev/
+
+# Documentation
+docs/
+README.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+# GitHub files
+.github/
+.gitignore
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+e2e.spec.ts
+int.spec.ts
+
+# Development files
+.env*
+.env.example
+docker-compose.yml
+playwright.config.js
+vitest.config.js
+tsconfig.json
+tsconfig.tsbuildinfo
+eslint.config.js
+.swcrc
+
+# Build artifacts (keep dist/)
+*.tsbuildinfo
+
+# Package manager files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+.temp/
+.tmp/
+temp/
+
+# Node modules (should not be included anyway)
+node_modules/
