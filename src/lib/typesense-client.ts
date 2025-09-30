@@ -18,7 +18,6 @@ export const testTypesenseConnection = async (client: Typesense.Client): Promise
     await client.health.retrieve()
     return true
   } catch (_error) {
-    // Handle Typesense connection error
     return false
   }
 }

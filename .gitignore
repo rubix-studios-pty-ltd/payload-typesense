@@ -1,58 +1,32 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Node modules
+node_modules/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
-
-/.idea/*
-!/.idea/runConfigurations
-
-# testing
-/coverage
-
-# next.js
-.next/
-/out/
-
-# production
-/build
-/dist
-
-# misc
-.DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
-
-# vercel
-.vercel
-
-# typescript
+# Build output
+dist/
 *.tsbuildinfo
 
+# Turbo cache
+.turbo/
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+turbo.log*
+
+# Environment files
 .env
+.env.local
+.env.*.local
 
-# development folder (for testing and development purposes only)
-/dev/
+# Editor settings
+.vscode/
+.idea/
 
-/dev/media
+# OS/system files
+.DS_Store
+Thumbs.db
 
-# Playwright
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-
-/typesense-data/docs/.vitepress/cache/
-docs/.vitepress/dist/
-
-# AI Assistant Development Guide (local reference only)
-FEATURE_DEVELOPMENT_GUIDE.md
+# .gitignore
+.npmrc

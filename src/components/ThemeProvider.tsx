@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, use } from 'react'
+import { createContext, use } from 'react'
 
 import type { ThemeConfig, ThemeContextValue } from './themes/types.js'
 

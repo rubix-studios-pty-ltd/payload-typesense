@@ -1,9 +1,7 @@
 # Source files
 src/
-dev/
 
 # Documentation
-docs/
 README.md
 CONTRIBUTING.md
 CHANGELOG.md
@@ -24,9 +22,6 @@ int.spec.ts
 # Development files
 .env*
 .env.example
-docker-compose.yml
-playwright.config.js
-vitest.config.js
 tsconfig.json
 tsconfig.tsbuildinfo
 eslint.config.js

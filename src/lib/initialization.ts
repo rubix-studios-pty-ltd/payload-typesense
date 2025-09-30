@@ -91,7 +91,7 @@ const syncExistingDocuments = async (
     const { docs } = await payload.find({
       collection: collectionSlug,
       depth: 0,
-      limit: 1000, // Adjust based on your needs
+      limit: 1000,
     })
 
     if (docs.length === 0) {
