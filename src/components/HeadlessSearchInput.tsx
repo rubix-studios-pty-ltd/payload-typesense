@@ -333,6 +333,16 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     return (
       <div
         className={`${resultsContainerClassName}`}
+        style={{
+          backgroundColor: themeConfig.theme.colors.resultBackground,
+          borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
+          cursor: 'pointer',
+          padding: themeConfig.theme.spacing.itemPadding,
+          transition:
+            themeConfig.config.enableAnimations !== false
+              ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
+              : 'none',
+        }}
       >
         <div
           className={`${themeConfig.classes.resultItem} ${resultItemClassName}`}
@@ -358,16 +368,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
             e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
           }}
           role="button"
-          style={{
-            backgroundColor: themeConfig.theme.colors.resultBackground,
-            borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
-            cursor: 'pointer',
-            padding: themeConfig.theme.spacing.itemPadding,
-            transition:
-              themeConfig.config.enableAnimations !== false
-                ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
-                : 'none',
-          }}
           tabIndex={0}
         >
           <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px' }}>
@@ -780,33 +780,33 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
       {isOpen && (
         <div
           className={`${resultsContainerClassName}`}
+          ref={resultsRef}
+          style={{
+            backgroundColor: themeConfig.theme.colors.resultsBackground,
+            border: `1px solid ${themeConfig.theme.colors.resultsBorder}`,
+            borderRadius:
+              themeConfig.config.enableRoundedCorners !== false
+                ? themeConfig.theme.spacing.resultsBorderRadius
+                : '0',
+            boxShadow:
+              themeConfig.config.enableShadows !== false
+                ? themeConfig.theme.shadows.shadowLg
+                : 'none',
+            left: '0',
+            marginTop: '4px',
+            maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
+            overflowY: 'auto',
+            position: 'absolute',
+            right: '0',
+            top: '100%',
+            zIndex: 1000,
+            ...(themeConfig.config.enableAnimations !== false && {
+              animation: `slideDown ${themeConfig.theme.animations.animationNormal} ${themeConfig.theme.animations.easeOut}`,
+            }),
+          }}
         >
           <div
             className={`${resultsClassName}`}
-            ref={resultsRef}
-            style={{
-              backgroundColor: themeConfig.theme.colors.resultsBackground,
-              border: `1px solid ${themeConfig.theme.colors.resultsBorder}`,
-              borderRadius:
-                themeConfig.config.enableRoundedCorners !== false
-                  ? themeConfig.theme.spacing.resultsBorderRadius
-                  : '0',
-              boxShadow:
-                themeConfig.config.enableShadows !== false
-                  ? themeConfig.theme.shadows.shadowLg
-                  : 'none',
-              left: '0',
-              marginTop: '4px',
-              maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
-              overflowY: 'auto',
-              position: 'absolute',
-              right: '0',
-              top: '100%',
-              zIndex: 1000,
-              ...(themeConfig.config.enableAnimations !== false && {
-                animation: `slideDown ${themeConfig.theme.animations.animationNormal} ${themeConfig.theme.animations.easeOut}`,
-              }),
-            }}
           >
             {error && (renderError ? renderError(error) : defaultRenderError(error))}
 
