@@ -302,19 +302,19 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
       case 'ArrowDown': {
         e.preventDefault()
         const nextIndex = currentIndex < resultItems.length - 1 ? currentIndex + 1 : 0
-        ;(resultItems[nextIndex] as HTMLElement)?.focus()
+          ; (resultItems[nextIndex] as HTMLElement)?.focus()
         break
       }
       case 'ArrowUp': {
         e.preventDefault()
         const prevIndex = currentIndex > 0 ? currentIndex - 1 : resultItems.length - 1
-        ;(resultItems[prevIndex] as HTMLElement)?.focus()
+          ; (resultItems[prevIndex] as HTMLElement)?.focus()
         break
       }
       case 'Enter':
         e.preventDefault()
         if (currentIndex >= 0 && resultItems[currentIndex]) {
-          ;(resultItems[currentIndex] as HTMLElement)?.click()
+          ; (resultItems[currentIndex] as HTMLElement)?.click()
         }
         break
       case 'Escape':

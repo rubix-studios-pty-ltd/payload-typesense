@@ -1,142 +1,159 @@
-import type { Payload } from 'payload'
-import type Typesense from 'typesense'
+import type { Payload } from "payload"
+import type Typesense from "typesense"
 
-import type { TypesenseSearchConfig } from '../index.js'
+import type { TypesenseSearchConfig } from "../index.js"
 
-import { validateConfig } from './config-validation.js'
-import { mapCollectionToTypesenseSchema, mapPayloadDocumentToTypesense } from './schema-mapper.js'
-import { testTypesenseConnection } from './typesense-client.js'
+import { validateConfig } from "./config-validation.js"
+import {
+	mapCollectionToTypesenseSchema,
+	mapPayloadDocumentToTypesense,
+} from "./schema-mapper.js"
+import { testTypesenseConnection } from "./typesense-client.js"
 
 export const initializeTypesenseCollections = async (
-  payload: Payload,
-  typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig,
+	payload: Payload,
+	typesenseClient: Typesense.Client,
+	pluginOptions: TypesenseSearchConfig
 ) => {
-  // Validate configuration first
-  const validation = validateConfig(pluginOptions)
-  if (!validation.success) {
-    // Handle configuration validation error
-    throw new Error('Invalid plugin configuration')
-  }
+	// Validate configuration first
+	const validation = validateConfig(pluginOptions)
+	if (!validation.success) {
+		// Handle configuration validation error
+		throw new Error("Invalid plugin configuration")
+	}
 
-  // Configuration validated successfully
+	// Configuration validated successfully
 
-  // Test Typesense connection first
-  const isConnected = await testTypesenseConnection(typesenseClient)
-  if (!isConnected) {
-    // Typesense connection failed
-    return
-  }
+	// Test Typesense connection first
+	const isConnected = await testTypesenseConnection(typesenseClient)
+	if (!isConnected) {
+		// Typesense connection failed
+		return
+	}
 
-  // Initialize Typesense collections
+	// Initialize Typesense collections
 
-  if (pluginOptions.collections) {
-    for (const [collectionSlug, config] of Object.entries(pluginOptions.collections)) {
-      if (config?.enabled) {
-        try {
-          await initializeCollection(payload, typesenseClient, collectionSlug, config)
-        } catch (_error) {
-          // Handle collection initialization error
-        }
-      }
-    }
-  }
+	if (pluginOptions.collections) {
+		for (const [collectionSlug, config] of Object.entries(
+			pluginOptions.collections
+		)) {
+			if (config?.enabled) {
+				try {
+					await initializeCollection(
+						payload,
+						typesenseClient,
+						collectionSlug,
+						config
+					)
+				} catch (_error) {
+					// Handle collection initialization error
+				}
+			}
+		}
+	}
 
-  // Collections initialized successfully
+	// Collections initialized successfully
 }
 
 const initializeCollection = async (
-  payload: Payload,
-  typesenseClient: Typesense.Client,
-  collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined,
+	payload: Payload,
+	typesenseClient: Typesense.Client,
+	collectionSlug: string,
+	config: NonNullable<TypesenseSearchConfig["collections"]>[string] | undefined
 ) => {
-  // Get the collection config from Payload
-  const collection = payload.collections[collectionSlug]
-  if (!collection) {
-    // Collection not found in Payload
-    return
-  }
+	// Get the collection config from Payload
+	const collection = payload.collections[collectionSlug]
+	if (!collection) {
+		// Collection not found in Payload
+		return
+	}
 
-  // Create Typesense schema
-  const schema = mapCollectionToTypesenseSchema(collection, collectionSlug, config)
-  // Create schema for collection
+	// Create Typesense schema
+	const schema = mapCollectionToTypesenseSchema(
+		collection,
+		collectionSlug,
+		config
+	)
+	// Create schema for collection
 
-  try {
-    // Check if collection exists
-    await typesenseClient.collections(collectionSlug).retrieve()
-    // Collection already exists
-  } catch (_error) {
-    // Collection doesn't exist, create it
-    try {
-      await typesenseClient.collections().create(schema)
-      // Collection created successfully
-    } catch (_createError) {
-      // Handle collection creation error
-      return
-    }
-  }
+	try {
+		// Check if collection exists
+		await typesenseClient.collections(collectionSlug).retrieve()
+		// Collection already exists
+	} catch (_error) {
+		// Collection doesn't exist, create it
+		try {
+			await typesenseClient.collections().create(schema)
+			// Collection created successfully
+		} catch (_createError) {
+			// Handle collection creation error
+			return
+		}
+	}
 
-  // Sync existing documents
-  await syncExistingDocuments(payload, typesenseClient, collectionSlug, config)
+	// Sync existing documents
+	await syncExistingDocuments(payload, typesenseClient, collectionSlug, config)
 }
 
 const syncExistingDocuments = async (
-  payload: Payload,
-  typesenseClient: Typesense.Client,
-  collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined,
+	payload: Payload,
+	typesenseClient: Typesense.Client,
+	collectionSlug: string,
+	config: NonNullable<TypesenseSearchConfig["collections"]>[string] | undefined
 ) => {
-  try {
-    const { docs } = await payload.find({
-      collection: collectionSlug,
-      depth: 0,
-      limit: 1000,
-    })
+	try {
+		const { docs } = await payload.find({
+			collection: collectionSlug,
+			depth: 0,
+			limit: 1000,
+		})
 
-    if (docs.length === 0) {
-      // No documents to sync
-      return
-    }
+		if (docs.length === 0) {
+			// No documents to sync
+			return
+		}
 
-    // Batch sync documents
-    const batchSize = 100
-    for (let i = 0; i < docs.length; i += batchSize) {
-      const batch = docs.slice(i, i + batchSize)
-      const typesenseDocs = batch.map((doc) =>
-        mapPayloadDocumentToTypesense(doc, collectionSlug, config),
-      )
+		// Batch sync documents
+		const batchSize = 100
+		for (let i = 0; i < docs.length; i += batchSize) {
+			const batch = docs.slice(i, i + batchSize)
+			const typesenseDocs = batch.map((doc) =>
+				mapPayloadDocumentToTypesense(doc, collectionSlug, config)
+			)
 
-      try {
-        const _importResult = await typesenseClient
-          .collections(collectionSlug)
-          .documents()
-          .import(typesenseDocs, { action: 'upsert' })
+			try {
+				const _importResult = await typesenseClient
+					.collections(collectionSlug)
+					.documents()
+					.import(typesenseDocs, { action: "upsert" })
 
-        // Documents synced successfully
-      } catch (batchError: any) {
-        // Handle batch sync error
+				// Documents synced successfully
+			} catch (batchError: any) {
+				// Handle batch sync error
 
-        // Log detailed import results if available
-        if (batchError.importResults) {
-          // Handle import results error
+				// Log detailed import results if available
+				if (batchError.importResults) {
+					// Handle import results error
 
-          // Try to sync documents individually to identify problematic ones
-          // Attempt individual document sync
-          for (let j = 0; j < typesenseDocs.length; j++) {
-            try {
-              await typesenseClient.collections(collectionSlug).documents().upsert(typesenseDocs[j])
-              // Individual sync successful
-            } catch (_individualError: any) {
-              // Handle individual sync error
-            }
-          }
-        }
-      }
-    }
+					// Try to sync documents individually to identify problematic ones
+					// Attempt individual document sync
+					for (let j = 0; j < typesenseDocs.length; j++) {
+						try {
+							await typesenseClient
+								.collections(collectionSlug)
+								.documents()
+								.upsert(typesenseDocs[j])
+							// Individual sync successful
+						} catch (_individualError: any) {
+							// Handle individual sync error
+						}
+					}
+				}
+			}
+		}
 
-    // Successfully synced documents
-  } catch (_error) {
-    // Handle document sync error
-  }
+		// Successfully synced documents
+	} catch (_error) {
+		// Handle document sync error
+	}
 }
