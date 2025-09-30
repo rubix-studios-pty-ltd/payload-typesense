@@ -4,6 +4,7 @@ import type Typesense from 'typesense'
 import type { TypesenseSearchConfig } from '../index.js'
 import type { HealthCheckResponse } from '../lib/types.js'
 
+import pkg from '../../package.json' with { type: 'json' }
 import { searchCache } from '../lib/cache.js'
 
 /**
@@ -97,7 +98,7 @@ export const createHealthCheckHandler = (
         ...response,
         responseTime,
         timestamp: new Date().toISOString(),
-        version: '1.0.11',
+        version: pkg.version,
       })
     } catch (_error) {
       // Handle health check error
@@ -177,7 +178,7 @@ export const createDetailedHealthCheckHandler = (
           ok: isTypesenseHealthy,
           version: 'unknown',
         },
-        version: '1.0.11',
+        version: pkg.version,
       }
 
       // Add error details if unhealthy
@@ -201,7 +202,7 @@ export const createDetailedHealthCheckHandler = (
         error: _error instanceof Error ? _error.message : 'Unknown error',
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
-        version: '1.0.11',
+        version: pkg.version,
       }
 
       return Response.json(errorResponse, { status: 500 })
