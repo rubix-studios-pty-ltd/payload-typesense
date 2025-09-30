@@ -1,7 +1,3 @@
-/**
- * Theme utility functions
- */
-
 import type { Theme, ThemeClasses, ThemeConfig } from './types.js'
 
 import { defaultTheme, themes } from './themes.js'

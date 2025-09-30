@@ -6,7 +6,6 @@ import { initializeTypesenseCollections } from './lib/initialization.js'
 import { mapPayloadDocumentToTypesense } from './lib/schema-mapper.js'
 import { createTypesenseClient } from './lib/typesense-client.js'
 
-// Re-export components
 export * from './components/index.js'
 
 export type TypesenseSearchConfig = {

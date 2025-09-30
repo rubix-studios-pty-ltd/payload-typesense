@@ -1,8 +1,3 @@
-/**
- * Simple in-memory cache for search results
- * In production, consider using Redis or similar
- */
-
 import type { CacheEntry, CacheOptions } from './types.js'
 
 export class SearchCache<T = any> {

@@ -1,7 +1,3 @@
-/**
- * Type definitions for the theme system
- */
-
 export interface ThemeColors {
   // Interactive elements
   collectionBadge: string

@@ -1,8 +1,3 @@
-/**
- * Generic types for better type safety across the plugin
- */
-
-// Base document interface that all collections should extend
 export interface BaseDocument {
   _status?: 'draft' | 'published'
   createdAt: Date | string

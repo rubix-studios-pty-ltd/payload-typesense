@@ -410,7 +410,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
               >
                 {result.document?.title || result.document?.name || result.title || 'Untitled'}
               </h3>
-              {result.text_match && (
+              {typeof result.text_match === 'number' && !isNaN(result.text_match) && (
                 <span
                   style={{
                     alignItems: 'center',
@@ -769,6 +769,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                   : 'none',
               width: '100%',
             }}
+            title="Search input"
             type="text"
             value={query}
           />

@@ -1,4 +1,3 @@
-// import type { Payload } from 'payload'
 import type Typesense from 'typesense'
 
 import type { TypesenseSearchConfig } from '../index.js'

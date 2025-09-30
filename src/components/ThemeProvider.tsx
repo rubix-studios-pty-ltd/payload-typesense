@@ -1,7 +1,3 @@
-/**
- * Theme Provider for HeadlessSearchInput
- */
-
 'use client'
 
 import React, { createContext, use } from 'react'

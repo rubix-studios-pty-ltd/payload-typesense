@@ -18,7 +18,6 @@ const searchAllCollections = async (
     // Universal search logic
 
     // Check cache first
-    const _cacheKey = `universal:${query}:${options.page}:${options.per_page}`
     const cachedResult = searchCache.get(query, 'universal', options)
     if (cachedResult) {
       // Return cached result
@@ -42,7 +41,7 @@ const searchAllCollections = async (
           highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
           num_typos: 0,
           page: options.page,
-          per_page: Math.ceil(options.per_page / enabledCollections.length), // Distribute results across collections
+          per_page: Math.ceil(options.per_page / enabledCollections.length),
           q: query,
           query_by: config?.searchFields?.join(',') || 'title,content',
           snippet_threshold: 30,
@@ -202,11 +201,17 @@ const createSearchHandler = (
       }
 
       // Extract search parameters
-      const q = String(query?.q || '')
+      const q = typeof query?.q === 'string' ? query.q : ''
       const pageParam = (query)?.page
       const perPageParam = (query)?.per_page
-      const page = pageParam ? parseInt(String(pageParam), 10) : 1
-      const per_page = perPageParam ? parseInt(String(perPageParam), 10) : 10
+      const page =
+        typeof pageParam === 'string' || typeof pageParam === 'number'
+          ? parseInt(String(pageParam), 10)
+          : 1
+      const per_page =
+        typeof perPageParam === 'string' || typeof perPageParam === 'number'
+          ? parseInt(String(perPageParam), 10)
+          : 10
       const sort_by = (query)?.sort_by
 
       // Validate parsed numbers

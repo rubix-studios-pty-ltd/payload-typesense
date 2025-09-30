@@ -44,7 +44,7 @@ function SearchPage() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
-      theme="modern" // Choose from: modern, minimal, elegant, dark, colorful
+      theme="modern" // Choose from: modern, dark
       placeholder="Search everything..."
       onResultClick={(result) => {
         console.log('Selected:', result.document)
@@ -156,7 +156,7 @@ const customTheme = {
 
 ### Theme Features
 
-- **5 Pre-built Themes**: Modern, Minimal, Elegant, Dark, Colorful
+- **2 Pre-built Themes**: Modern, Dark
 - **Unlimited Customization**: Override any color, spacing, typography, or animation
 - **Performance Options**: Disable animations/shadows for better performance
 - **Responsive Design**: Automatic mobile optimization

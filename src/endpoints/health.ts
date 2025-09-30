@@ -1,7 +1,3 @@
-/**
- * Health check endpoint for monitoring plugin status
- */
-
 import type { PayloadHandler } from 'payload'
 import type Typesense from 'typesense'
 

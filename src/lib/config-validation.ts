@@ -1,7 +1,3 @@
-/**
- * Configuration validation using Zod schemas
- */
-
 import { z } from 'zod'
 
 // Typesense node configuration schema
