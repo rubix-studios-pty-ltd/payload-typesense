@@ -59,6 +59,10 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    */
   renderResultsHeader?: (found: number, searchTime: number) => React.ReactNode
   /**
+   * Custom CSS class for results container
+   */
+  resultContainerClassName?: string
+  /**
    * Custom CSS class for individual result items
    */
   resultItemClassName?: string
@@ -108,6 +112,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   renderNoResults,
   renderResult,
   renderResultsHeader,
+  resultContainerClassName = '',
   resultItemClassName = '',
   resultsClassName = '',
   resultsHeaderClassName = '',
@@ -329,150 +334,138 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
 
     return (
       <div
-        className={`${themeConfig.classes.resultItem} ${resultItemClassName}`}
-        data-result-item
-        key={result.document?.id || result.id || _index}
-        onBlur={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
-        }}
-        onClick={() => handleResultClick(result)}
-        onFocus={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundFocus
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            handleResultClick(result)
-          }
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundHover
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
-        }}
-        role="button"
-        style={{
-          backgroundColor: themeConfig.theme.colors.resultBackground,
-          borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
-          cursor: 'pointer',
-          padding: themeConfig.theme.spacing.itemPadding,
-          transition:
-            themeConfig.config.enableAnimations !== false
-              ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
-              : 'none',
-        }}
-        tabIndex={0}
+        className={`${resultContainerClassName}`}
       >
-        <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px' }}>
-          {/* Collection Icon */}
-          <div style={{ flexShrink: 0, marginTop: '4px' }}>
-            <div
-              style={{
-                alignItems: 'center',
-                backgroundColor: themeConfig.theme.colors.collectionBadge,
-                borderRadius: themeConfig.theme.spacing.inputBorderRadius,
-                color: themeConfig.theme.colors.collectionBadgeText,
-                display: 'flex',
-                fontSize: '14px',
-                fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                height: '32px',
-                justifyContent: 'center',
-                width: '32px',
-              }}
-            >
-              {result.collection?.charAt(0).toUpperCase() || '📄'}
-            </div>
-          </div>
-
-          {/* Content */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                alignItems: 'center',
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '8px',
-              }}
-            >
-              <h3
+        <div
+          className={`${themeConfig.classes.resultItem} ${resultItemClassName}`}
+          data-result-item
+          key={result.document?.id || result.id || _index}
+          onBlur={(e) => {
+            e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
+          }}
+          onClick={() => handleResultClick(result)}
+          onFocus={(e) => {
+            e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundFocus
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              handleResultClick(result)
+            }
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundHover
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
+          }}
+          role="button"
+          style={{
+            backgroundColor: themeConfig.theme.colors.resultBackground,
+            borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
+            cursor: 'pointer',
+            padding: themeConfig.theme.spacing.itemPadding,
+            transition:
+              themeConfig.config.enableAnimations !== false
+                ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
+                : 'none',
+          }}
+          tabIndex={0}
+        >
+          <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px' }}>
+            {/* Collection Icon */}
+            <div style={{ flexShrink: 0, marginTop: '4px' }}>
+              <div
                 style={{
-                  color: themeConfig.theme.colors.titleText,
-                  fontFamily: themeConfig.theme.typography.fontFamily,
-                  fontSize: themeConfig.theme.typography.fontSizeLg,
-                  fontWeight: themeConfig.theme.typography.fontWeightSemibold,
-                  lineHeight: themeConfig.theme.typography.lineHeightTight,
-                  margin: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
+                  alignItems: 'center',
+                  backgroundColor: themeConfig.theme.colors.collectionBadge,
+                  borderRadius: themeConfig.theme.spacing.inputBorderRadius,
+                  color: themeConfig.theme.colors.collectionBadgeText,
+                  display: 'flex',
+                  fontSize: '14px',
+                  fontWeight: themeConfig.theme.typography.fontWeightMedium,
+                  height: '32px',
+                  justifyContent: 'center',
+                  width: '32px',
                 }}
               >
-                {result.document?.title || result.document?.name || result.title || 'Untitled'}
-              </h3>
-              {typeof result.text_match === 'number' && !isNaN(result.text_match) && (
-                <span
-                  style={{
-                    alignItems: 'center',
-                    backgroundColor: themeConfig.theme.colors.scoreBadge,
-                    borderRadius: '4px',
-                    color: themeConfig.theme.colors.scoreBadgeText,
-                    display: 'inline-flex',
-                    fontSize: themeConfig.theme.typography.fontSizeXs,
-                    fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                    marginLeft: '8px',
-                    padding: '2px 6px',
-                  }}
-                >
-                  {relativePercentage}%
-                </span>
-              )}
+                {result.collection?.charAt(0).toUpperCase() || '📄'}
+              </div>
             </div>
 
-            {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (
+            {/* Content */}
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div
-                dangerouslySetInnerHTML={{
-                  __html:
-                    result.highlight?.title?.snippet || result.highlight?.content?.snippet || '',
-                }}
                 style={{
-                  color: themeConfig.theme.colors.descriptionText,
-                  display: '-webkit-box',
-                  fontSize: themeConfig.theme.typography.fontSizeSm,
-                  lineHeight: themeConfig.theme.typography.lineHeightNormal,
-                  marginTop: '4px',
-                  overflow: 'hidden',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
+                  alignItems: 'center',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  marginBottom: '8px',
                 }}
-              />
-            )}
-
-            <div
-              style={{
-                alignItems: 'center',
-                color: themeConfig.theme.colors.metaText,
-                display: 'flex',
-                fontSize: themeConfig.theme.typography.fontSizeXs,
-                gap: '12px',
-                marginTop: '8px',
-              }}
-            >
-              <span style={{ alignItems: 'center', display: 'inline-flex' }}>
-                <svg
-                  fill="currentColor"
-                  style={{ height: '12px', marginRight: '4px', width: '12px' }}
-                  viewBox="0 0 20 20"
+              >
+                <h3
+                  style={{
+                    color: themeConfig.theme.colors.titleText,
+                    fontFamily: themeConfig.theme.typography.fontFamily,
+                    fontSize: themeConfig.theme.typography.fontSizeLg,
+                    fontWeight: themeConfig.theme.typography.fontWeightSemibold,
+                    lineHeight: themeConfig.theme.typography.lineHeightTight,
+                    margin: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
-                  <path
-                    clipRule="evenodd"
-                    d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                    fillRule="evenodd"
-                  />
-                </svg>
-                {result.collection}
-              </span>
-              {(result.document?.updatedAt || result.updatedAt) && (
+                  {result.document?.title || result.document?.name || result.title || 'Untitled'}
+                </h3>
+                {typeof result.text_match === 'number' && !isNaN(result.text_match) && (
+                  <span
+                    style={{
+                      alignItems: 'center',
+                      backgroundColor: themeConfig.theme.colors.scoreBadge,
+                      borderRadius: '4px',
+                      color: themeConfig.theme.colors.scoreBadgeText,
+                      display: 'inline-flex',
+                      fontSize: themeConfig.theme.typography.fontSizeXs,
+                      fontWeight: themeConfig.theme.typography.fontWeightMedium,
+                      marginLeft: '8px',
+                      padding: '2px 6px',
+                    }}
+                  >
+                    {relativePercentage}%
+                  </span>
+                )}
+              </div>
+
+              {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      result.highlight?.title?.snippet || result.highlight?.content?.snippet || '',
+                  }}
+                  style={{
+                    color: themeConfig.theme.colors.descriptionText,
+                    display: '-webkit-box',
+                    fontSize: themeConfig.theme.typography.fontSizeSm,
+                    lineHeight: themeConfig.theme.typography.lineHeightNormal,
+                    marginTop: '4px',
+                    overflow: 'hidden',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 2,
+                  }}
+                />
+              )}
+
+              <div
+                style={{
+                  alignItems: 'center',
+                  color: themeConfig.theme.colors.metaText,
+                  display: 'flex',
+                  fontSize: themeConfig.theme.typography.fontSizeXs,
+                  gap: '12px',
+                  marginTop: '8px',
+                }}
+              >
                 <span style={{ alignItems: 'center', display: 'inline-flex' }}>
                   <svg
                     fill="currentColor"
@@ -481,32 +474,48 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                   >
                     <path
                       clipRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
                       fillRule="evenodd"
                     />
                   </svg>
-                  {new Date(result.document?.updatedAt || result.updatedAt).toLocaleDateString()}
+                  {result.collection}
                 </span>
-              )}
+                {(result.document?.updatedAt || result.updatedAt) && (
+                  <span style={{ alignItems: 'center', display: 'inline-flex' }}>
+                    <svg
+                      fill="currentColor"
+                      style={{ height: '12px', marginRight: '4px', width: '12px' }}
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                    {new Date(result.document?.updatedAt || result.updatedAt).toLocaleDateString()}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Arrow Icon */}
-          <div
-            style={{
-              flexShrink: 0,
-              opacity: 0,
-              transition: `opacity ${themeConfig.theme.animations.transitionNormal} ${themeConfig.theme.animations.easeInOut}`,
-            }}
-          >
-            <svg
-              fill="none"
-              stroke="currentColor"
-              style={{ color: themeConfig.theme.colors.metaText, height: '16px', width: '16px' }}
-              viewBox="0 0 24 24"
+            {/* Arrow Icon */}
+            <div
+              style={{
+                flexShrink: 0,
+                opacity: 0,
+                transition: `opacity ${themeConfig.theme.animations.transitionNormal} ${themeConfig.theme.animations.easeInOut}`,
+              }}
             >
-              <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-            </svg>
+              <svg
+                fill="none"
+                stroke="currentColor"
+                style={{ color: themeConfig.theme.colors.metaText, height: '16px', width: '16px' }}
+                viewBox="0 0 24 24"
+              >
+                <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
