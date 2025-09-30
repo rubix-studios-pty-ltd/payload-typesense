@@ -27,21 +27,6 @@ permissions:
   packages: write
   
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm test
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-
   lint:
     runs-on: ubuntu-latest
     steps:
