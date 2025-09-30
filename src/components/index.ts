@@ -3,6 +3,7 @@ export type {
   HealthCheckResponse,
   SearchResponse,
   SearchResult,
+  SearchResultProps,
   TypesenseSearchConfig,
 } from '../lib/types.js'
 export { default as HeadlessSearchInput } from './HeadlessSearchInput.js'
