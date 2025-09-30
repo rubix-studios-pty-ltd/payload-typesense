@@ -4,16 +4,19 @@ This plugin is a fork of FrontTribe's Typesense Search Plugin for Payload CMS…
 
 A production-ready search plugin that integrates Typesense with Payload CMS, offering fast, typo-tolerant search with real-time synchronization. This fork by Rubix Studios reduces bloat and introduces targeted changes for improved performance, maintainability, and flexibility.
 
+[![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
+![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
+
 ## Installation
 
 ```sh
-pnpm add @rubixstudios/typesense
+pnpm add @rubixstudios/payload-typesense
 ```
 
 ```typescript
 // payload.config.ts
 import { buildConfig } from 'payload/config'
-import { typesenseSearch } from '@rubixstudios/typesense'
+import { typesenseSearch } from '@rubixstudios/payload-typesense'
 
 export default buildConfig({
   plugins: [
@@ -37,8 +40,7 @@ export default buildConfig({
 ```
 
 ```tsx
-// 4. Use the search component
-import { HeadlessSearchInput } from '@rubixstudios/typesense'
+import { HeadlessSearchInput } from '@rubixstudios/payload-typesense'
 
 function SearchPage() {
   return (
@@ -85,11 +87,11 @@ function PostSearch() {
 ## Features
 
 - **Performance**: Sub-millisecond response times for search queries
-- **Flexible Search**: Single, multiple, or universal collection search with one component
-- **Modern Interface**: Responsive design implemented with Tailwind CSS
+- **Flexible**: Single, multiple, or universal collection search with one component
+- **Modern**: Responsive design implemented with Tailwind CSS
 - **Optimized API**: Automatically routes requests to the most efficient endpoint
-- **Real-Time Sync**: Continuous data sync with Payload CMS
-- **Built-in Caching**: In-memory cache with configurable time-to-live settings
+- **Real-Time**: Continuous data sync with Payload CMS
+- **Caching**: In-memory cache with configurable time-to-live settings
 - **Production Ready**: Robust error handling and performance optimization
 - **Responsive**: Mobile-first architecture ensuring compatibility across devices
 
@@ -104,7 +106,7 @@ function PostSearch() {
 
 ## Components
 
-- **HeadlessSearchInput** - Single component supporting all search patterns:
+- **HeadlessSearchInput**: Single component supporting all search patterns:
 - **Single Collection**: `collection="posts"` - Direct API calls for optimal performance
 - **Multiple Collections**: `collections={['posts', 'products']}` - Smart filtering with universal search
 - **Universal Search**: No collection props - Search across all collections
@@ -112,25 +114,16 @@ function PostSearch() {
 
 ## Theme System
 
-The plugin includes a powerful theme system with 5 pre-built themes and unlimited customization:
+The plugin includes a powerful theme system with 2 pre-built themes and unlimited customization:
 
 ### Pre-built Themes
 
 ```tsx
-// Modern theme (default) - Clean and professional
+// Modern theme (default)
 <HeadlessSearchInput theme="modern" />
 
-// Minimal theme - Flat design with minimal styling
-<HeadlessSearchInput theme="minimal" />
-
-// Elegant theme - Sophisticated with gradients
-<HeadlessSearchInput theme="elegant" />
-
-// Dark theme - Perfect for dark mode
+// Dark theme
 <HeadlessSearchInput theme="dark" />
-
-// Colorful theme - Vibrant and modern
-<HeadlessSearchInput theme="colorful" />
 ```
 
 ### Custom Themes
@@ -163,20 +156,22 @@ const customTheme = {
 - **CSS Variables**: Advanced styling with CSS custom properties
 - **TypeScript Support**: Full type safety for all theme configurations
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For support or inquiries:
+
+- LinkedIn: [rubixvi](https://www.linkedin.com/in/rubixvi/)
+- Website: [Rubix Studios](https://rubixstudios.com.au)
+
+## Author
+
+Rubix Studios Pty. Ltd.  
+[https://rubixstudios.com.au](https://rubixstudios.com.au)
 
 ## Acknowledgments
 
 - [FrontTribe](https://github.com/FrontTribe/typesense-search)
-- [Typesense](https://typesense.org/)
-- [Payload CMS](https://payloadcms.com/)
