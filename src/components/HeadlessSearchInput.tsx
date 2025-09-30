@@ -53,7 +53,7 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
   /**
    * Custom render function for results
    */
-  renderResult?: (result: SearchResult<T>, index: number) => React.ReactNode
+  renderResult?: (result: SearchResult<T>, index: number, handlers: { onClick: (result: SearchResult<T>) => void }) => React.ReactNode
   /**
    * Custom render function for results header
    */
@@ -828,7 +828,9 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                     className={`${resultsListClassName}`}
                   >
                     {results.hits.map((result, index) =>
-                      renderResult ? renderResult(result, index) : defaultRenderResult(result, index),
+                      renderResult
+                        ? renderResult(result, index, { onClick: handleResultClick })
+                        : defaultRenderResult(result, index),
                     )}
                   </div>
                 ) : renderNoResults ? (
