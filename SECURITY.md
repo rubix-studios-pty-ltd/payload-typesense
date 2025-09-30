@@ -8,7 +8,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of Rubix Payload seriously. If you believe you have found a security vulnerability, please report it to us following these steps:
+We take the security of PayloadCMS + Typesense Plugin seriously. If you believe you have found a security vulnerability, please report it to us following these steps:
 
 1. **DO NOT** create a public GitHub issue for the vulnerability.
 2. Contact us directly at one of the following:
@@ -22,7 +22,7 @@ Please include the following details in your report:
 - Steps to reproduce the issue
 - Potential impact of the vulnerability
 - Any possible mitigations
-- Version of Rubix Payload affected
+- Version of PayloadCMS + Typesense Plugin affected
 
 ## Response Process
 
@@ -39,7 +39,7 @@ Please include the following details in your report:
 
 ## Best Practices
 
-When using Rubix Payload in production:
+When using PayloadCMS + Typesense Plugin in production:
 
 1. Keep all dependencies up to date
 2. Use secure environment variables for sensitive data
@@ -68,4 +68,4 @@ We continuously monitor our codebase for security issues through:
 For any security-related questions, contact:
 
 Rubix Studios Pty. Ltd.  
-Website: [https://www.rubixstudios.com.au](https://www.rubixstudios.com.au)
+Website: [https://rubixstudios.com.au](https://rubixstudios.com.au)

@@ -1,4 +1,4 @@
-# Typesense Plugin for Payload CMS
+# PayloadCMS + Typesense Plugin
 
 This plugin is a fork of FrontTribe's Typesense Search Plugin for Payload CMS…
 
