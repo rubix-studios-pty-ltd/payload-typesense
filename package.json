@@ -1,13 +1,13 @@
 {
-  "name": "@rubixstudios/typesense",
-  "version": "1.0.11",
+  "name": "@rubixstudios/payload-typesense",
+  "version": "1.0.0",
   "description": "A production-ready search plugin that integrates Typesense with Payload CMS, offering fast, typo-tolerant search with real-time synchronization. This fork by Rubix Studios reduces bloat and introduces targeted changes for improved performance, maintainability, and flexibility.",
   "license": "MIT",
   "author": "Rubix Studios <hello@rubixstudios.com.au> (https://rubixstudios.com.au)",
   "homepage": "https://rubixstudios.com.au",
   "repository": {
     "type": "git",
-    "url": "https://github.com/rubix-studios-pty-ltd/payload-typesense.git",
+    "url": "git+https://github.com/rubix-studios-pty-ltd/payload-typesense.git",
     "directory": "packages/payload-typesense"
   },
   "bugs": {

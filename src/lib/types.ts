@@ -72,6 +72,11 @@ export interface SuggestResult<T = any> {
   text_match?: number
 }
 
+export type SearchResultProps<T = any> = {
+  onClick?: (result: SearchResult<T>) => void
+  result: SearchResult<T>
+}
+
 // Generic suggest response interface
 export interface SuggestResponse<T = any> {
   found: number
