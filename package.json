@@ -88,12 +88,5 @@
     "typesense": "^2.1.0",
     "zod": "^4.1.11"
   },
-  "pnpm": {
-    "overrides": {
-      "@typescript-eslint/parser": "^8.43.0",
-      "@typescript-eslint/eslint-plugin": "^8.43.0",
-      "@typescript-eslint/typescript-estree": "^8.43.0"
-    }
-  },
   "packageManager": "pnpm@10.17.1"
 }
