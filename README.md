@@ -1,11 +1,19 @@
-# Typesense Search Plugin for Payload CMS
+# Typesense Plugin for Payload CMS
 
-A powerful, production-ready search plugin that integrates Typesense with Payload CMS, providing lightning-fast, typo-tolerant search capabilities with real-time synchronization.
+This plugin is a fork of FrontTribe's Typesense Search Plugin for Payload CMS…
+
+A production-ready search plugin that integrates Typesense with Payload CMS, offering fast, typo-tolerant search with real-time synchronization. This fork by Rubix Studios reduces bloat and introduces targeted changes for improved performance, maintainability, and flexibility.
+
+## Installation
+
+```sh
+pnpm add @rubixstudios/typesense
+```
 
 ```typescript
 // payload.config.ts
 import { buildConfig } from 'payload/config'
-import { typesenseSearch } from 'typesense-search-plugin'
+import { typesenseSearch } from '@rubixstudios/typesense'
 
 export default buildConfig({
   plugins: [
@@ -30,7 +38,7 @@ export default buildConfig({
 
 ```tsx
 // 4. Use the search component
-import { HeadlessSearchInput } from 'typesense-search-plugin'
+import { HeadlessSearchInput } from '@rubixstudios/typesense'
 
 function SearchPage() {
   return (
@@ -74,18 +82,18 @@ function PostSearch() {
 }
 ```
 
-## ✨ Features
+## Features
 
-- **⚡ Lightning Fast**: Sub-millisecond search response times
-- **🔍 Flexible Search**: Single, multiple, or universal collection search with one component
-- **🎨 Modern UI**: Beautiful, responsive design with Tailwind CSS
-- **🎯 Smart API Selection**: Automatically chooses optimal endpoint for performance
-- **🔄 Real-time Sync**: Automatic synchronization with Payload CMS
-- **💾 Built-in Caching**: In-memory cache with configurable TTL
-- **🛡️ Production Ready**: Comprehensive error handling and performance optimization
-- **📱 Responsive**: Mobile-first design that works on all devices
+- **Performance**: Sub-millisecond response times for search queries
+- **Flexible Search**: Single, multiple, or universal collection search with one component
+- **Modern Interface**: Responsive design implemented with Tailwind CSS
+- **Optimized API**: Automatically routes requests to the most efficient endpoint
+- **Real-Time Sync**: Continuous data sync with Payload CMS
+- **Built-in Caching**: In-memory cache with configurable time-to-live settings
+- **Production Ready**: Robust error handling and performance optimization
+- **Responsive**: Mobile-first architecture ensuring compatibility across devices
 
-## 🔧 API Endpoints
+## API Endpoints
 
 - `GET /api/search` - Universal search across all collections
 - `GET /api/search/{collection}` - Search specific collection
@@ -94,7 +102,7 @@ function PostSearch() {
 - `GET /api/search/collections` - Collection metadata
 - `GET /api/search/health` - Health check
 
-## 🎨 Components
+## Components
 
 - **`HeadlessSearchInput`** - Single component supporting all search patterns:
   - **Single Collection**: `collection="posts"` - Direct API calls for optimal performance
@@ -102,7 +110,7 @@ function PostSearch() {
   - **Universal Search**: No collection props - Search across all collections
   - **Complete UI Control**: Customizable rendering with comprehensive theme system
 
-## 🎨 Theme System
+## Theme System
 
 The plugin includes a powerful theme system with 5 pre-built themes and unlimited customization:
 
@@ -155,32 +163,7 @@ const customTheme = {
 - **CSS Variables**: Advanced styling with CSS custom properties
 - **TypeScript Support**: Full type safety for all theme configurations
 
-## 🆕 What's New in v1.4.0
-
-### 🎨 Theme System - Major Feature Release
-
-- **🎨 Comprehensive Theme System**: 5 pre-built themes (Modern, Minimal, Elegant, Dark, Colorful)
-- **🎨 Unlimited Customization**: Override any color, spacing, typography, or animation
-- **🎨 Performance Options**: Disable animations/shadows for better performance
-- **🎨 Responsive Design**: Automatic mobile optimization with theme system
-- **🎨 CSS Variables**: Advanced styling with CSS custom properties (29 variables)
-- **🎨 TypeScript Support**: Full type safety for all theme configurations
-- **🎨 Theme Provider**: Advanced theme context management
-- **🎨 React Hooks**: useTheme, useThemeConfig, useResponsiveTheme for theme management
-- **🎨 Developer-Friendly**: All theme configurations within the plugin and components
-
-### 🚀 Enhanced Features
-
-- **🚀 Enhanced HeadlessSearchInput**: Now supports comprehensive theme system integration
-- **🎯 Smart API Selection**: Automatically chooses the most efficient endpoint
-- **📊 Relative Scoring**: Meaningful percentage display for search result relevance
-- **🔧 Simplified Architecture**: One component handles all search patterns
-- **📱 Responsive Design**: Mobile-first approach with excellent UX
-- **⚡ Performance**: Optimized with client-side filtering and efficient API calls
-- **📚 Complete Documentation**: Comprehensive theme system documentation with examples
-- **🧪 Integrated Demo**: Theme showcase and testing interface in search demo
-
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
@@ -188,11 +171,12 @@ const customTheme = {
 4. Add tests
 5. Submit a pull request
 
-## 📄 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
-- [Typesense](https://typesense.org/) for the amazing search engine
-- [Payload CMS](https://payloadcms.com/) for the flexible headless CMS
+- [FrontTribe](https://github.com/FrontTribe/typesense-search)
+- [Typesense](https://typesense.org/)
+- [Payload CMS](https://payloadcms.com/)
