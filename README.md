@@ -10,6 +10,8 @@ A production-ready search plugin that integrates Typesense with Payload CMS, off
 [![install size](https://packagephobia.com/badge?p=typesense-search-plugin)](https://packagephobia.com/result?p=typesense-search-plugin)
 **FrontTribe's Typesense Search Plugin**
 
+This fork offers the same functionality as the original plugin but with fewer bugs, improved TypeScript type safety, no Vercel errors, additional usability features, and a smaller footprint.
+
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 ![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
 
