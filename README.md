@@ -4,11 +4,11 @@ This plugin is a fork of FrontTribe's Typesense Search Plugin for Payload CMS…
 
 A production-ready search plugin that integrates Typesense with Payload CMS, offering fast, typo-tolerant search with real-time synchronization. This fork by Rubix Studios reduces bloat and introduces targeted changes for improved performance, maintainability, and flexibility.
 
-**PayloadCMS + Typesense Plugin**
 [![install size](https://packagephobia.com/badge?p=@rubixstudios/payload-typesense)](https://packagephobia.com/result?p=@rubixstudios/payload-typesense)
+**PayloadCMS + Typesense Plugin**
 
-**FrontTribe's Typesense Search Plugin**
 [![install size](https://packagephobia.com/badge?p=typesense-search-plugin)](https://packagephobia.com/result?p=typesense-search-plugin)
+**FrontTribe's Typesense Search Plugin**
 
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 ![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
