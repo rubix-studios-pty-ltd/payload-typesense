@@ -48,10 +48,10 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org/
 
+      - run: pnpm install --frozen-lockfile
+      
       - name: Build package
         run: pnpm build
-
-      - run: pnpm install --frozen-lockfile
 
       - name: Release with semantic-release
         run: pnpm release
