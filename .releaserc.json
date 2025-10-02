@@ -2,7 +2,7 @@
     "branches": [
         "main",
         {
-            "name": "dev",
+            "name": "development",
             "prerelease": true
         }
     ],
@@ -22,7 +22,8 @@
                 "assets": [
                     "CHANGELOG.md",
                     "package.json",
-                    "pnpm-lock.yaml"
+                    "pnpm-lock.yaml",
+                    "dist/**"
                 ],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
             }

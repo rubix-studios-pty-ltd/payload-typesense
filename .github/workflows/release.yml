@@ -23,7 +23,12 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+
+      - name: Clean build artifacts
+        run: pnpm clean
+
+      - name: Lint project
+        run: pnpm lint
 
   release:
     runs-on: ubuntu-latest
@@ -42,6 +47,9 @@ jobs:
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org/
+
+      - name: Build package
+        run: pnpm build
 
       - run: pnpm install --frozen-lockfile
 
