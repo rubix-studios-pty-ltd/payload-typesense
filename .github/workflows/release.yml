@@ -3,24 +3,9 @@ name: Release
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-    paths-ignore:
-      - "package.json"
-      - "pnpm-lock.yaml"
-  workflow_dispatch:
-    inputs:
-      release-type:
-        description: "Type of version bump"
-        required: true
-        default: patch
-        type: choice
-        options:
-          - patch
-          - minor
-          - major
 
 permissions:
+  id-token: write
   contents: write
   issues: write
   pull-requests: write
@@ -36,16 +21,13 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
 
   release:
     runs-on: ubuntu-latest
     needs: [lint]
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      contains(github.event.head_commit.message, 'release')
 
     steps:
       - uses: actions/checkout@v4
@@ -58,42 +40,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org/
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Determine release type
-        id: bump
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "type=${{ github.event.inputs.release-type }}" >> $GITHUB_OUTPUT
-          else
-            last_commit=$(git log -1 --pretty=%B)
-            if echo "$last_commit" | grep -iq "\[major\]"; then
-              echo "type=major" >> $GITHUB_OUTPUT
-            elif echo "$last_commit" | grep -iq "\[minor\]"; then
-              echo "type=minor" >> $GITHUB_OUTPUT
-            else
-              echo "type=patch" >> $GITHUB_OUTPUT
-            fi
-          fi
-
-      - name: NPM Release
-        run: |
-          git config user.name "Vincent Vu"
-          git config user.email "172068404+rubixvi@users.noreply.github.com"
-          pnpm release:${{ steps.bump.outputs.type }}
-          git push --follow-tags origin main
+      - name: Release with semantic-release
+        run: pnpm release
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: GitHub Release
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          gh release create "v$VERSION" \
-            --title "Release v$VERSION" \
-            --generate-notes || echo "Release already exists"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

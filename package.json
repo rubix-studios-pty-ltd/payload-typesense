@@ -7,8 +7,7 @@
   "homepage": "https://rubixstudios.com.au",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rubix-studios-pty-ltd/payload-typesense.git",
-    "directory": "packages/payload-typesense"
+    "url": "git+https://github.com/rubix-studios-pty-ltd/payload-typesense.git"
   },
   "bugs": {
     "url": "https://github.com/rubix-studios-pty-ltd/payload-typesense/issues"
@@ -54,25 +53,29 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "update": "pnpm update --latest && pnpm install && pnpm prune && pnpm dedupe",
-    "release:patch": "pnpm clean && pnpm build && pnpm version patch -m \"chore(release): %s\" && pnpm publish --access public",
-    "release:minor": "pnpm clean && pnpm build && pnpm version minor -m \"chore(release): %s\" && pnpm publish --access public",
-    "release:major": "pnpm clean && pnpm build && pnpm version major -m \"chore(release): %s\" && pnpm publish --access public"
+    "release": "semantic-release"
   },
   "devDependencies": {
     "@payloadcms/eslint-config": "3.28.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.6",
+    "@semantic-release/npm": "^12.0.2",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.5",
     "@types/react": "19.1.16",
     "eslint": "^9.36.0",
     "payload": "3.58.0",
     "rimraf": "6.0.1",
+    "semantic-release": "^24.2.9",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
     "payload": "^3.57.0"
   },
   "engines": {
-    "node": "^22.19.0 || >=20.9.0"
+    "node": ">=22 <24",
+    "pnpm": ">=10"
   },
   "publishConfig": {
     "access": "public",
