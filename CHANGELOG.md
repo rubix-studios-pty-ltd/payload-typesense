@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.8...v1.0.9) (2025-10-02)
+
+
+### Bug Fixes
+
+* move pnpm install step to before the build process in release workflow ([0fa6c88](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/0fa6c88276f4a92802d29467964d364c5b76d23a))
+* rename 'dev' branch to 'development' and update release assets ([d8df879](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/d8df8795babf261dc29b0dadde722c0a9c68975c))
+
 ## [1.0.8](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.7...v1.0.8) (2025-10-02)
 
 
