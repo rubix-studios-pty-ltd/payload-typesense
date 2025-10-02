@@ -13,7 +13,7 @@ We take the security of PayloadCMS + Typesense Plugin seriously. If you believe 
 1. **DO NOT** create a public GitHub issue for the vulnerability.
 2. Contact us directly at one of the following:
    - X: [@rubixvi](https://x.com/rubixvi)
-   - Email: [Contact Form](https://www.rubixstudios.com.au)
+   - Email: [Contact Form](https://rubixstudios.com.au/contact)
    - Facebook: [rubixvi](https://www.facebook.com/rubixvi/)
 
 Please include the following details in your report:
