@@ -1,1 +1,0 @@
-{"version":3,"file":"typesense-client.d.ts","sourceRoot":"","sources":["../../src/lib/typesense-client.ts"],"names":[],"mappings":"AAAA,OAAO,SAAS,MAAM,WAAW,CAAA;AAEjC,OAAO,KAAK,EAAE,qBAAqB,EAAE,MAAM,aAAa,CAAA;AAiDxD,eAAO,MAAM,qBAAqB,GACjC,iBAAiB,qBAAqB,CAAC,WAAW,CAAC,KACjD,SAAS,CAAC,MAoBZ,CAAA;AAED,eAAO,MAAM,uBAAuB,GACnC,GAAG,SAAS,CAAC,MAAM,KACjB,OAAO,CAAC,OAAO,CAQjB,CAAA"}
