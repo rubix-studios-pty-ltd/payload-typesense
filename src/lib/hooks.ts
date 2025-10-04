@@ -83,8 +83,6 @@ const syncDocumentToTypesense = async (
 
 		// Document synced successfully
 	} catch (error: any) {
-		// Handle document sync error
-
 		// Log the problematic document for debugging
 		if (error.message.includes("validation")) {
 			// Log problematic document details
@@ -99,8 +97,6 @@ const deleteDocumentFromTypesense = async (
 ) => {
 	try {
 		await typesenseClient.collections(collectionSlug).documents(docId).delete()
-
-		// Document deleted successfully
 	} catch (_error) {
 		// Handle document deletion error
 	}

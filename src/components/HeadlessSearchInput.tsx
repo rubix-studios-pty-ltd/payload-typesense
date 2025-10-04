@@ -71,6 +71,14 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    */
   resultsContainerClassName?: string
   /**
+   * Show date in search results
+   */
+  renderDate?: boolean
+  /**
+   * Show match percentage in search results
+   */
+  renderMatchPercentage?: boolean
+  /**
    * Show loading state
    */
   showLoading?: boolean
@@ -113,8 +121,10 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   resultItemClassName = '',
   resultsClassName = '',
   resultsContainerClassName = '',
+  renderDate = true,
   resultsHeaderClassName = '',
   resultsListClassName = '',
+  renderMatchPercentage = true,
   showLoading = true,
   showResultCount = true,
   showSearchTime = true,
@@ -370,9 +380,9 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           role="button"
           tabIndex={0}
         >
-          <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px' }}>
+          <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px', padding: '6px' }}>
             {/* Collection Icon */}
-            <div style={{ flexShrink: 0, marginTop: '4px' }}>
+            <div style={{ flexShrink: 0 }}>
               <div
                 style={{
                   alignItems: 'center',
@@ -405,7 +415,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                   style={{
                     color: themeConfig.theme.colors.titleText,
                     fontFamily: themeConfig.theme.typography.fontFamily,
-                    fontSize: themeConfig.theme.typography.fontSizeLg,
+                    fontSize: themeConfig.theme.typography.fontSizeBase,
                     fontWeight: themeConfig.theme.typography.fontWeightSemibold,
                     lineHeight: themeConfig.theme.typography.lineHeightTight,
                     margin: 0,
@@ -416,7 +426,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                 >
                   {result.document?.title || result.document?.name || result.title || 'Untitled'}
                 </h3>
-                {typeof result.text_match === 'number' && !isNaN(result.text_match) && (
+                {renderMatchPercentage && typeof result.text_match === 'number' && !isNaN(result.text_match) && (
                   <span
                     style={{
                       alignItems: 'center',
@@ -445,6 +455,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                     color: themeConfig.theme.colors.descriptionText,
                     display: '-webkit-box',
                     fontSize: themeConfig.theme.typography.fontSizeSm,
+                    fontWeight: themeConfig.theme.typography.fontWeightNormal,
                     lineHeight: themeConfig.theme.typography.lineHeightNormal,
                     marginTop: '4px',
                     overflow: 'hidden',
@@ -464,21 +475,23 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                   marginTop: '8px',
                 }}
               >
-                <span style={{ alignItems: 'center', display: 'inline-flex' }}>
-                  <svg
-                    fill="currentColor"
-                    style={{ height: '12px', marginRight: '4px', width: '12px' }}
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                      fillRule="evenodd"
-                    />
-                  </svg>
-                  {result.collection}
-                </span>
-                {(result.document?.updatedAt || result.updatedAt) && (
+                {result.collection && (
+                  <span style={{ alignItems: 'center', display: 'inline-flex' }}>
+                    <svg
+                      fill="currentColor"
+                      style={{ height: '12px', marginRight: '4px', width: '12px' }}
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                    {result.collection}
+                  </span>
+                )}
+                {renderDate && (result.document?.updatedAt || result.updatedAt) && (
                   <span style={{ alignItems: 'center', display: 'inline-flex' }}>
                     <svg
                       fill="currentColor"
@@ -495,24 +508,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                   </span>
                 )}
               </div>
-            </div>
-
-            {/* Arrow Icon */}
-            <div
-              style={{
-                flexShrink: 0,
-                opacity: 0,
-                transition: `opacity ${themeConfig.theme.animations.transitionNormal} ${themeConfig.theme.animations.easeInOut}`,
-              }}
-            >
-              <svg
-                fill="none"
-                stroke="currentColor"
-                style={{ color: themeConfig.theme.colors.metaText, height: '16px', width: '16px' }}
-                viewBox="0 0 24 24"
-              >
-                <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
-              </svg>
             </div>
           </div>
         </div>
@@ -762,6 +757,14 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
               transform: 'translateY(-50%)',
             }}
           >
+            <style>
+              {`
+                @keyframes spin {
+                  0% { transform: rotate(0deg); }
+                  100% { transform: rotate(360deg); }
+                }
+              `}
+            </style>
             <div
               data-testid="loading-spinner"
               style={{
@@ -777,7 +780,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
         )}
       </div>
 
-      {isOpen && (
+      {isOpen && results && (
         <div
           className={`${resultsContainerClassName}`}
           ref={resultsRef}
@@ -798,6 +801,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
             marginTop: '10px',
             maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
             overflow: 'hidden',
+            padding: '1px',
             position: 'absolute',
             right: '0',
             top: '100%',

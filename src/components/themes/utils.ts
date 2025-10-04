@@ -98,7 +98,8 @@ export function generateThemeClasses(
 			: "0",
 		boxShadow: enableShadows ? theme.shadows.shadowLg : "none",
 		left: "0",
-		marginTop: "4px",
+		marginBottom: "2px",
+		marginTop: "2px",
 		maxHeight: theme.spacing.resultsMaxHeight,
 		overflowY: "auto",
 		position: "absolute",
@@ -174,7 +175,7 @@ export function generateThemeClasses(
 	})
 
 	const resultsListStyles = css({
-		padding: "8px 0",
+		padding: "4px",
 	})
 
 	// Result item styles
