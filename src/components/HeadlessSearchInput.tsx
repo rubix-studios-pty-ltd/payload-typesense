@@ -26,6 +26,10 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    */
   perPage?: number
   /**
+   * Show date in search results
+   */
+  renderDate?: boolean
+  /**
    * Custom render function for error state
    */
   renderError?: (error: string) => React.ReactNode
@@ -46,6 +50,10 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    * Custom render function for loading state
    */
   renderLoading?: () => React.ReactNode
+  /**
+   * Show match percentage in search results
+   */
+  renderMatchPercentage?: boolean
   /**
    * Custom render function for no results
    */
@@ -70,14 +78,6 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    * Custom CSS class for results container
    */
   resultsContainerClassName?: string
-  /**
-   * Show date in search results
-   */
-  renderDate?: boolean
-  /**
-   * Show match percentage in search results
-   */
-  renderMatchPercentage?: boolean
   /**
    * Show loading state
    */
@@ -113,18 +113,18 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   onSearch,
   perPage = 10,
   placeholder = 'Search...',
+  renderDate = true,
   renderError,
   renderInput,
+  renderMatchPercentage = true,
   renderNoResults,
   renderResult,
   renderResultsHeader,
   resultItemClassName = '',
   resultsClassName = '',
   resultsContainerClassName = '',
-  renderDate = true,
   resultsHeaderClassName = '',
   resultsListClassName = '',
-  renderMatchPercentage = true,
   showLoading = true,
   showResultCount = true,
   showSearchTime = true,
