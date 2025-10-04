@@ -18,21 +18,16 @@ export const initializeTypesenseCollections = async (
 	// Validate configuration first
 	const validation = validateConfig(pluginOptions)
 	if (!validation.success) {
-		// Handle configuration validation error
 		throw new Error("Invalid plugin configuration")
 	}
-
-	// Configuration validated successfully
 
 	// Test Typesense connection first
 	const isConnected = await testTypesenseConnection(typesenseClient)
 	if (!isConnected) {
-		// Typesense connection failed
 		return
 	}
 
 	// Initialize Typesense collections
-
 	if (pluginOptions.collections) {
 		for (const [collectionSlug, config] of Object.entries(
 			pluginOptions.collections
@@ -51,8 +46,6 @@ export const initializeTypesenseCollections = async (
 			}
 		}
 	}
-
-	// Collections initialized successfully
 }
 
 const initializeCollection = async (
@@ -64,7 +57,6 @@ const initializeCollection = async (
 	// Get the collection config from Payload
 	const collection = payload.collections[collectionSlug]
 	if (!collection) {
-		// Collection not found in Payload
 		return
 	}
 
@@ -74,19 +66,15 @@ const initializeCollection = async (
 		collectionSlug,
 		config
 	)
-	// Create schema for collection
 
 	try {
 		// Check if collection exists
 		await typesenseClient.collections(collectionSlug).retrieve()
-		// Collection already exists
 	} catch (_error) {
 		// Collection doesn't exist, create it
 		try {
 			await typesenseClient.collections().create(schema)
-			// Collection created successfully
 		} catch (_createError) {
-			// Handle collection creation error
 			return
 		}
 	}
@@ -109,7 +97,6 @@ const syncExistingDocuments = async (
 		})
 
 		if (docs.length === 0) {
-			// No documents to sync
 			return
 		}
 
@@ -127,14 +114,10 @@ const syncExistingDocuments = async (
 					.documents()
 					.import(typesenseDocs, { action: "upsert" })
 
-				// Documents synced successfully
 			} catch (batchError: any) {
-				// Handle batch sync error
 
 				// Log detailed import results if available
 				if (batchError.importResults) {
-					// Handle import results error
-
 					// Try to sync documents individually to identify problematic ones
 					// Attempt individual document sync
 					for (let j = 0; j < typesenseDocs.length; j++) {
