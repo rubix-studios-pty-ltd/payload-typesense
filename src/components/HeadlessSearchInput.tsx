@@ -801,7 +801,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
             marginTop: '10px',
             maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
             overflow: 'hidden',
-            padding: '1px',
+            padding: '4px',
             position: 'absolute',
             right: '0',
             top: '100%',
