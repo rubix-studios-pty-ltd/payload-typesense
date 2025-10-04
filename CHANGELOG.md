@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.10...v1.0.11) (2025-10-04)
+
+
+### Bug Fixes
+
+* restore renderDate and renderMatchPercentage props in HeadlessSearchInputProps interface ([59ad62e](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/59ad62ec77e6560311b8513181a3b7fd09a60986))
+
 ## [1.0.10](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.9...v1.0.10) (2025-10-02)
 
 
