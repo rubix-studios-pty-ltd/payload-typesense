@@ -63,9 +63,9 @@
     "@semantic-release/npm": "^12.0.2",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.5",
-    "@types/react": "19.2.0",
+    "@types/react": "19.2.2",
     "eslint": "^9.37.0",
-    "payload": "3.58.0",
+    "payload": "3.59.1",
     "rimraf": "6.0.1",
     "semantic-release": "^24.2.9",
     "typescript": "5.9.3"
@@ -92,7 +92,7 @@
   },
   "dependencies": {
     "typesense": "^2.1.0",
-    "zod": "^4.1.11"
+    "zod": "^4.1.12"
   },
   "packageManager": "pnpm@10.17.1"
 }
