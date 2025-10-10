@@ -13,7 +13,6 @@ import {
 	mergeThemeConfig,
 } from "./utils.js"
 
-// Theme context
 const ThemeContext = createContext<null | ThemeContextValue>(null)
 
 /**

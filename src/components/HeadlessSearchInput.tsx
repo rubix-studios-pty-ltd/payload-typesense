@@ -141,7 +141,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
   const collectionsRef = useRef(collections)
 
-  // Theme configuration
   const themeConfig = useThemeConfig({
     theme: typeof theme === 'string' ? theme : theme.theme || 'modern',
     ...(typeof theme === 'object' ? theme : {}),
@@ -155,7 +154,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   }, [collections])
 
   // Debounced search function
-  // Use refs to avoid recreating functions on every render
   const onResultsRef = useRef(onResults)
   const onSearchRef = useRef(onSearch)
   onResultsRef.current = onResults
@@ -195,7 +193,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
 
         searchResults = await response.json()
 
-        // Filter results if specific collections were requested
         if (collectionsRef.current && collectionsRef.current.length > 0) {
           const filteredHits =
             searchResults.hits?.filter(
@@ -228,7 +225,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     [baseUrl, collection, perPage, minQueryLength],
   )
 
-  // Debounced search effect
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current)

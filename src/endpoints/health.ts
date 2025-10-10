@@ -60,7 +60,7 @@ export const createHealthCheckHandler = (
       // Test Typesense connection
       const isTypesenseHealthy = await testTypesenseConnection(typesenseClient)
       const typesenseInfo = isTypesenseHealthy
-        ? { ok: true, version: 'unknown' } // Typesense doesn't expose version in health check
+        ? { ok: true, version: 'unknown' }
         : { ok: false }
 
       // Get collection information
@@ -101,7 +101,6 @@ export const createHealthCheckHandler = (
         version: pkg.version,
       })
     } catch (_error) {
-      // Handle health check error
 
       const errorResponse: HealthCheckResponse = {
         cache: getCacheStats(),

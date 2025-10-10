@@ -52,12 +52,10 @@ export function generateThemeClasses(
 	const enableShadows = config.enableShadows !== false
 	const enableRoundedCorners = config.enableRoundedCorners !== false
 
-	// Helper function to create CSS string
 	const css = (styles: Record<string, number | object | string>) => {
 		return Object.entries(styles)
 			.map(([key, value]) => {
 				if (typeof value === "object" && value !== null) {
-					// Handle nested objects like ':hover', '::placeholder'
 					const nested = Object.entries(
 						value as Record<string, number | string>
 					)
@@ -77,7 +75,6 @@ export function generateThemeClasses(
 			.join("; ")
 	}
 
-	// Container styles
 	const containerStyles = css({
 		margin: "0 auto",
 		maxWidth: "600px",
@@ -111,7 +108,6 @@ export function generateThemeClasses(
 		}),
 	})
 
-	// Input styles
 	const inputStyles = css({
 		"::placeholder": {
 			color: theme.colors.inputPlaceholder,
@@ -144,7 +140,6 @@ export function generateThemeClasses(
 		width: "100%",
 	})
 
-	// Results styles
 	const resultsStyles = css({
 		backgroundColor: theme.colors.resultsBackground,
 		border: `1px solid ${theme.colors.resultsBorder}`,
@@ -178,7 +173,6 @@ export function generateThemeClasses(
 		padding: "4px",
 	})
 
-	// Result item styles
 	const resultItemStyles = css({
 		":focus": {
 			backgroundColor: theme.colors.resultBackgroundFocus,
@@ -203,7 +197,6 @@ export function generateThemeClasses(
 			: "none",
 	})
 
-	// Content styles
 	const resultTitleStyles = css({
 		color: theme.colors.titleText,
 		fontFamily: theme.typography.fontFamily,
@@ -249,7 +242,6 @@ export function generateThemeClasses(
 		marginTop: "8px",
 	})
 
-	// Badge styles
 	const collectionBadgeStyles = css({
 		backgroundColor: theme.colors.collectionBadge,
 		borderRadius: enableRoundedCorners ? "12px" : "0",
@@ -274,7 +266,6 @@ export function generateThemeClasses(
 		padding: "2px 6px",
 	})
 
-	// State styles
 	const loadingStyles = css({
 		alignItems: "center",
 		color: theme.colors.loadingText,
@@ -315,7 +306,6 @@ export function generateThemeClasses(
 		textAlign: "center",
 	})
 
-	// Facet styles
 	const facetContainerStyles = css({
 		backgroundColor: theme.colors.headerBackground,
 		borderBottom: `1px solid ${theme.colors.headerBorder}`,
@@ -350,7 +340,6 @@ export function generateThemeClasses(
 		color: theme.colors.facetActiveText,
 	})
 
-	// Utility styles
 	const hiddenStyles = css({
 		display: "none",
 	})

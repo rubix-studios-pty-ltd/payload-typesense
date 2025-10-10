@@ -26,8 +26,6 @@ const searchAllCollections = async (
 	}
 ) => {
 	try {
-		// Universal search logic
-
 		// Check cache first
 		const cachedResult = searchCache.get(query, "universal", options)
 		if (cachedResult) {
@@ -40,7 +38,6 @@ const searchAllCollections = async (
 		).filter(([_, config]) => config?.enabled)
 
 		// Process enabled collections
-
 		if (enabledCollections.length === 0) {
 			return Response.json(
 				{ error: "No collections enabled for search" },
@@ -65,13 +62,10 @@ const searchAllCollections = async (
 					}
 
 					// Search collection
-
 					const results = await typesenseClient
 						.collections(collectionName)
 						.documents()
 						.search(searchParameters)
-
-					// Process results
 
 					// Add collection metadata to each hit
 					return {
