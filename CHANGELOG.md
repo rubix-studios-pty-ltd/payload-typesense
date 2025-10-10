@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.1.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.11...v1.1.0) (2025-10-10)
+
+
+### Bug Fixes
+
+* increase padding in HeadlessSearchInput component for better layout ([8d6305a](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/8d6305ad301e4e8a372ef3aad58dbe998c926fca))
+* update eslint-config version references for consistency ([4fd2fe6](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/4fd2fe69031e5eff6ed1b0beadc476ed9b73d5ba))
+
+
+### Features
+
+* enhance functionality and improve performance ([5aee198](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/5aee198aa5a6163f9c99cb8ad2159150df954acc))
+
 ## [1.0.11](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.0.10...v1.0.11) (2025-10-04)
 
 
