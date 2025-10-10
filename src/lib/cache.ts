@@ -6,8 +6,8 @@ export class SearchCache<T = any> {
 	private readonly maxSize: number
 
 	constructor(options: CacheOptions = {}) {
-		this.defaultTTL = options.ttl || 5 * 60 * 1000 // 5 minutes default
-		this.maxSize = options.maxSize || 1000 // 1000 entries default
+		this.defaultTTL = options.ttl || 5 * 60 * 1000
+		this.maxSize = options.maxSize || 1000
 	}
 
 	/**
@@ -133,7 +133,7 @@ export class SearchCache<T = any> {
 // Global cache instance
 export const searchCache = new SearchCache({
 	maxSize: 1000,
-	ttl: 5 * 60 * 1000, // 5 minutes
+	ttl: 5 * 60 * 1000,
 })
 
 // Cleanup expired entries every 10 minutes
