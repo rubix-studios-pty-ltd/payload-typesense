@@ -183,3 +183,4 @@ Rubix Studios Pty. Ltd.
 ## Acknowledgments
 
 - [FrontTribe](https://github.com/FrontTribe/typesense-search)
+
