@@ -65,9 +65,9 @@
     "@swc/core": "^1.15.0",
     "@types/react": "19.2.2",
     "eslint": "^9.39.1",
-    "payload": "3.62.1",
+    "payload": "3.63.0",
     "rimraf": "6.1.0",
-    "semantic-release": "^25.0.1",
+    "semantic-release": "^25.0.2",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
