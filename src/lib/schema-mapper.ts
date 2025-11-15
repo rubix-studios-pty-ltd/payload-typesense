@@ -82,7 +82,7 @@ export const mapToTypesense = (
 
     const value = doc[field]
 
-    if (value === undefined || value === null) {
+    if (value == null) {
       typesenseDoc[field] = ''
       continue
     }
