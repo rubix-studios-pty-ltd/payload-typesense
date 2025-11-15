@@ -50,6 +50,8 @@
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
     "build:types": "tsc -p tsconfig.json",
     "clean": "rimraf -g {dist,*.tsbuildinfo}",
+    "format": "pnpx prettier --write . --log-level warn",
+    "format:check": "pnpx prettier --check .",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "update": "pnpm update --latest && pnpm install && pnpm prune && pnpm dedupe",
@@ -66,6 +68,7 @@
     "@types/react": "19.2.4",
     "eslint": "^9.39.1",
     "payload": "3.63.0",
+    "prettier": "^3.6.2",
     "rimraf": "6.1.0",
     "semantic-release": "^25.0.2",
     "typescript": "5.9.3"

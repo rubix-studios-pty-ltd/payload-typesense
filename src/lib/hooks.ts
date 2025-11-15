@@ -1,103 +1,78 @@
-import type Typesense from "typesense"
+import type Typesense from 'typesense'
 
-import type { TypesenseSearchConfig } from "../index.js"
+import { type CollectionAfterChangeHook, type CollectionAfterDeleteHook } from 'payload'
 
-import { mapPayloadDocumentToTypesense } from "./schema-mapper.js"
+import { type TypesenseSearchConfig } from '../index.js'
+import { ensureCollection } from '../utils/ensureCollection.js'
+import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
 
 export const setupHooks = (
-	typesenseClient: Typesense.Client,
-	pluginOptions: TypesenseSearchConfig,
-	existingHooks?: any
+  typesenseClient: Typesense.Client,
+  pluginOptions: TypesenseSearchConfig,
+  existingHooks: {
+    afterChange?: Record<string, CollectionAfterChangeHook[]>
+    afterDelete?: Record<string, CollectionAfterDeleteHook[]>
+  } = {}
 ) => {
-	const hooks = { ...existingHooks }
+  const hooks = { ...existingHooks }
 
-	if (pluginOptions.collections) {
-		for (const [collectionSlug, config] of Object.entries(
-			pluginOptions.collections
-		)) {
-			if (config?.enabled) {
-				// After create/update hook
-				hooks.afterChange = {
-					...hooks.afterChange,
-					[collectionSlug]: [
-						...(hooks.afterChange?.[collectionSlug] || []),
-						async ({
-							doc,
-							operation,
-							req: _req,
-						}: {
-							doc: any
-							operation: any
-							req: any
-						}) => {
-							await syncDocumentToTypesense(
-								typesenseClient,
-								collectionSlug,
-								doc,
-								operation,
-								config
-							)
-						},
-					],
-				}
+  for (const [collectionSlug, config] of Object.entries(pluginOptions.collections || {})) {
+    if (!config?.enabled) {
+      continue
+    }
 
-				// After delete hook
-				hooks.afterDelete = {
-					...hooks.afterDelete,
-					[collectionSlug]: [
-						...(hooks.afterDelete?.[collectionSlug] || []),
-						async ({ doc, req: _req }: { doc: any; req: any }) => {
-							await deleteDocumentFromTypesense(
-								typesenseClient,
-								collectionSlug,
-								doc.id
-							)
-						},
-					],
-				}
-			}
-		}
-	}
+    const changeHook: CollectionAfterChangeHook = async ({ doc, operation }) => {
+      await syncDocumentToTypesense(typesenseClient, collectionSlug, doc, operation, config)
+    }
 
-	return hooks
+    hooks.afterChange = {
+      ...hooks.afterChange,
+      [collectionSlug]: [...(hooks.afterChange?.[collectionSlug] || []), changeHook],
+    }
+
+    const deleteHook: CollectionAfterDeleteHook = async ({ doc }) => {
+      if (doc?.id) {
+        await deleteDocumentFromTypesense(typesenseClient, collectionSlug, String(doc?.id))
+      }
+    }
+
+    hooks.afterDelete = {
+      ...hooks.afterDelete,
+      [collectionSlug]: [...(hooks.afterDelete?.[collectionSlug] || []), deleteHook],
+    }
+  }
+
+  return hooks
 }
 
-const syncDocumentToTypesense = async (
-	typesenseClient: Typesense.Client,
-	collectionSlug: string,
-	doc: any,
-	operation: "create" | "update",
-	config: NonNullable<TypesenseSearchConfig["collections"]>[string] | undefined
+export const syncDocumentToTypesense = async (
+  typesenseClient: Typesense.Client,
+  collectionSlug: string,
+  doc: any,
+  _operation: 'create' | 'update',
+  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
 ) => {
-	try {
-		const typesenseDoc = mapPayloadDocumentToTypesense(
-			doc,
-			collectionSlug,
-			config
-		)
+  try {
+    const schema = mapCollectionToTypesense(collectionSlug, config)
 
-		await typesenseClient
-			.collections(collectionSlug)
-			.documents()
-			.upsert(typesenseDoc)
+    await ensureCollection(typesenseClient, collectionSlug, schema)
 
-		// Document synced successfully
-	} catch (error: any) {
-		// Log the problematic document for debugging
-		if (error.message.includes("validation")) {
-			// Log problematic document details
-		}
-	}
+    const typesenseDoc = mapToTypesense(doc, collectionSlug, config)
+
+    await typesenseClient.collections(collectionSlug).documents().upsert(typesenseDoc)
+  } catch {
+    // swallow to avoid breaking payload saves
+  }
 }
 
-const deleteDocumentFromTypesense = async (
-	typesenseClient: Typesense.Client,
-	collectionSlug: string,
-	docId: string
+export const deleteDocumentFromTypesense = async (
+  typesenseClient: Typesense.Client,
+  collectionSlug: string,
+  docId: string
 ) => {
-	try {
-		await typesenseClient.collections(collectionSlug).documents(docId).delete()
-	} catch (_error) {
-		// Handle document deletion error
-	}
+  try {
+    await typesenseClient.collections(collectionSlug).documents(docId).delete()
+  } catch {
+    // ignore delete errors
+  }
 }

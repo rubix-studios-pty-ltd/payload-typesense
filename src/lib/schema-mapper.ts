@@ -1,178 +1,119 @@
-import type { Collection } from "payload"
+import { type TypesenseSearchConfig } from '../index.js'
+import { type BaseDocument } from '../types.js'
+import { extractText } from '../utils/extractText.js'
 
-import type { TypesenseSearchConfig } from "../index.js"
+export const mapCollectionToTypesense = (
+  collectionSlug: string,
+  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+) => {
+  const searchableFields = config?.searchFields || ['title', 'content', 'description']
+  const facetFields = config?.facetFields || []
 
-// Helper function to extract text content from richText structure
-const extractTextFromRichText = (richText: any): string => {
-	if (!richText || !richText.root) {
-		return ""
-	}
+  const baseFields = [
+    { name: 'id', type: 'string' },
+    { name: 'slug', type: 'string' },
+    { name: 'createdAt', type: 'int64' },
+    { name: 'updatedAt', type: 'int64' },
+  ] as const
 
-	const extractText = (node: any): string => {
-		if (typeof node === "string") {
-			return node
-		}
+  const searchFields = searchableFields.map((field: string) => ({
+    name: field,
+    type: 'string' as const,
+    facet: facetFields.includes(field),
+  }))
 
-		if (node && typeof node === "object") {
-			if (node.text) {
-				return node.text
-			}
+  const facetOnlyFields = facetFields
+    .filter((field: string) => !searchableFields.includes(field))
+    .map((field: string) => ({
+      name: field,
+      type: 'string' as const,
+      facet: true,
+    }))
 
-			if (node.children && Array.isArray(node.children)) {
-				return node.children.map(extractText).join("")
-			}
-		}
+  const finalSchema = {
+    name: collectionSlug,
+    fields: [...baseFields, ...searchFields, ...facetOnlyFields],
+  }
 
-		return ""
-	}
-
-	return extractText(richText.root)
+  return finalSchema
 }
 
-export const mapCollectionToTypesenseSchema = (
-	collection: Collection,
-	collectionSlug: string,
-	config: NonNullable<TypesenseSearchConfig["collections"]>[string] | undefined
+export const mapToTypesense = (
+  doc: BaseDocument,
+  _collectionSlug: string,
+  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
 ) => {
-	const searchableFields = config?.searchFields || [
-		"title",
-		"content",
-		"description",
-	]
-	const facetFields = config?.facetFields || []
+  const searchableFields = config?.searchFields || ['title', 'content', 'description']
+  const facetFields = config?.facetFields || []
 
-	// Map schema for collection
+  if (!doc.id) {
+    throw new Error(`Document missing required 'id' field: ${JSON.stringify(doc)}`)
+  }
 
-	// Base fields that every collection should have
-	// Note: 'id' field is automatically created by Typesense, so we don't include it
-	const baseFields = [
-		{ name: "slug", type: "string" as const }, // Always include slug for navigation
-		{ name: "createdAt", type: "int64" as const },
-		{ name: "updatedAt", type: "int64" as const },
-	]
+  const createdAt = doc.createdAt ? new Date(doc.createdAt) : new Date()
+  const updatedAt = doc.updatedAt ? new Date(doc.updatedAt) : new Date()
 
-	// Map searchable fields
-	const searchFields = searchableFields.map((field: string) => ({
-		name: field,
-		type: "string" as const,
-		facet: facetFields.includes(field),
-	}))
+  const typesenseDoc: Record<string, number | string> = {
+    id: String(doc.id),
+    slug: String(doc.slug || ''),
+    createdAt: createdAt.getTime(),
+    updatedAt: updatedAt.getTime(),
+  }
 
-	// Process search fields
+  for (const field of searchableFields) {
+    if (field.includes('.')) {
+      const [arrayField, subField] = field.split('.', 2)
+      if (arrayField && subField && Array.isArray(doc[arrayField])) {
+        const joined = (doc[arrayField] as unknown[])
+          .map((item) =>
+            item && typeof item === 'object' && subField in item
+              ? String((item as Record<string, unknown>)[subField] ?? '')
+              : ''
+          )
+          .filter(Boolean)
+          .join(' ')
 
-	// Map facet-only fields (not in searchable fields)
-	const facetOnlyFields = facetFields
-		.filter((field: string) => !searchableFields.includes(field))
-		.map((field: string) => ({
-			name: field,
-			type: "string" as const,
-			facet: true,
-		}))
+        typesenseDoc[field] = joined
+      } else {
+        typesenseDoc[field] = ''
+      }
+      continue
+    }
 
-	const finalSchema = {
-		name: collectionSlug,
-		fields: [...baseFields, ...searchFields, ...facetOnlyFields],
-	}
+    const value = doc[field]
 
-	// Return final schema
+    if (value === undefined || value === null) {
+      typesenseDoc[field] = ''
+      continue
+    }
 
-	return finalSchema
-}
+    if (
+      (field === 'content' || field === 'description') &&
+      typeof value === 'object' &&
+      value !== null &&
+      'root' in value
+    ) {
+      typesenseDoc[field] = extractText(value as { root: unknown }) || ''
+    } else {
+      typesenseDoc[field] = String(value)
+    }
+  }
 
-export const mapPayloadDocumentToTypesense = (
-	doc: any,
-	collectionSlug: string,
-	config: NonNullable<TypesenseSearchConfig["collections"]>[string] | undefined
-) => {
-	const searchableFields = config?.searchFields || [
-		"title",
-		"content",
-		"description",
-	]
-	const facetFields = config?.facetFields || []
+  for (const field of facetFields) {
+    const value = doc[field]
+    typesenseDoc[field] = value !== undefined && value !== null ? String(value) : 'unknown'
+  }
 
-	// Validate required fields
-	if (!doc.id) {
-		throw new Error(
-			`Document missing required 'id' field: ${JSON.stringify(doc)}`
-		)
-	}
+  const hasSearchableContent = searchableFields.some((field) => {
+    const value = typesenseDoc[field]
+    return typeof value === 'string' && value.trim().length > 0
+  })
 
-	if (!doc.createdAt) {
-		// Use current time for missing createdAt
-		doc.createdAt = new Date()
-	}
+  if (!hasSearchableContent) {
+    if (!typesenseDoc.title) {
+      typesenseDoc.title = `Document ${doc.id}`
+    }
+  }
 
-	if (!doc.updatedAt) {
-		// Use current time for missing updatedAt
-		doc.updatedAt = new Date()
-	}
-
-	// Base document structure with safe date handling
-	const typesenseDoc: any = {
-		id: String(doc.id), // Ensure ID is a string
-		slug: doc.slug || "", // Always include slug for navigation
-		createdAt: new Date(doc.createdAt).getTime(),
-		updatedAt: new Date(doc.updatedAt).getTime(),
-	}
-
-	// Add searchable fields with validation
-	searchableFields.forEach((field: string) => {
-		// Handle array fields with dot notation (e.g., 'technologies.name', 'tags.tag')
-		if (field.includes(".")) {
-			const [arrayField, subField] = field.split(".", 2)
-			if (
-				arrayField &&
-				subField &&
-				Array.isArray(doc[arrayField]) &&
-				doc[arrayField].length > 0
-			) {
-				typesenseDoc[field] = doc[arrayField]
-					.map((item: any) => item?.[subField] || "")
-					.join(" ")
-			} else {
-				typesenseDoc[field] = ""
-			}
-		} else if (doc[field] !== undefined && doc[field] !== null) {
-			// Handle richText fields specially
-			if (
-				(field === "content" || field === "description") &&
-				typeof doc[field] === "object" &&
-				doc[field].root
-			) {
-				// Extract text from richText structure
-				typesenseDoc[field] = extractTextFromRichText(doc[field])
-			} else {
-				// Convert to string for other fields
-				typesenseDoc[field] = String(doc[field])
-			}
-		} else {
-			// Set empty string for missing fields
-			typesenseDoc[field] = ""
-		}
-	})
-
-	// Add facet fields with validation - ensure all facet fields are present
-	facetFields.forEach((field: string) => {
-		if (doc[field] !== undefined && doc[field] !== null) {
-			// Convert to string for facet fields
-			typesenseDoc[field] = String(doc[field])
-		} else {
-			// Add default value for missing facet fields
-			typesenseDoc[field] = "unknown"
-		}
-	})
-
-	// Validate that we have at least one searchable field
-	const hasSearchableContent = searchableFields.some(
-		(field: string) =>
-			typesenseDoc[field] && typesenseDoc[field].trim().length > 0
-	)
-
-	if (!hasSearchableContent) {
-		// Add placeholder for missing content
-		typesenseDoc.title = typesenseDoc.title || `Document ${doc.id}`
-	}
-
-	return typesenseDoc
+  return typesenseDoc
 }
