@@ -2,7 +2,7 @@ import type Typesense from 'typesense'
 
 import { type Payload } from 'payload'
 
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { type BaseDocument, type ImportError } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { testConnection } from '../utils/testConnection.js'
@@ -12,7 +12,7 @@ import { validateConfig } from './validation.js'
 export const initializeTypesenseCollections = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig
+  pluginOptions: TypesenseConfig
 ) => {
   const validation = validateConfig(pluginOptions)
   if (!validation.success) {
@@ -36,7 +36,7 @@ const initializeCollection = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   const collection = payload.collections[collectionSlug]
 
@@ -58,7 +58,7 @@ const syncExistingDocuments = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   try {
     const { docs } = await payload.find({

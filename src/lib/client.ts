@@ -1,6 +1,6 @@
 import Typesense from 'typesense'
 
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 
 let client: null | Typesense.Client = null
 
@@ -50,7 +50,7 @@ const createOfflineClient = (): Typesense.Client => {
 }
 
 export const createClient = (
-  typesenseConfig: TypesenseSearchConfig['typesense']
+  typesenseConfig: TypesenseConfig['typesense']
 ): Typesense.Client => {
   if (client) {
     return client

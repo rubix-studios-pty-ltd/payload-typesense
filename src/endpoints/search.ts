@@ -1,6 +1,6 @@
 import type Typesense from 'typesense'
 
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { createAdvancedSearch } from './handler/createAdvancedSearch.js'
 import { createCollections } from './handler/createCollections.js'
 import { createSearch } from './handler/createSearch.js'
@@ -9,7 +9,7 @@ import { createDetailedHealthCheck, createHealthCheck } from './health.js'
 
 export const createSearchEndpoints = (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig,
+  pluginOptions: TypesenseConfig,
   lastSyncTime?: number
 ) => {
   return [

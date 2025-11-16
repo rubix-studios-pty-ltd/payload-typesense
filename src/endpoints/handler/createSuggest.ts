@@ -2,11 +2,11 @@ import type Typesense from 'typesense'
 
 import { type PayloadHandler, type PayloadRequest } from 'payload'
 
-import { type TypesenseSearchConfig } from '../../index.js'
+import { type TypesenseConfig } from '../../index.js'
 
 export const createSuggest = (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig
+  pluginOptions: TypesenseConfig
 ): PayloadHandler => {
   return async (request: PayloadRequest) => {
     if (!request.url) {

@@ -1,8 +1,8 @@
 import { type PayloadHandler } from 'payload'
 
-import { type TypesenseSearchConfig } from '../../index.js'
+import { type TypesenseConfig } from '../../index.js'
 
-export const createCollections = (pluginOptions: TypesenseSearchConfig): PayloadHandler => {
+export const createCollections = (pluginOptions: TypesenseConfig): PayloadHandler => {
   return () => {
     try {
       const enabledCollections = Object.entries(pluginOptions.collections || {})

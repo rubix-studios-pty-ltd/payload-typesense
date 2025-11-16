@@ -69,48 +69,6 @@ export function validateConfig(config: unknown): ValidationResult {
   }
 }
 
-export function validateAndTransformConfig(config: unknown): ValidationResult {
-  try {
-    const validatedConfig = TypesenseSearchConfigSchema.parse(config)
-    return { data: validatedConfig, success: true }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.issues.map((issue) => {
-        const path = issue.path.length ? `${issue.path.join('.')}: ` : ''
-        return `${path}${issue.message}`
-      })
-
-      return { errors, success: false }
-    }
-
-    return { errors: ['Invalid configuration format'], success: false }
-  }
-}
-
-export function validateCollectionConfig(collectionSlug: string, config: unknown): ValidateResult {
-  try {
-    const validatedConfig = CollectionConfigSchema.parse(config)
-    return {
-      data: { [collectionSlug]: validatedConfig },
-      success: true,
-    }
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      const errors = error.issues.map((issue) => {
-        const path = issue.path.length ? `${issue.path.join('.')}: ` : ''
-        return `Collection '${collectionSlug}' - ${path}${issue.message}`
-      })
-
-      return { errors, success: false }
-    }
-
-    return {
-      errors: [`Collection '${collectionSlug}': Invalid configuration format`],
-      success: false,
-    }
-  }
-}
-
 export function getValidationErrors(errors: string[]): string {
   return errors.map((error, index) => `${index + 1}. ${error}`).join('\n')
 }

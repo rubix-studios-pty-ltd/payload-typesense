@@ -1,10 +1,10 @@
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { type BaseDocument } from '../types.js'
 import { extractText } from '../utils/extractText.js'
 
 export const mapCollectionToTypesense = (
   collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
@@ -30,18 +30,18 @@ export const mapCollectionToTypesense = (
       facet: true,
     }))
 
-  const finalSchema = {
+  const schema = {
     name: collectionSlug,
     fields: [...baseFields, ...searchFields, ...facetOnlyFields],
   }
 
-  return finalSchema
+  return schema
 }
 
 export const mapToTypesense = (
   doc: BaseDocument,
   _collectionSlug: string,
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
