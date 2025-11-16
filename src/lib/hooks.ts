@@ -2,13 +2,13 @@ import type Typesense from 'typesense'
 
 import { type CollectionAfterChangeHook, type CollectionAfterDeleteHook } from 'payload'
 
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
 
 export const setupHooks = (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig,
+  pluginOptions: TypesenseConfig,
   existingHooks: {
     afterChange?: Record<string, CollectionAfterChangeHook[]>
     afterDelete?: Record<string, CollectionAfterDeleteHook[]>
@@ -50,7 +50,7 @@ export const syncDocumentToTypesense = async (
   collectionSlug: string,
   doc: any,
   _operation: 'create' | 'update',
-  config: NonNullable<TypesenseSearchConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   try {
     const schema = mapCollectionToTypesense(collectionSlug, config)

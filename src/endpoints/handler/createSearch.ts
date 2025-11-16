@@ -2,14 +2,14 @@ import type Typesense from 'typesense'
 
 import { type PayloadHandler, type PayloadRequest } from 'payload'
 
-import { type TypesenseSearchConfig } from '../../index.js'
+import { type TypesenseConfig } from '../../index.js'
 import { searchCache } from '../../lib/cache.js'
 import { getValidationErrors, validateSearchParams } from '../../lib/validation.js'
 import { getAllCollections } from '../../utils/getAllCollections.js'
 
 export const createSearch = (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig
+  pluginOptions: TypesenseConfig
 ): PayloadHandler => {
   return async (request: PayloadRequest) => {
     try {

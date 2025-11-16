@@ -7,10 +7,7 @@ import { initializeTypesenseCollections } from './lib/initialization.js'
 
 export * from './components/index.js'
 
-export type TypesenseSearchConfig = {
-  /**
-   * Collections to index in Typesense
-   */
+export type TypesenseConfig = {
   collections?: Partial<
     Record<
       string,
@@ -27,9 +24,6 @@ export type TypesenseSearchConfig = {
 
   disabled?: boolean
 
-  /**
-   * Global plugin settings
-   */
   settings?: {
     autoSync?: boolean
     batchSize?: number
@@ -37,9 +31,6 @@ export type TypesenseSearchConfig = {
     searchEndpoint?: string
   }
 
-  /**
-   * Typesense server configuration
-   */
   typesense: {
     apiKey: string
     connectionTimeoutSeconds?: number
@@ -52,22 +43,19 @@ export type TypesenseSearchConfig = {
 }
 
 export const typesenseSearch =
-  (pluginOptions: TypesenseSearchConfig) =>
+  (pluginOptions: TypesenseConfig) =>
   (config: Config): Config => {
     if (pluginOptions.disabled) {
       return config
     }
 
-    // Initialize Typesense client
     const typesenseClient = createClient(pluginOptions.typesense)
 
-    // Add search endpoints
     config.endpoints = [
       ...(config.endpoints || []),
       ...createSearchEndpoints(typesenseClient, pluginOptions, Date.now()),
     ]
 
-    // Apply hooks to individual collections
     if (pluginOptions.settings?.autoSync !== false && pluginOptions.collections) {
       config.collections = (config.collections || []).map((collection) => {
         const collectionConfig = pluginOptions.collections?.[collection.slug]
@@ -103,7 +91,6 @@ export const typesenseSearch =
       })
     }
 
-    // Initialize collections in Typesense
     const incomingOnInit = config.onInit
     config.onInit = async (payload) => {
       if (incomingOnInit) {

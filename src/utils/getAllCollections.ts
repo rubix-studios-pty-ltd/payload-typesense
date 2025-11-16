@@ -1,11 +1,11 @@
 import type Typesense from 'typesense'
 
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { searchCache } from '../lib/cache.js'
 
 export const getAllCollections = async (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig,
+  pluginOptions: TypesenseConfig,
   query: string,
   options: {
     filters: Record<string, unknown>

@@ -3,7 +3,7 @@ import type Typesense from 'typesense'
 import { type PayloadHandler } from 'payload'
 
 import pkg from '../../package.json' with { type: 'json' }
-import { type TypesenseSearchConfig } from '../index.js'
+import { type TypesenseConfig } from '../index.js'
 import { type HealthCheckResponse } from '../types.js'
 import { buildError } from '../utils/buildError.js'
 import { getCacheStats } from '../utils/getCacheStats.js'
@@ -12,7 +12,7 @@ import { testConnection } from '../utils/testConnection.js'
 
 export const createHealthCheck = (
   typesenseClient: Typesense.Client,
-  _pluginOptions: TypesenseSearchConfig,
+  _pluginOptions: TypesenseConfig,
   lastSyncTime?: number
 ): PayloadHandler => {
   return async (): Promise<Response> => {
@@ -56,7 +56,7 @@ export const createHealthCheck = (
 
 export const createDetailedHealthCheck = (
   typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseSearchConfig,
+  pluginOptions: TypesenseConfig,
   lastSyncTime?: number
 ): PayloadHandler => {
   return async (): Promise<Response> => {

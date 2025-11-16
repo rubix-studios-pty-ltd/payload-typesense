@@ -62,12 +62,12 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/github": "^12.0.2",
-    "@semantic-release/npm": "^13.1.1",
+    "@semantic-release/npm": "^13.1.2",
     "@swc/cli": "^0.7.9",
-    "@swc/core": "^1.15.1",
-    "@types/react": "19.2.4",
+    "@swc/core": "^1.15.2",
+    "@types/react": "19.2.5",
     "eslint": "^9.39.1",
-    "payload": "3.63.0",
+    "payload": "3.64.0",
     "prettier": "^3.6.2",
     "rimraf": "6.1.0",
     "semantic-release": "^25.0.2",
@@ -97,5 +97,5 @@
     "typesense": "^2.1.0",
     "zod": "^4.1.12"
   },
-  "packageManager": "pnpm@10.21.0"
+  "packageManager": "pnpm@10.22.0"
 }
