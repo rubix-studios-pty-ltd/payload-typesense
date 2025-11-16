@@ -28,6 +28,7 @@ export default [
   {
     rules: {
       'no-restricted-exports': 'off',
+      '@typescript-eslint/unbound-method': 'off'
     },
   },
   {
