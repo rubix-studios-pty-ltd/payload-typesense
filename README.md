@@ -63,27 +63,12 @@ function SearchPage() {
   )
 }
 
-// Multi-collection search
-function MultiCollectionSearch() {
+function CollectionSearch() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
       collections={['posts', 'products']}
       placeholder="Search posts & products..."
-      onResultClick={(result) => {
-        console.log('Selected:', result.document)
-      }}
-    />
-  )
-}
-
-// Single collection search
-function PostSearch() {
-  return (
-    <HeadlessSearchInput
-      baseUrl="http://localhost:3000"
-      collection="posts"
-      placeholder="Search posts..."
       onResultClick={(result) => {
         console.log('Selected:', result.document)
       }}
@@ -183,4 +168,3 @@ Rubix Studios Pty. Ltd.
 ## Acknowledgments
 
 - [FrontTribe](https://github.com/FrontTribe/typesense-search)
-

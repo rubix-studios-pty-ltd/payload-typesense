@@ -1,105 +1,17 @@
 'use client'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-import type { BaseSearchInputProps, SearchResponse, SearchResult } from '../lib/types.js'
-import type { ThemeConfig } from './themes/types.js'
-
+import { type HeadlessSearchInputProps } from '../lib/headlessSearch.js'
+import { type SearchResult } from '../types.js'
+import { handleKeyboard } from '../utils/keyboard.js'
+import { useDebounce } from '../utils/useDebounce.js'
+import { useSearch } from '../utils/useSearch.js'
 import { useThemeConfig } from './themes/hooks.js'
-
-export interface HeadlessSearchInputProps<T = Record<string, unknown>>
-  extends BaseSearchInputProps<T> {
-  /**
-   * Collection to search in (for single collection search)
-   */
-  collection?: string
-  /**
-   * Collections to search in (for multi-collection search)
-   */
-  collections?: string[]
-  /**
-   * Enable suggestions
-   */
-  enableSuggestions?: boolean
-  /**
-   * Number of results to show per page
-   */
-  perPage?: number
-  /**
-   * Show date in search results
-   */
-  renderDate?: boolean
-  /**
-   * Custom render function for error state
-   */
-  renderError?: (error: string) => React.ReactNode
-  /**
-   * Custom input element (for complete control)
-   */
-  renderInput?: (props: {
-    className: string
-    onBlur: (e: React.FocusEvent) => void
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-    onFocus: () => void
-    onKeyDown: (e: React.KeyboardEvent) => void
-    placeholder: string
-    ref: React.RefObject<HTMLInputElement | null>
-    value: string
-  }) => React.ReactNode
-  /**
-   * Custom render function for loading state
-   */
-  renderLoading?: () => React.ReactNode
-  /**
-   * Show match percentage in search results
-   */
-  renderMatchPercentage?: boolean
-  /**
-   * Custom render function for no results
-   */
-  renderNoResults?: (query: string) => React.ReactNode
-  /**
-   * Custom render function for results
-   */
-  renderResult?: (result: SearchResult<T>, index: number, handlers: { onClick: (result: SearchResult<T>) => void }) => React.ReactNode
-  /**
-   * Custom render function for results header
-   */
-  renderResultsHeader?: (found: number, searchTime: number) => React.ReactNode
-  /**
-   * Custom CSS class for individual result items
-   */
-  resultItemClassName?: string
-  /**
-   * Custom CSS class for the results container
-   */
-  resultsClassName?: string
-  /**
-   * Custom CSS class for results container
-   */
-  resultsContainerClassName?: string
-  /**
-   * Show loading state
-   */
-  showLoading?: boolean
-  /**
-   * Show result count
-   */
-  showResultCount?: boolean
-  /**
-   * Show search time
-   */
-  showSearchTime?: boolean
-  /**
-   * Theme configuration
-   */
-  theme?: string | ThemeConfig
-}
 
 const HeadlessSearchInput = <T = Record<string, unknown>,>({
   baseUrl,
   className = '',
-  collection,
   collections,
   debounceMs = 300,
   enableSuggestions: _enableSuggestions = true,
@@ -131,150 +43,46 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   theme = 'modern',
 }: HeadlessSearchInputProps<T>): React.ReactElement => {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<null | SearchResponse<T>>(null)
-  const [isLoading, setIsLoading] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
-  const [error, setError] = useState<null | string>(null)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
-  const collectionsRef = useRef(collections)
 
   const themeConfig = useThemeConfig({
     theme: typeof theme === 'string' ? theme : theme.theme || 'modern',
     ...(typeof theme === 'object' ? theme : {}),
   })
 
-  // Note: If neither collection nor collections is provided, the component will search all collections
+  const debouncedQuery = useDebounce(query, debounceMs)
 
-  // Update collections ref when prop changes
-  useEffect(() => {
-    collectionsRef.current = collections
-  }, [collections])
-
-  // Debounced search function
-  const onResultsRef = useRef(onResults)
-  const onSearchRef = useRef(onSearch)
-  onResultsRef.current = onResults
-  onSearchRef.current = onSearch
-
-  const performSearch = useCallback(
-    async (searchQuery: string) => {
-      if (searchQuery.length < minQueryLength) {
-        setResults(null)
-        setIsLoading(false)
-        return
-      }
-
-      setIsLoading(true)
-      setError(null)
-
-      try {
-        let searchUrl: string
-        let searchResults: SearchResponse<T>
-
-        if (collection) {
-          // Single collection search
-          searchUrl = `${baseUrl}/api/search/${collection}?q=${encodeURIComponent(searchQuery)}&per_page=${perPage}`
-        } else if (collectionsRef.current && collectionsRef.current.length > 0) {
-          // Multiple collections specified - use universal search and filter client-side
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(searchQuery)}&per_page=${perPage * 2}`
-        } else {
-          // No collections specified - use universal search
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(searchQuery)}&per_page=${perPage}`
-        }
-
-        const response = await fetch(searchUrl)
-
-        if (!response.ok) {
-          throw new Error(`Search failed: ${response.status} ${response.statusText}`)
-        }
-
-        searchResults = await response.json()
-
-        if (collectionsRef.current && collectionsRef.current.length > 0) {
-          const filteredHits =
-            searchResults.hits?.filter(
-              (hit) => hit.collection && collectionsRef.current!.includes(hit.collection),
-            ) || []
-
-          const filteredCollections =
-            searchResults.collections?.filter(
-              (col) => col.collection && collectionsRef.current!.includes(col.collection),
-            ) || []
-
-          searchResults = {
-            ...searchResults,
-            collections: filteredCollections,
-            found: filteredHits.length,
-            hits: filteredHits,
-          }
-        }
-
-        setResults(searchResults)
-        onResultsRef.current?.(searchResults)
-        onSearchRef.current?.(searchQuery, searchResults)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Search failed')
-        setResults(null)
-      } finally {
-        setIsLoading(false)
-      }
-    },
-    [baseUrl, collection, perPage, minQueryLength],
-  )
+  const { error, isLoading, results, search } = useSearch<T>({
+    baseUrl,
+    collections,
+    minQueryLength,
+    onResults,
+    onSearch,
+    perPage,
+  })
 
   useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
+    if (debouncedQuery.length >= minQueryLength) {
+      void search(debouncedQuery)
     }
+  }, [debouncedQuery, minQueryLength, search])
 
-    if (query.length >= minQueryLength) {
-      debounceRef.current = setTimeout(() => {
-        void performSearch(query)
-        void onSearchRef.current?.(
-          query,
-          results || {
-            found: 0,
-            hits: [],
-            page: 1,
-            request_params: { per_page: 10, q: query },
-            search_cutoff: false,
-            search_time_ms: 0,
-          },
-        )
-      }, debounceMs)
-    } else {
-      setResults(null)
-      setIsLoading(false)
-    }
-
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, debounceMs, minQueryLength, performSearch])
-
-  // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuery(value)
     setIsOpen(value.length >= minQueryLength)
   }
 
-  // Handle input focus
   const handleInputFocus = () => {
     if (query.length >= minQueryLength) {
       setIsOpen(true)
     }
   }
 
-  // Handle input blur
   const handleInputBlur = (_e: React.FocusEvent) => {
-    // Delay hiding results to allow clicking on them
     setTimeout(() => {
       if (!resultsRef.current?.contains(document.activeElement)) {
         setIsOpen(false)
@@ -282,52 +90,19 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     }, 150)
   }
 
-  // Handle result click
   const handleResultClick = (result: SearchResult<T>) => {
     onResultClick?.(result)
     setIsOpen(false)
     setQuery('')
   }
 
-  // Handle keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || !results) {
-      return
-    }
-
-    const resultItems = resultsRef.current?.querySelectorAll('[data-result-item]')
-    if (!resultItems) {
-      return
-    }
-
-    const currentIndex = Array.from(resultItems).findIndex(
-      (item) => item === document.activeElement,
-    )
-
-    switch (e.key) {
-      case 'ArrowDown': {
-        e.preventDefault()
-        const nextIndex = currentIndex < resultItems.length - 1 ? currentIndex + 1 : 0
-          ; (resultItems[nextIndex] as HTMLElement)?.focus()
-        break
-      }
-      case 'ArrowUp': {
-        e.preventDefault()
-        const prevIndex = currentIndex > 0 ? currentIndex - 1 : resultItems.length - 1
-          ; (resultItems[prevIndex] as HTMLElement)?.focus()
-        break
-      }
-      case 'Enter':
-        e.preventDefault()
-        if (currentIndex >= 0 && resultItems[currentIndex]) {
-          ; (resultItems[currentIndex] as HTMLElement)?.click()
-        }
-        break
-      case 'Escape':
-        setIsOpen(false)
-        inputRef.current?.blur()
-        break
-    }
+    handleKeyboard(e, {
+      inputRef,
+      isOpen,
+      results,
+      resultsRef,
+    })
   }
 
   // Default render functions
@@ -422,23 +197,25 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                 >
                   {result.document?.title || result.document?.name || result.title || 'Untitled'}
                 </h3>
-                {renderMatchPercentage && typeof result.text_match === 'number' && !isNaN(result.text_match) && (
-                  <span
-                    style={{
-                      alignItems: 'center',
-                      backgroundColor: themeConfig.theme.colors.scoreBadge,
-                      borderRadius: '4px',
-                      color: themeConfig.theme.colors.scoreBadgeText,
-                      display: 'inline-flex',
-                      fontSize: themeConfig.theme.typography.fontSizeXs,
-                      fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                      marginLeft: '8px',
-                      padding: '2px 6px',
-                    }}
-                  >
-                    {relativePercentage}%
-                  </span>
-                )}
+                {renderMatchPercentage &&
+                  typeof result.text_match === 'number' &&
+                  !isNaN(result.text_match) && (
+                    <span
+                      style={{
+                        alignItems: 'center',
+                        backgroundColor: themeConfig.theme.colors.scoreBadge,
+                        borderRadius: '4px',
+                        color: themeConfig.theme.colors.scoreBadgeText,
+                        display: 'inline-flex',
+                        fontSize: themeConfig.theme.typography.fontSizeXs,
+                        fontWeight: themeConfig.theme.typography.fontWeightMedium,
+                        marginLeft: '8px',
+                        padding: '2px 6px',
+                      }}
+                    >
+                      {relativePercentage}%
+                    </span>
+                  )}
               </div>
 
               {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (
@@ -824,13 +601,11 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                     : defaultRenderResultsHeader(results.found, results.search_time_ms))}
 
                 {results.hits.length > 0 ? (
-                  <div
-                    className={`${resultsListClassName}`}
-                  >
+                  <div className={`${resultsListClassName}`}>
                     {results.hits.map((result, index) =>
                       renderResult
                         ? renderResult(result, index, { onClick: handleResultClick })
-                        : defaultRenderResult(result, index),
+                        : defaultRenderResult(result, index)
                     )}
                   </div>
                 ) : renderNoResults ? (

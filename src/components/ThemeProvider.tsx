@@ -1,10 +1,9 @@
 'use client'
 
-import { createContext, use } from 'react'
-
-import type { ThemeConfig, ThemeContextValue } from './themes/types.js'
+import React, { createContext, use } from 'react'
 
 import { useThemeConfig } from './themes/hooks.js'
+import { type ThemeConfig, type ThemeContextValue } from './themes/types.js'
 
 interface ThemeProviderProps {
   children: React.ReactNode
