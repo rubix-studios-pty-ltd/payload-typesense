@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.1...v1.1.2) (2025-11-16)
+
+
+### Bug Fixes
+
+* enforce required fields in BaseDocument interface and improve document filtering in syncExistingDocuments function ([0f78a1d](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/0f78a1da2c49791d4315515e06e063b6e7bcb156))
+* improve type checking for document ID in delete hook ([5b0b475](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/5b0b4756069fa9fea87c7369e4b25832163a2117))
+* simplify null check for document fields in mapToTypesense function ([a41783a](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/a41783a85a7cf5a8ab52f01b3c4ea05c2cd988ba))
+
 ## [1.1.1](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.0...v1.1.1) (2025-10-31)
 
 
