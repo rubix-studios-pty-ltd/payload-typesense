@@ -3,7 +3,7 @@ import type Typesense from 'typesense'
 import { type Payload } from 'payload'
 
 import { type TypesenseSearchConfig } from '../index.js'
-import { type ImportError } from '../types.js'
+import { type BaseDocument, type ImportError } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { testConnection } from '../utils/testConnection.js'
 import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
@@ -72,9 +72,23 @@ const syncExistingDocuments = async (
     }
 
     const batchSize = 100
+
     for (let i = 0; i < docs.length; i += batchSize) {
       const batch = docs.slice(i, i + batchSize)
-      const mapped = batch.map((doc) => mapToTypesense(doc, collectionSlug, config))
+      const mapped = batch
+        .filter((doc): doc is BaseDocument => {
+          if (typeof doc !== 'object' || doc === null) {
+            return false
+          }
+
+          if (!('id' in doc)) {
+            return false
+          }
+
+          const id = (doc as Record<string, unknown>).id
+          return typeof id === 'string'
+        })
+        .map((doc) => mapToTypesense(doc, collectionSlug, config))
 
       try {
         await typesenseClient

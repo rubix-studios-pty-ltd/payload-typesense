@@ -1,10 +1,10 @@
 export interface BaseDocument {
   [key: string]: unknown
   _status?: 'draft' | 'published'
-  createdAt?: Date | string
-  id?: number | string
+  createdAt: Date | string
+  id: number | string
   slug?: string
-  updatedAt?: Date | string
+  updatedAt: Date | string
 }
 
 export interface RichTextNode {
