@@ -31,7 +31,7 @@ export const setupHooks = (
     }
 
     const deleteHook: CollectionAfterDeleteHook = async ({ doc }) => {
-      if (doc?.id) {
+      if (typeof doc?.id === 'string' || typeof doc?.id === 'number') {
         await deleteDocumentFromTypesense(typesenseClient, collectionSlug, String(doc?.id))
       }
     }
