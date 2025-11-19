@@ -65,7 +65,7 @@
     "@semantic-release/npm": "^13.1.2",
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.2",
-    "@types/react": "19.2.5",
+    "@types/react": "19.2.6",
     "eslint": "^9.39.1",
     "payload": "3.64.0",
     "prettier": "^3.6.2",
