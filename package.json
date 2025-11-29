@@ -64,12 +64,12 @@
     "@semantic-release/github": "^12.0.2",
     "@semantic-release/npm": "^13.1.2",
     "@swc/cli": "^0.7.9",
-    "@swc/core": "^1.15.2",
-    "@types/react": "19.2.5",
+    "@swc/core": "^1.15.3",
+    "@types/react": "19.2.7",
     "eslint": "^9.39.1",
-    "payload": "3.64.0",
-    "prettier": "^3.6.2",
-    "rimraf": "6.1.0",
+    "payload": "3.65.0",
+    "prettier": "^3.7.2",
+    "rimraf": "6.1.2",
     "semantic-release": "^25.0.2",
     "typescript": "5.9.3"
   },
@@ -95,7 +95,7 @@
   },
   "dependencies": {
     "typesense": "^2.1.0",
-    "zod": "^4.1.12"
+    "zod": "^4.1.13"
   },
-  "packageManager": "pnpm@10.22.0"
+  "packageManager": "pnpm@10.24.0"
 }
