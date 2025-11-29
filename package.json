@@ -84,6 +84,7 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/",
     "main": "./dist/index.js",
+    "provenance": true,
     "types": "./dist/index.d.ts",
     "exports": {
       ".": {
