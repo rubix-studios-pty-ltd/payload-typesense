@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.3...v1.1.4) (2025-11-29)
+
+
+### Bug Fixes
+
+* update @types/react and related dependencies to latest versions ([ab5be3d](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ab5be3d559115554f96b0f898a85b12d95d04220))
+* update packageManager version to pnpm@10.24.0 ([ce8bab3](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ce8bab3f2be76db2330ab1086f8e1df7318322aa))
+* update payload and prettier to latest versions ([8fe0805](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/8fe08052389506ec15ef3718725909cfc0fc2f6f))
+* update release workflow and configuration for npm provenance ([f80ad51](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/f80ad51d9a921ac2241ecf705df89e5fee70f4e2))
+
 ## [1.1.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.2...v1.1.3) (2025-11-16)
 
 
