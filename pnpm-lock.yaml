@@ -16,7 +16,7 @@ importers:
         version: 4.1.13
     devDependencies:
       '@payloadcms/eslint-config':
-        specifier: 3.28.0
+        specifier: ^3.28.0
         version: 3.28.0(@testing-library/dom@10.4.1)(@typescript-eslint/eslint-plugin@8.45.0(@typescript-eslint/parser@8.26.1(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.3))(eslint@9.39.1(jiti@1.21.7))(typescript@5.9.3))(jiti@1.21.7)(ts-api-utils@2.1.0(typescript@5.9.3))
       '@swc/cli':
         specifier: ^0.7.9
@@ -31,19 +31,19 @@ importers:
         specifier: ^9.39.1
         version: 9.39.1(jiti@1.21.7)
       payload:
-        specifier: 3.65.0
+        specifier: ^3.65.0
         version: 3.65.0(graphql@16.11.0)(typescript@5.9.3)
       prettier:
         specifier: ^3.7.2
         version: 3.7.2
       rimraf:
-        specifier: 6.1.2
+        specifier: ^6.1.2
         version: 6.1.2
       semantic-release:
         specifier: ^25.0.2
         version: 25.0.2(typescript@5.9.3)
       typescript:
-        specifier: 5.9.3
+        specifier: ^5.9.3
         version: 5.9.3
 
 packages:

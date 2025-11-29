@@ -58,16 +58,16 @@
     "release": "semantic-release"
   },
   "devDependencies": {
-    "@payloadcms/eslint-config": "3.28.0",
+    "@payloadcms/eslint-config": "^3.28.0",
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.3",
     "@types/react": "19.2.7",
     "eslint": "^9.39.1",
-    "payload": "3.65.0",
+    "payload": "^3.65.0",
     "prettier": "^3.7.2",
-    "rimraf": "6.1.2",
+    "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
-    "typescript": "5.9.3"
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "payload": "^3.57.0"
