@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.5...v1.1.6) (2025-11-29)
+
+
+### Bug Fixes
+
+* add npm upgrade step for OIDC compatibility in release workflow ([9e0cb5e](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9e0cb5e30728ed2ef21a56a14617e396b2ed4b8c))
+
 ## [1.1.5](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.4...v1.1.5) (2025-11-29)
 
 
