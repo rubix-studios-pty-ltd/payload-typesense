@@ -49,9 +49,7 @@ const createOfflineClient = (): Typesense.Client => {
   } as unknown as Typesense.Client
 }
 
-export const createClient = (
-  typesenseConfig: TypesenseConfig['typesense']
-): Typesense.Client => {
+export const createClient = (typesenseConfig: TypesenseConfig['typesense']): Typesense.Client => {
   if (client) {
     return client
   }
