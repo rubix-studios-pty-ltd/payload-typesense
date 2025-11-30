@@ -90,7 +90,7 @@ function CollectionSearch() {
 - **Responsive**: Mobile-first architecture ensuring compatibility across devices
 - **Tree Shakable**: Modular structure for lightweight builds
 
-## API Endpoints
+## Endpoints
 
 - `GET /api/search` - Universal search across all collections
 - `GET /api/search/{collection}` - Search specific collection
@@ -106,11 +106,11 @@ function CollectionSearch() {
 - **Universal Search**: No collection props - Search across all collections
 - **Complete UI Control**: Customizable rendering with comprehensive theme system
 
-## Theme System
+## Themes
 
 The plugin includes a powerful theme system with 2 pre-built themes and unlimited customization:
 
-### Pre-built Themes
+### Pre-built
 
 ```tsx
 // Modern theme (default)
@@ -120,7 +120,7 @@ The plugin includes a powerful theme system with 2 pre-built themes and unlimite
 <HeadlessSearchInput theme="dark" />
 ```
 
-### Custom Themes
+### Custom
 
 ```tsx
 const customTheme = {
@@ -141,7 +141,7 @@ const customTheme = {
 <HeadlessSearchInput theme={customTheme} />
 ```
 
-### Themes
+### Theme Features
 
 - **2 Pre-built Themes**: Modern, Dark
 - **Unlimited Customization**: Override any color, spacing, typography, or animation
@@ -150,14 +150,14 @@ const customTheme = {
 - **CSS Variables**: Advanced styling with CSS custom properties
 - **TypeScript Support**: Full type safety for all theme configurations
 
-### Production
+## Production
 
 - **Race Condition Protection**: `ensureCollection` prevents startup crashes
 - **Type Safety**: Proper Payload CMS types prevent runtime errors
 - **Document Validation**: Filters malformed data before sync
 - **Graceful Degradation**: Silent failures don't break Payload operations
 
-### Developer
+## Developer
 
 - **Smaller Components**: Easier to understand and maintain
 - **Maintainable**: Single Responsibility Principle enforced
