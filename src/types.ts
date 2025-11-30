@@ -117,6 +117,7 @@ export type TypesenseConfig = {
         icon?: string
         searchFields?: string[]
         sortFields?: string[]
+        syncLimit?: number
       }
     >
   >
