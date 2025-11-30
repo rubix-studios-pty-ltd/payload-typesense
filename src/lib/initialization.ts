@@ -60,54 +60,73 @@ const syncExistingDocuments = async (
   config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   try {
-    const { docs } = await payload.find({
-      collection: collectionSlug,
-      depth: 0,
-      limit: 1000,
-    })
+    const limit = config?.syncLimit ?? 1000
+    let page = 1
+    let hasMore = true
+    let totalPages: number | undefined
 
-    if (!docs.length) {
-      return
-    }
+    while (hasMore) {
+      const {
+        docs,
+        hasNextPage,
+        totalPages: pages,
+      } = await payload.find({
+        collection: collectionSlug,
+        depth: 0,
+        limit,
+        page,
+      })
 
-    const batchSize = 100
+      if (pages) {
+        totalPages = pages
+      }
 
-    for (let i = 0; i < docs.length; i += batchSize) {
-      const batch = docs.slice(i, i + batchSize)
-      const mapped = batch
-        .filter((doc): doc is BaseDocument => {
-          if (typeof doc !== 'object' || doc === null) {
-            return false
-          }
+      if (!docs.length) {
+        break
+      }
 
-          if (!('id' in doc)) {
-            return false
-          }
+      const batchSize = 100
 
-          const id = (doc as Record<string, unknown>).id
-          return typeof id === 'string'
-        })
-        .map((doc) => mapToTypesense(doc, collectionSlug, config))
+      for (let i = 0; i < docs.length; i += batchSize) {
+        const batch = docs.slice(i, i + batchSize)
+        const mapped = batch
+          .filter((doc): doc is BaseDocument => {
+            if (typeof doc !== 'object' || doc === null) {
+              return false
+            }
 
-      try {
-        await typesenseClient
-          .collections(collectionSlug)
-          .documents()
-          .import(mapped, { action: 'upsert' })
-      } catch (error: unknown) {
-        const err = error as ImportError
-        if (err?.importResults) {
-          for (const doc of mapped) {
-            try {
-              await typesenseClient.collections(collectionSlug).documents().upsert(doc)
-            } catch {
-              // ignore individual errors
+            if (!('id' in doc)) {
+              return false
+            }
+
+            const id = (doc as Record<string, unknown>).id
+            return typeof id === 'string'
+          })
+          .map((doc) => mapToTypesense(doc, collectionSlug, config))
+
+        try {
+          await typesenseClient
+            .collections(collectionSlug)
+            .documents()
+            .import(mapped, { action: 'upsert' })
+        } catch (error: unknown) {
+          const err = error as ImportError
+          if (err?.importResults) {
+            for (const doc of mapped) {
+              try {
+                await typesenseClient.collections(collectionSlug).documents().upsert(doc)
+              } catch {
+                // ignore individual item errors
+              }
             }
           }
         }
       }
+
+      hasMore = hasNextPage ?? (totalPages ? page < totalPages : false)
+      page++
     }
   } catch {
-    // ignore main sync errors
+    // ignore top-level sync errors
   }
 }
