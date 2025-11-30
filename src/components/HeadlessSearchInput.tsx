@@ -28,7 +28,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   renderDate = true,
   renderError,
   renderInput,
-  renderMatchPercentage = true,
   renderNoResults,
   renderResult,
   renderResultsHeader,
@@ -105,12 +104,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     })
   }
 
-  // Default render functions
   const defaultRenderResult = (result: SearchResult, _index: number) => {
-    // Calculate relative percentage based on the highest score in current results
-    const maxScore = results?.hits?.reduce((max, hit) => Math.max(max, hit.text_match || 0), 0) || 1
-    const relativePercentage = Math.round(((result.text_match || 0) / maxScore) * 100)
-
     return (
       <div
         className={`${resultsContainerClassName}`}
@@ -152,7 +146,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           tabIndex={0}
         >
           <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px', padding: '6px' }}>
-            {/* Collection Icon */}
             <div style={{ flexShrink: 0 }}>
               <div
                 style={{
@@ -197,25 +190,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                 >
                   {result.document?.title || result.document?.name || result.title || 'Untitled'}
                 </h3>
-                {renderMatchPercentage &&
-                  typeof result.text_match === 'number' &&
-                  !isNaN(result.text_match) && (
-                    <span
-                      style={{
-                        alignItems: 'center',
-                        backgroundColor: themeConfig.theme.colors.scoreBadge,
-                        borderRadius: '4px',
-                        color: themeConfig.theme.colors.scoreBadgeText,
-                        display: 'inline-flex',
-                        fontSize: themeConfig.theme.typography.fontSizeXs,
-                        fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                        marginLeft: '8px',
-                        padding: '2px 6px',
-                      }}
-                    >
-                      {relativePercentage}%
-                    </span>
-                  )}
               </div>
 
               {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (

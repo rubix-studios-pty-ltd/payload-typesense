@@ -1,17 +1,10 @@
-import type { Theme, ThemeClasses, ThemeConfig } from './types.js'
-
 import { defaultTheme, themes } from './themes.js'
+import { type Theme, type ThemeClasses, type ThemeConfig } from './types.js'
 
-/**
- * Get a theme by name or return the default theme
- */
 export function getTheme(themeName: string): Theme {
   return themes[themeName] || defaultTheme
 }
 
-/**
- * Merge theme configurations with custom overrides
- */
 export function mergeThemeConfig(config: ThemeConfig): Theme {
   const baseTheme = typeof config.theme === 'string' ? getTheme(config.theme) : config.theme
 
@@ -40,9 +33,26 @@ export function mergeThemeConfig(config: ThemeConfig): Theme {
   }
 }
 
-/**
- * Generate CSS classes from theme configuration
- */
+export function css(
+  styles: Record<string, number | Record<string, number | string> | string>
+): string {
+  const toKebab = (key: string) => key.replace(/([A-Z])/g, '-$1').toLowerCase()
+
+  const serialize = (obj: Record<string, number | string>) =>
+    Object.entries(obj)
+      .map(([prop, val]) => `${toKebab(prop)}: ${val}`)
+      .join('; ')
+
+  return Object.entries(styles)
+    .map(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        return `${toKebab(key)} { ${serialize(value)} }`
+      }
+      return `${toKebab(key)}: ${value}`
+    })
+    .join('; ')
+}
+
 export function generateThemeClasses(
   theme: Theme,
   config: Partial<ThemeConfig> = {}
@@ -50,23 +60,6 @@ export function generateThemeClasses(
   const enableAnimations = config.enableAnimations !== false
   const enableShadows = config.enableShadows !== false
   const enableRoundedCorners = config.enableRoundedCorners !== false
-
-  const css = (styles: Record<string, number | object | string>) => {
-    return Object.entries(styles)
-      .map(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
-          const nested = Object.entries(value as Record<string, number | string>)
-            .map(
-              ([nestedKey, nestedValue]) =>
-                `${nestedKey.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${nestedValue}`
-            )
-            .join('; ')
-          return `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: { ${nested} }`
-        }
-        return `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}: ${value}`
-      })
-      .join('; ')
-  }
 
   const containerStyles = css({
     margin: '0 auto',

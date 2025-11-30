@@ -3,8 +3,7 @@ import type Typesense from 'typesense'
 import { type PayloadHandler } from 'payload'
 
 import pkg from '../../package.json' with { type: 'json' }
-import { type TypesenseConfig } from '../index.js'
-import { type HealthCheckResponse } from '../types.js'
+import { type HealthCheckResponse, type TypesenseConfig } from '../types.js'
 import { buildError } from '../utils/buildError.js'
 import { getCacheStats } from '../utils/getCacheStats.js'
 import { getCollectionInfo } from '../utils/getCollectionInfo.js'

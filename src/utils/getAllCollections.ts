@@ -1,7 +1,7 @@
 import type Typesense from 'typesense'
 
-import { type TypesenseConfig } from '../index.js'
 import { searchCache } from '../lib/cache.js'
+import { type TypesenseConfig } from '../types.js'
 
 export const getAllCollections = async (
   typesenseClient: Typesense.Client,

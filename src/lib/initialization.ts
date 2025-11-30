@@ -2,14 +2,13 @@ import type Typesense from 'typesense'
 
 import { type Payload } from 'payload'
 
-import { type TypesenseConfig } from '../index.js'
-import { type BaseDocument, type ImportError } from '../types.js'
+import { type BaseDocument, type ImportError, type TypesenseConfig } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { testConnection } from '../utils/testConnection.js'
 import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
 import { validateConfig } from './validation.js'
 
-export const initializeTypesenseCollections = async (
+export const initializeTypesense = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
   pluginOptions: TypesenseConfig

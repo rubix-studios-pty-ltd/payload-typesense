@@ -1,6 +1,6 @@
 import Typesense from 'typesense'
 
-import { type TypesenseConfig } from '../index.js'
+import { type TypesenseConfig } from '../types.js'
 
 let client: null | Typesense.Client = null
 
