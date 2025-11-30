@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.2.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.8...v1.2.0) (2025-11-30)
+
+
+### Features
+
+* **sync:** implement pagination and configurable sync limit for document synchronization ([ccfe345](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ccfe345392e4bd67b66c66a4562988118b53aded))
+
 ## [1.1.8](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.7...v1.1.8) (2025-11-30)
 
 
