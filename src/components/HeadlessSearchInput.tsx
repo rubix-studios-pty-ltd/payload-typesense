@@ -9,37 +9,41 @@ import { useDebounce } from '../utils/useDebounce.js'
 import { useSearch } from '../utils/useSearch.js'
 import { useThemeConfig } from './themes/hooks.js'
 
-const HeadlessSearchInput = <T = Record<string, unknown>,>({
-  baseUrl,
-  className = '',
-  collections,
-  debounceMs = 300,
-  enableSuggestions: _enableSuggestions = true,
-  errorClassName = '',
-  inputClassName = '',
-  inputWrapperClassName = '',
-  minQueryLength = 2,
-  noResultsClassName = '',
-  onResultClick,
-  onResults,
-  onSearch,
-  perPage = 10,
-  placeholder = 'Search...',
-  renderDate = true,
-  renderError,
-  renderInput,
-  renderNoResults,
-  renderResult,
-  renderResultsHeader,
-  resultItemClassName = '',
-  resultsClassName = '',
-  resultsContainerClassName = '',
-  resultsHeaderClassName = '',
-  resultsListClassName = '',
-  showLoading = true,
-  showResultCount = true,
-  theme = 'modern',
-}: HeadlessSearchInputProps<T>): React.ReactElement => {
+export function HeadlessSearchInput<T = Record<string, unknown>>(
+  props: HeadlessSearchInputProps<T>
+): React.ReactElement {
+  const {
+    baseUrl,
+    className = '',
+    collections,
+    debounceMs = 300,
+    enableSuggestions: _enableSuggestions = true,
+    errorClassName = '',
+    inputClassName = '',
+    inputWrapperClassName = '',
+    minQueryLength = 2,
+    noResultsClassName = '',
+    onResultClick,
+    onResults,
+    onSearch,
+    perPage = 10,
+    placeholder = 'Search...',
+    renderDate = true,
+    renderError,
+    renderInput,
+    renderNoResults,
+    renderResult,
+    renderResultsHeader,
+    resultItemClassName = '',
+    resultsClassName = '',
+    resultsContainerClassName = '',
+    resultsHeaderClassName = '',
+    resultsListClassName = '',
+    showLoading = true,
+    showResultCount = true,
+    theme = 'modern',
+  } = props
+
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
 
@@ -583,4 +587,3 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
 }
 
 export default HeadlessSearchInput
-export { HeadlessSearchInput }
