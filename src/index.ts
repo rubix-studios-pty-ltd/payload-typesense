@@ -7,6 +7,7 @@ import { initializeTypesense } from './lib/initialization.js'
 import { type TypesenseConfig } from './types.js'
 
 export * from './components/index.js'
+export type { TypesenseConfig } from './types.js'
 
 export const typesenseSearch =
   (pluginOptions: TypesenseConfig) =>
