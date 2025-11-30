@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.8](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.7...v1.1.8) (2025-11-30)
+
+
+### Bug Fixes
+
+* **search:** trigger release with cleaned HeadlessSearchInput structure ([3cdd668](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/3cdd6686103d9fd262ca25267e2dfc9911cd1238))
+
 ## [1.1.7](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.6...v1.1.7) (2025-11-29)
 
 
