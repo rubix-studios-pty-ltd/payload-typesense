@@ -2,7 +2,7 @@ import type Typesense from 'typesense'
 
 import { type PayloadHandler, type PayloadRequest } from 'payload'
 
-import { type TypesenseConfig } from '../../index.js'
+import { type TypesenseConfig } from '../../types.js'
 
 export const createSuggest = (
   typesenseClient: Typesense.Client,

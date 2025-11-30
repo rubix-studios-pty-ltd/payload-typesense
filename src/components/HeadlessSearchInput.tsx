@@ -28,7 +28,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   renderDate = true,
   renderError,
   renderInput,
-  renderMatchPercentage = true,
   renderNoResults,
   renderResult,
   renderResultsHeader,
@@ -39,7 +38,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   resultsListClassName = '',
   showLoading = true,
   showResultCount = true,
-  showSearchTime = true,
   theme = 'modern',
 }: HeadlessSearchInputProps<T>): React.ReactElement => {
   const [query, setQuery] = useState('')
@@ -105,12 +103,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     })
   }
 
-  // Default render functions
   const defaultRenderResult = (result: SearchResult, _index: number) => {
-    // Calculate relative percentage based on the highest score in current results
-    const maxScore = results?.hits?.reduce((max, hit) => Math.max(max, hit.text_match || 0), 0) || 1
-    const relativePercentage = Math.round(((result.text_match || 0) / maxScore) * 100)
-
     return (
       <div
         className={`${resultsContainerClassName}`}
@@ -152,7 +145,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           tabIndex={0}
         >
           <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px', padding: '6px' }}>
-            {/* Collection Icon */}
             <div style={{ flexShrink: 0 }}>
               <div
                 style={{
@@ -197,25 +189,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
                 >
                   {result.document?.title || result.document?.name || result.title || 'Untitled'}
                 </h3>
-                {renderMatchPercentage &&
-                  typeof result.text_match === 'number' &&
-                  !isNaN(result.text_match) && (
-                    <span
-                      style={{
-                        alignItems: 'center',
-                        backgroundColor: themeConfig.theme.colors.scoreBadge,
-                        borderRadius: '4px',
-                        color: themeConfig.theme.colors.scoreBadgeText,
-                        display: 'inline-flex',
-                        fontSize: themeConfig.theme.typography.fontSizeXs,
-                        fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                        marginLeft: '8px',
-                        padding: '2px 6px',
-                      }}
-                    >
-                      {relativePercentage}%
-                    </span>
-                  )}
               </div>
 
               {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (
@@ -391,7 +364,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     </div>
   )
 
-  const defaultRenderResultsHeader = (found: number, searchTime: number) => (
+  const defaultRenderResultsHeader = (found: number) => (
     <div
       className={`${resultsHeaderClassName}`}
       style={{
@@ -429,19 +402,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           {found} result{found !== 1 ? 's' : ''} found
         </span>
       </div>
-      {showSearchTime && (
-        <span
-          style={{
-            backgroundColor: themeConfig.theme.colors.inputBorder,
-            borderRadius: '12px',
-            color: themeConfig.theme.colors.metaText,
-            fontSize: themeConfig.theme.typography.fontSizeXs,
-            padding: '4px 8px',
-          }}
-        >
-          {searchTime}ms
-        </span>
-      )}
     </div>
   )
 
@@ -597,8 +557,8 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
               <>
                 {showResultCount &&
                   (renderResultsHeader
-                    ? renderResultsHeader(results.found, results.search_time_ms)
-                    : defaultRenderResultsHeader(results.found, results.search_time_ms))}
+                    ? renderResultsHeader(results.found)
+                    : defaultRenderResultsHeader(results.found))}
 
                 {results.hits.length > 0 ? (
                   <div className={`${resultsListClassName}`}>

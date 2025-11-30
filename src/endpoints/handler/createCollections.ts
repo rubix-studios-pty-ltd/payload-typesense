@@ -1,6 +1,6 @@
 import { type PayloadHandler } from 'payload'
 
-import { type TypesenseConfig } from '../../index.js'
+import { type TypesenseConfig } from '../../types.js'
 
 export const createCollections = (pluginOptions: TypesenseConfig): PayloadHandler => {
   return () => {

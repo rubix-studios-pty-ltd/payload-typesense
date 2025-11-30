@@ -2,7 +2,7 @@ import type Typesense from 'typesense'
 
 import { type CollectionAfterChangeHook, type CollectionAfterDeleteHook } from 'payload'
 
-import { type TypesenseConfig } from '../index.js'
+import { type TypesenseConfig } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
 

@@ -1,6 +1,6 @@
 import type Typesense from 'typesense'
 
-import { type TypesenseConfig } from '../index.js'
+import { type TypesenseConfig } from '../types.js'
 import { createAdvancedSearch } from './handler/createAdvancedSearch.js'
 import { createCollections } from './handler/createCollections.js'
 import { createSearch } from './handler/createSearch.js'

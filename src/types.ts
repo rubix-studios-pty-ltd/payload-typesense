@@ -18,7 +18,6 @@ export interface RichText {
   root?: RichTextNode
 }
 
-// Generic search result interface
 export interface SearchResult<T = any> {
   collection?: string
   content?: string
@@ -47,12 +46,10 @@ export interface SearchResult<T = any> {
     score: string
     tokens_matched: number
   }
-  // Additional fields for display
   title?: string
   updatedAt?: string
 }
 
-// Generic search response interface
 export interface SearchResponse<T = any> {
   collections?: Array<{
     collection: string
@@ -74,7 +71,6 @@ export interface SearchResponse<T = any> {
   search_time_ms: number
 }
 
-// Generic suggest result interface
 export interface SuggestResult<T = any> {
   collection?: string
   displayName?: string
@@ -89,7 +85,6 @@ export type SearchResultProps<T = any> = {
   result: SearchResult<T>
 }
 
-// Generic suggest response interface
 export interface SuggestResponse<T = any> {
   found: number
   hits: SuggestResult<T>[]
@@ -102,18 +97,50 @@ export interface SuggestResponse<T = any> {
   search_time_ms: number
 }
 
-// Generic collection configuration
 export interface CollectionConfig<T = any> {
   displayName?: string
   enabled?: boolean
   facetFields?: Array<keyof T | string>
-  // Custom field mapping for complex nested structures
   fieldMapping?: Record<string, string>
   icon?: string
   searchFields?: Array<keyof T | string>
 }
 
-// Generic plugin configuration
+export type TypesenseConfig = {
+  collections?: Partial<
+    Record<
+      string,
+      {
+        displayName?: string
+        enabled: boolean
+        facetFields?: string[]
+        icon?: string
+        searchFields?: string[]
+        sortFields?: string[]
+      }
+    >
+  >
+
+  disabled?: boolean
+
+  settings?: {
+    autoSync?: boolean
+    batchSize?: number
+    categorized?: boolean
+    searchEndpoint?: string
+  }
+
+  typesense: {
+    apiKey: string
+    connectionTimeoutSeconds?: number
+    nodes: Array<{
+      host: string
+      port: number | string
+      protocol: 'http' | 'https'
+    }>
+  }
+}
+
 export interface TypesenseSearchConfig<T = Record<string, any>> {
   collections: Record<string, CollectionConfig<T>>
   settings?: {
@@ -136,7 +163,6 @@ export interface TypesenseSearchConfig<T = Record<string, any>> {
   }
 }
 
-// Generic search parameters
 export interface SearchParams {
   facets?: string[]
   filters?: Record<string, any>
@@ -150,14 +176,12 @@ export interface SearchParams {
   typo_tokens_threshold?: number
 }
 
-// Generic component props for search inputs
 export interface BaseSearchInputProps<T = any> {
   baseUrl: string
   className?: string
   collections?: string | string[]
   debounceMs?: number
   errorClassName?: string
-  // Styling props
   inputClassName?: string
   inputWrapperClassName?: string
   loadingClassName?: string
@@ -174,14 +198,12 @@ export interface BaseSearchInputProps<T = any> {
   resultsListClassName?: string
 }
 
-// Generic cache entry
 export interface CacheEntry<T = any> {
   data: T
   timestamp: number
   ttl: number
 }
 
-// Generic cache options
 export interface CacheOptions {
   maxSize?: number
   ttl?: number
@@ -217,7 +239,6 @@ export interface ImportError extends Error {
   }>
 }
 
-// Generic API response wrapper
 export interface ApiResponse<T = any> {
   data?: T
   error?: ErrorResponse

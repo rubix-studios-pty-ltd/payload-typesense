@@ -1,5 +1,4 @@
-import { type TypesenseConfig } from '../index.js'
-import { type BaseDocument } from '../types.js'
+import { type BaseDocument, type TypesenseConfig } from '../types.js'
 import { extractText } from '../utils/extractText.js'
 
 export const mapCollectionToTypesense = (

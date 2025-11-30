@@ -2,8 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo } from 'react'
 
-import type { Theme, ThemeConfig, ThemeContextValue } from './types.js'
-
+import { type Theme, type ThemeConfig, type ThemeContextValue } from './types.js'
 import {
   applyTheme,
   generateThemeClasses,
@@ -197,5 +196,4 @@ export function useCustomTheme(
   }, [baseThemeName, overrides])
 }
 
-// Export context for provider
 export { ThemeContext }
