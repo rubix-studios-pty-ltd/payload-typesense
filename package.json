@@ -66,7 +66,7 @@
     "@types/react": "19.2.7",
     "eslint": "^9.39.1",
     "payload": "^3.65.0",
-    "prettier": "^3.7.2",
+    "prettier": "^3.7.3",
     "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
     "typescript": "^5.9.3"
@@ -82,7 +82,6 @@
     "access": "public",
     "registry": "https://registry.npmjs.org/",
     "main": "./dist/index.js",
-    "provenance": true,
     "types": "./dist/index.d.ts",
     "exports": {
       ".": {

@@ -2,8 +2,6 @@
   "$schema": "https://swc.rs/schema.json",
   "sourceMaps": true,
   "exclude": [
-    "node_modules",
-    "payload",
     "/**/mocks",
     "/**/*.spec.ts",
     "/**/*.test.ts"
