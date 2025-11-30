@@ -46,10 +46,6 @@ export interface HeadlessSearchInputProps<
    */
   renderLoading?: () => React.ReactNode
   /**
-   * Show match percentage in search results
-   */
-  renderMatchPercentage?: boolean
-  /**
    * Custom render function for no results
    */
   renderNoResults?: (query: string) => React.ReactNode
@@ -64,7 +60,7 @@ export interface HeadlessSearchInputProps<
   /**
    * Custom render function for results header
    */
-  renderResultsHeader?: (found: number, searchTime: number) => React.ReactNode
+  renderResultsHeader?: (found: number) => React.ReactNode
   /**
    * Custom CSS class for individual result items
    */
@@ -85,10 +81,6 @@ export interface HeadlessSearchInputProps<
    * Show result count
    */
   showResultCount?: boolean
-  /**
-   * Show search time
-   */
-  showSearchTime?: boolean
   /**
    * Theme configuration
    */

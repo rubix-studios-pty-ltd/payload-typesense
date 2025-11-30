@@ -38,7 +38,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
   resultsListClassName = '',
   showLoading = true,
   showResultCount = true,
-  showSearchTime = true,
   theme = 'modern',
 }: HeadlessSearchInputProps<T>): React.ReactElement => {
   const [query, setQuery] = useState('')
@@ -365,7 +364,7 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
     </div>
   )
 
-  const defaultRenderResultsHeader = (found: number, searchTime: number) => (
+  const defaultRenderResultsHeader = (found: number) => (
     <div
       className={`${resultsHeaderClassName}`}
       style={{
@@ -403,19 +402,6 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
           {found} result{found !== 1 ? 's' : ''} found
         </span>
       </div>
-      {showSearchTime && (
-        <span
-          style={{
-            backgroundColor: themeConfig.theme.colors.inputBorder,
-            borderRadius: '12px',
-            color: themeConfig.theme.colors.metaText,
-            fontSize: themeConfig.theme.typography.fontSizeXs,
-            padding: '4px 8px',
-          }}
-        >
-          {searchTime}ms
-        </span>
-      )}
     </div>
   )
 
@@ -571,8 +557,8 @@ const HeadlessSearchInput = <T = Record<string, unknown>,>({
               <>
                 {showResultCount &&
                   (renderResultsHeader
-                    ? renderResultsHeader(results.found, results.search_time_ms)
-                    : defaultRenderResultsHeader(results.found, results.search_time_ms))}
+                    ? renderResultsHeader(results.found)
+                    : defaultRenderResultsHeader(results.found))}
 
                 {results.hits.length > 0 ? (
                   <div className={`${resultsListClassName}`}>
