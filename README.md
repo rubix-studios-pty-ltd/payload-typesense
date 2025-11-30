@@ -1,16 +1,16 @@
 # PayloadCMS + Typesense Plugin
 
-This plugin is a fork of FrontTribe's Typesense Search Plugin for Payload CMS…
+This plugin is a fork of FrontTribe’s Typesense Search Plugin for Payload CMS.
 
-A production-ready search plugin that integrates Typesense with Payload CMS, offering fast, typo-tolerant search with real-time synchronization. This fork by Rubix Studios reduces bloat and introduces targeted changes for improved performance, maintainability, and flexibility.
+It provides a production-ready integration between Payload CMS and Typesense, delivering fast, typo-tolerant search with real-time synchronization.
+
+The Rubix Studios fork introduces targeted enhancements that improve stability, TypeScript precision, and deployment reliability (including full Vercel compatibility) while reducing overall code size by 67% for a lighter, more maintainable build.
 
 [![install size](https://packagephobia.com/badge?p=@rubixstudios/payload-typesense)](https://packagephobia.com/result?p=@rubixstudios/payload-typesense)
 **PayloadCMS + Typesense Plugin**
 
 [![install size](https://packagephobia.com/badge?p=typesense-search-plugin)](https://packagephobia.com/result?p=typesense-search-plugin)
 **FrontTribe's Typesense Search Plugin**
-
-This fork offers the same functionality as the original plugin but with fewer bugs, improved TypeScript type safety, no Vercel errors, additional usability features, and a smaller footprint.
 
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 ![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
@@ -40,6 +40,7 @@ export default buildConfig({
           facetFields: ['category', 'status'],
           displayName: 'Blog Posts',
           icon: '📝',
+          syncLimit: 500, // overrides default 1000 per page (optional)
         },
       },
     }),
@@ -54,7 +55,7 @@ function SearchPage() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
-      theme="modern" // Choose from: modern, dark
+      theme="modern" // choose from either modern or dark
       placeholder="Search everything..."
       onResultClick={(result) => {
         console.log('Selected:', result.document)
@@ -87,6 +88,7 @@ function CollectionSearch() {
 - **Caching**: In-memory cache with configurable time-to-live settings
 - **Production Ready**: Robust error handling and performance optimization
 - **Responsive**: Mobile-first architecture ensuring compatibility across devices
+- **Tree Shakable**: Modular structure for lightweight builds
 
 ## API Endpoints
 
@@ -139,7 +141,7 @@ const customTheme = {
 <HeadlessSearchInput theme={customTheme} />
 ```
 
-### Theme Features
+### Themes
 
 - **2 Pre-built Themes**: Modern, Dark
 - **Unlimited Customization**: Override any color, spacing, typography, or animation
@@ -147,6 +149,19 @@ const customTheme = {
 - **Responsive Design**: Automatic mobile optimization
 - **CSS Variables**: Advanced styling with CSS custom properties
 - **TypeScript Support**: Full type safety for all theme configurations
+
+### Production
+
+- **Race Condition Protection**: `ensureCollection` prevents startup crashes
+- **Type Safety**: Proper Payload CMS types prevent runtime errors
+- **Document Validation**: Filters malformed data before sync
+- **Graceful Degradation**: Silent failures don't break Payload operations
+
+### Developer
+
+- **Smaller Components**: Easier to understand and maintain
+- **Maintainable**: Single Responsibility Principle enforced
+- **Well-Documented**: Clear separation of concerns
 
 ## License
 
