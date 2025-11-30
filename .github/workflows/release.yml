@@ -23,12 +23,8 @@ jobs:
         with:
           node-version: 22
       - run: pnpm install --frozen-lockfile
-
-      - name: Clean build artifacts
-        run: pnpm clean
-
-      - name: Lint project
-        run: pnpm lint
+      - run: pnpm clean
+      - run: pnpm lint
 
   release:
     runs-on: ubuntu-latest
@@ -60,12 +56,8 @@ jobs:
           echo "npm version: $(npm --version)"
 
       - run: pnpm install --frozen-lockfile
-
-      - name: Build package
-        run: pnpm build
-
-      - name: Release with semantic-release
-        run: pnpm release
+      - run: pnpm build
+      - run: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
