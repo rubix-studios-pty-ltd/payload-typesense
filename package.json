@@ -65,14 +65,14 @@
     "@swc/core": "^1.15.3",
     "@types/react": "19.2.7",
     "eslint": "^9.39.1",
-    "payload": "^3.65.0",
-    "prettier": "^3.7.3",
+    "payload": "^3.66.0",
+    "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "payload": "^3.57.0"
+    "payload": "^3.66.0"
   },
   "engines": {
     "node": ">=22 <24",
