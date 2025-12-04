@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.0...v1.2.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* **security:** update prettier to version 3.7.4 and other dependencies ([932ffce](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/932ffceeec291bde0da116e3c01a76d4bd322a94))
+
 # [1.2.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.1.8...v1.2.0) (2025-11-30)
 
 
