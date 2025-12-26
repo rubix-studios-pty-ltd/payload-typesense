@@ -95,5 +95,5 @@
     "typesense": "^2.1.0",
     "zod": "^4.2.1"
   },
-  "packageManager": "pnpm@10.26.1"
+  "packageManager": "pnpm@10.26.2"
 }
