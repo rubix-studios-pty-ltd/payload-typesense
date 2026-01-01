@@ -62,7 +62,7 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@swc/cli": "^0.7.9",
-    "@swc/core": "^1.15.7",
+    "@swc/core": "^1.15.8",
     "@types/react": "19.2.7",
     "eslint": "^9.39.2",
     "payload": "^3.69.0",
@@ -93,7 +93,7 @@
   },
   "dependencies": {
     "typesense": "^2.1.0",
-    "zod": "^4.2.1"
+    "zod": "^4.3.4"
   },
   "packageManager": "pnpm@10.27.0"
 }
