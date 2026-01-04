@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.1...v1.2.2) (2026-01-04)
+
+
+### Bug Fixes
+
+* update copyright year for Rubix Studios in LICENSE ([ce1033b](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ce1033b61cc31ff6de2d008ab56b03f9fcd02ac8))
+* update packageManager to pnpm@10.26.2 ([2b223cd](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/2b223cda9c36910d928a5642117504df182e8827))
+* update packageManager to pnpm@10.27.0 ([a388306](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/a3883069a9ed53b2789aae8a28622eaa33d8f841))
+* update zod dependency to version 4.3.5 ([eacc490](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/eacc4903bc530614019d5cfaa1c4aa6b20b9a88b))
+
 ## [1.2.1](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.0...v1.2.1) (2025-12-04)
 
 
