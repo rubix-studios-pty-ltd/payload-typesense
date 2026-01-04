@@ -93,7 +93,7 @@
   },
   "dependencies": {
     "typesense": "^2.1.0",
-    "zod": "^4.3.4"
+    "zod": "^4.3.5"
   },
   "packageManager": "pnpm@10.27.0"
 }
