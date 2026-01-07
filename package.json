@@ -65,7 +65,7 @@
     "@swc/core": "^1.15.8",
     "@types/react": "19.2.7",
     "eslint": "^9.39.2",
-    "payload": "^3.69.0",
+    "payload": "^3.70.0",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
