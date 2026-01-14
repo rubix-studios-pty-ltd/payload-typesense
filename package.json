@@ -61,11 +61,11 @@
     "@payloadcms/eslint-config": "^3.28.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@swc/cli": "^0.7.9",
+    "@swc/cli": "^0.7.10",
     "@swc/core": "^1.15.8",
-    "@types/react": "19.2.7",
+    "@types/react": "19.2.8",
     "eslint": "^9.39.2",
-    "payload": "^3.70.0",
+    "payload": "^3.71.1",
     "prettier": "^3.7.4",
     "rimraf": "^6.1.2",
     "semantic-release": "^25.0.2",
@@ -75,7 +75,7 @@
     "payload": "^3.66.0"
   },
   "engines": {
-    "node": ">=22 <24",
+    "node": ">=22.0.0 <30.0.0",
     "pnpm": ">=10"
   },
   "publishConfig": {
@@ -95,5 +95,5 @@
     "typesense": "^2.1.0",
     "zod": "^4.3.5"
   },
-  "packageManager": "pnpm@10.27.0"
+  "packageManager": "pnpm@10.28.0"
 }
