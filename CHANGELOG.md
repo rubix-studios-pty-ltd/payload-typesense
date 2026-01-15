@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.4](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.3...v1.2.4) (2026-01-15)
+
+
+### Bug Fixes
+
+* update @types/node dependency to version 25.0.9 ([77e8cd1](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/77e8cd145b18cd0973ac53f13a95b197d5d9d14d))
+* update node engine version to support 24.x and 25.x ([876a02d](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/876a02df61c9bac4abd2af47ab8000a636cb8bdf))
+* update prettier to version 3.8.0 and adjust node engine requirement ([bc28deb](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/bc28deb6f00d192cb3551a80ceed29731eba7887))
+
 ## [1.2.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.2...v1.2.3) (2026-01-14)
 
 
