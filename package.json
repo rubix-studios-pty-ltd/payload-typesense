@@ -75,7 +75,7 @@
     "payload": "^3.66.0"
   },
   "engines": {
-    "node": ">=22.0.0 <30.0.0",
+    "node": "24.x || 25.x",
     "pnpm": ">=10"
   },
   "publishConfig": {
