@@ -395,7 +395,7 @@ export function applyTheme(theme: Theme, element: string, variant?: string): str
     const variantKey = `${element}${
       variant.charAt(0).toUpperCase() + variant.slice(1)
     }` as keyof ThemeClasses
-    return `${(classes as any)[element] || ''} ${(classes as any)[variantKey] || ''}`
+    return `${(classes)[element] || ''} ${(classes)[variantKey] || ''}`
   }
 
   return classes[element as keyof ThemeClasses] || ''

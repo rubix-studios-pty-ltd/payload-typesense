@@ -22,7 +22,7 @@ export interface SearchResult<T = any> {
   collection?: string
   content?: string
   displayName?: string
-  document: T
+  document: { id?: string } & T
   highlight?: {
     [field: string]: {
       matched_tokens: string[]

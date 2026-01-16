@@ -292,7 +292,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                       ) : (
                         <RenderedResult
                           index={index}
-                          key={(result.document as any)?.id || result.id || index}
+                          key={(result.document)?.id || result.id || index}
                           onResultClick={handleResultClick}
                           renderDate={renderDate}
                           result={result}
