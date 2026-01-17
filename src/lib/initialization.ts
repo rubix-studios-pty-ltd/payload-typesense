@@ -19,10 +19,7 @@ export const initializeTypesense = async (
   }
 
   const isConnected = await testConnection(typesenseClient)
-  if (!isConnected) {
-    payload.logger.warn('Typesense connection failed.')
-    return
-  }
+  if (!isConnected) return
 
   const entries = Object.entries(pluginOptions.collections || {})
   const vector = pluginOptions.vectorSearch
