@@ -8,6 +8,7 @@ export const getAllCollections = async (
   pluginOptions: TypesenseConfig,
   query: string,
   options: {
+    collections?: string[]
     filters: Record<string, unknown>
     page: number
     per_page: number
@@ -20,9 +21,15 @@ export const getAllCollections = async (
       return Response.json(cachedResult)
     }
 
-    const enabledCollections = Object.entries(pluginOptions.collections || {}).filter(
+    let enabledCollections = Object.entries(pluginOptions.collections || {}).filter(
       ([_, config]) => config?.enabled
     )
+
+    if (options.collections && options.collections.length > 0) {
+      enabledCollections = enabledCollections.filter(([collectionName]) =>
+        options.collections!.includes(collectionName)
+      )
+    }
 
     if (enabledCollections.length === 0) {
       return Response.json({ error: 'No collections enabled for search' }, { status: 400 })

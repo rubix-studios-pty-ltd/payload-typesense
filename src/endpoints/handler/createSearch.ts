@@ -27,6 +27,8 @@ export const createSearch = (
       const q = url.searchParams.get('q') || ''
       const page = Number(url.searchParams.get('page') || 1)
       const per_page = Number(url.searchParams.get('per_page') || 10)
+      const collectionsParam = url.searchParams.get('collections')
+      const collections = collectionsParam ? collectionsParam.split(',').filter(Boolean) : undefined
 
       const sort_by = url.searchParams.has('sort_by')
         ? url.searchParams.get('sort_by') || ''
@@ -63,6 +65,7 @@ export const createSearch = (
         }
 
         return getAllCollections(typesenseClient, pluginOptions, q, {
+          collections,
           filters: {},
           page,
           per_page,

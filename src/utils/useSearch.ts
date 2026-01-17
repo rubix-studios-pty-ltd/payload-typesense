@@ -25,10 +25,9 @@ export function useSearch<T = Record<string, unknown>>({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
 
-  // Keep refs only for callbacks to avoid unnecessary re-renders of search function
   const onResultsRef = useRef(onResults)
   const onSearchRef = useRef(onSearch)
-  
+
   onResultsRef.current = onResults
   onSearchRef.current = onSearch
 
@@ -49,40 +48,25 @@ export function useSearch<T = Record<string, unknown>>({
           q: searchQuery,
         })
 
-        const isSingleCollection = Array.isArray(collections) && collections.length === 1
-        const endpoint = isSingleCollection 
-          ? `${baseUrl}/api/search/${collections[0]}` 
-          : `${baseUrl}/api/search`
-        
-        const searchUrl = `${endpoint}?${params.toString()}`
+        let searchUrl: string
+
+        if (Array.isArray(collections) && collections.length > 0) {
+          if (collections.length === 1) {
+            searchUrl = `${baseUrl}/api/search/${collections[0]}?${params.toString()}`
+          } else {
+            params.append('collections', collections.join(','))
+            searchUrl = `${baseUrl}/api/search?${params.toString()}`
+          }
+        } else {
+          searchUrl = `${baseUrl}/api/search?${params.toString()}`
+        }
 
         const response = await fetch(searchUrl)
         if (!response.ok) {
           throw new Error(`Search failed: ${response.status} ${response.statusText}`)
         }
 
-        let searchResults: SearchResponse<T> = await response.json()
-
-        if (Array.isArray(collections) && collections.length > 1) {
-          const filteredHits =
-            searchResults.hits?.filter(
-              (hit) => hit.collection && collections.includes(hit.collection)
-            ) || []
-
-          const filteredCollections =
-            searchResults.collections?.filter(
-              (col) => col.collection && collections.includes(col.collection)
-            ) || []
-
-          const totalFound = filteredCollections.reduce((sum, col) => sum + (col.found || 0), 0)
-
-          searchResults = {
-            ...searchResults,
-            collections: filteredCollections,
-            found: totalFound,
-            hits: filteredHits,
-          }
-        }
+        const searchResults: SearchResponse<T> = await response.json()
 
         setResults(searchResults)
         onResultsRef.current?.(searchResults)
