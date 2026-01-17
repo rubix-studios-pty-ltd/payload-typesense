@@ -2,6 +2,7 @@ import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
 import { type TypesenseConfig } from '../types.js'
+import { performVectorSearch } from './vectorSearch.js'
 
 export const getAllCollections = async (
   typesenseClient: Typesense.Client,
@@ -13,6 +14,7 @@ export const getAllCollections = async (
     page: number
     per_page: number
     sort_by?: string
+    vector?: boolean
   }
 ) => {
   try {
@@ -42,21 +44,31 @@ export const getAllCollections = async (
 
     const searchPromises = enabledCollections.map(async ([collectionName, config]) => {
       try {
-        const searchParameters: Record<string, unknown> = {
-          highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
-          num_typos: 0,
-          page: options.page,
-          per_page: options.per_page,
-          q: query,
-          query_by: config?.searchFields?.join(',') || 'title,content',
-          snippet_threshold: 30,
-          typo_tokens_threshold: 1,
-        }
+        let results
 
-        const results = await typesenseClient
-          .collections(collectionName)
-          .documents()
-          .search(searchParameters)
+        if (options.vector) {
+          results = await performVectorSearch(typesenseClient, pluginOptions, query, {
+            collection: collectionName,
+            page: options.page,
+            per_page: options.per_page,
+          })
+        } else {
+          const searchParameters: Record<string, unknown> = {
+            highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
+            num_typos: 0,
+            page: options.page,
+            per_page: options.per_page,
+            q: query,
+            query_by: config?.searchFields?.join(',') || 'title,content',
+            snippet_threshold: 30,
+            typo_tokens_threshold: 1,
+          }
+
+          results = await typesenseClient
+            .collections(collectionName)
+            .documents()
+            .search(searchParameters)
+        }
 
         return {
           collection: collectionName,

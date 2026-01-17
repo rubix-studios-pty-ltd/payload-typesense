@@ -1,9 +1,10 @@
-import { type BaseDocument, type TypesenseConfig } from '../types.js'
+import { type BaseDocument, type CollectionFieldSchema, type TypesenseConfig } from '../types.js'
 import { extractText } from '../utils/extractText.js'
 
 export const mapCollectionToTypesense = (
   collectionSlug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
+  pluginOptions?: TypesenseConfig
 ) => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
@@ -29,9 +30,28 @@ export const mapCollectionToTypesense = (
       facet: true,
     }))
 
+  const fields: CollectionFieldSchema[] = [...baseFields, ...searchFields, ...facetOnlyFields]
+
+  if (pluginOptions?.vectorSearch?.enabled) {
+    const vectorFieldName = pluginOptions.vectorSearch.defaultVectorField ?? 'embedding'
+    const embedFromFields = pluginOptions.vectorSearch.embedFrom ?? searchableFields
+    const embeddingModel = pluginOptions.vectorSearch.embeddingModel ?? 'ts/all-MiniLM-L12-v2'
+
+    fields.push({
+      name: vectorFieldName,
+      type: 'float[]',
+      embed: {
+        from: embedFromFields,
+        model_config: {
+          model_name: embeddingModel,
+        },
+      },
+    })
+  }
+
   const schema = {
     name: collectionSlug,
-    fields: [...baseFields, ...searchFields, ...facetOnlyFields],
+    fields,
   }
 
   return schema

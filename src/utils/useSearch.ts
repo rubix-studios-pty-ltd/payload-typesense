@@ -11,6 +11,7 @@ type UseSearchOptions<T> = {
   onResults?: (results: SearchResponse<T>) => void
   onSearch?: (query: string, results: SearchResponse<T>) => void
   perPage: number
+  vector?: boolean
 }
 
 export function useSearch<T = Record<string, unknown>>({
@@ -20,6 +21,7 @@ export function useSearch<T = Record<string, unknown>>({
   onResults,
   onSearch,
   perPage,
+  vector = false,
 }: UseSearchOptions<T>) {
   const [results, setResults] = useState<null | SearchResponse<T>>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -47,6 +49,10 @@ export function useSearch<T = Record<string, unknown>>({
           per_page: String(perPage),
           q: searchQuery,
         })
+
+        if (vector) {
+          params.append('vector', 'true')
+        }
 
         let searchUrl: string
 
@@ -79,7 +85,7 @@ export function useSearch<T = Record<string, unknown>>({
         setIsLoading(false)
       }
     },
-    [baseUrl, collections, minQueryLength, perPage]
+    [baseUrl, collections, minQueryLength, perPage, vector]
   )
 
   return {

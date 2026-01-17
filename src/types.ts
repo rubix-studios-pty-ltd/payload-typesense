@@ -140,6 +140,13 @@ export type TypesenseConfig = {
       protocol: 'http' | 'https'
     }>
   }
+
+  vectorSearch?: {
+    defaultVectorField?: string
+    embeddingModel?: string
+    embedFrom?: string[]
+    enabled?: boolean
+  }
 }
 
 export interface TypesenseSearchConfig<T = Record<string, any>> {
@@ -280,6 +287,12 @@ export type FieldType =
 
 export interface CollectionFieldSchema {
   [t: string]: unknown
+  embed?: {
+    from: string[]
+    model_config: {
+      model_name: string
+    }
+  }
   facet?: boolean
   index?: boolean
   infix?: boolean

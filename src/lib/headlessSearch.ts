@@ -88,4 +88,8 @@ export interface HeadlessSearchInputProps<
    * Theme configuration
    */
   theme?: string | ThemeConfig
+  /**
+   * Enable vector search mode (replaces text search)
+   */
+  vector?: boolean
 }

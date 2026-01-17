@@ -22,7 +22,14 @@ export const setupHooks = (
     }
 
     const changeHook: CollectionAfterChangeHook = async ({ doc, operation }) => {
-      await syncDocumentToTypesense(typesenseClient, collectionSlug, doc, operation, config)
+      await syncDocumentToTypesense(
+        typesenseClient,
+        collectionSlug,
+        doc,
+        operation,
+        config,
+        pluginOptions
+      )
     }
 
     hooks.afterChange = {
@@ -50,10 +57,11 @@ export const syncDocumentToTypesense = async (
   collectionSlug: string,
   doc: BaseDocument,
   _operation: 'create' | 'update',
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
+  pluginOptions?: TypesenseConfig
 ) => {
   try {
-    const schema = mapCollectionToTypesense(collectionSlug, config)
+    const schema = mapCollectionToTypesense(collectionSlug, config, pluginOptions)
 
     await ensureCollection(typesenseClient, collectionSlug, schema)
 

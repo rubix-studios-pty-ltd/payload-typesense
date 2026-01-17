@@ -6,6 +6,7 @@ import { searchCache } from '../../lib/cache.js'
 import { getValidationErrors, validateSearchParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
 import { getAllCollections } from '../../utils/getAllCollections.js'
+import { performVectorSearch } from '../../utils/vectorSearch.js'
 
 export const createSearch = (
   typesenseClient: Typesense.Client,
@@ -29,6 +30,7 @@ export const createSearch = (
       const per_page = Number(url.searchParams.get('per_page') || 10)
       const collectionsParam = url.searchParams.get('collections')
       const collections = collectionsParam ? collectionsParam.split(',').filter(Boolean) : undefined
+      const vector = url.searchParams.get('vector') === 'true'
 
       const sort_by = url.searchParams.has('sort_by')
         ? url.searchParams.get('sort_by') || ''
@@ -70,6 +72,7 @@ export const createSearch = (
           page,
           per_page,
           sort_by,
+          vector,
         })
       }
 
@@ -79,6 +82,27 @@ export const createSearch = (
 
       if (!q.trim()) {
         return Response.json({ error: 'Query parameter "q" is required' }, { status: 400 })
+      }
+
+      if (vector) {
+        try {
+          const results = await performVectorSearch(typesenseClient, pluginOptions, q, {
+            collection,
+            page,
+            per_page,
+          })
+
+          return Response.json(results)
+        } catch (vectorError) {
+          return Response.json(
+            {
+              details:
+                vectorError instanceof Error ? vectorError.message : 'Unknown vector search error',
+              error: 'Vector search failed',
+            },
+            { status: 500 }
+          )
+        }
       }
 
       const fields =
@@ -96,7 +120,7 @@ export const createSearch = (
         ...(sort_by ? { sort_by } : {}),
       }
 
-      const cacheKey = { fields, page, per_page, sort_by }
+      const cacheKey = { fields, page, per_page, sort_by, vector }
       const cached = searchCache.get(q, collection, cacheKey)
 
       if (cached) {

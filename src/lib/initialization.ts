@@ -27,7 +27,7 @@ export const initializeTypesense = async (
   const entries = Object.entries(pluginOptions.collections || {})
   for (const [slug, cfg] of entries) {
     if (cfg?.enabled) {
-      await initializeCollection(payload, typesenseClient, slug, cfg)
+      await initializeCollection(payload, typesenseClient, slug, cfg, pluginOptions)
     }
   }
 }
@@ -36,12 +36,13 @@ const initializeCollection = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
+  pluginOptions: TypesenseConfig
 ) => {
   const collection = payload.collections[collectionSlug]
   if (!collection) return
 
-  const schema = mapCollectionToTypesense(collectionSlug, config)
+  const schema = mapCollectionToTypesense(collectionSlug, config, pluginOptions)
 
   const exists = await ensureCollection(typesenseClient, collectionSlug, schema)
   if (!exists) return
