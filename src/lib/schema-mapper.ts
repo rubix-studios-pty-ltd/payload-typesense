@@ -10,7 +10,6 @@ export const mapCollectionToTypesense = (
   const facetFields = config?.facetFields || []
 
   const baseFields = [
-    // DO NOT include 'id'
     { name: 'slug', type: 'string' },
     { name: 'createdAt', type: 'int64' },
     { name: 'updatedAt', type: 'int64' },
