@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { type SearchResponse } from '../types.js'
 
@@ -11,6 +11,7 @@ type UseSearchOptions<T> = {
   onResults?: (results: SearchResponse<T>) => void
   onSearch?: (query: string, results: SearchResponse<T>) => void
   perPage: number
+  vector?: boolean
 }
 
 export function useSearch<T = Record<string, unknown>>({
@@ -20,26 +21,17 @@ export function useSearch<T = Record<string, unknown>>({
   onResults,
   onSearch,
   perPage,
+  vector = false,
 }: UseSearchOptions<T>) {
   const [results, setResults] = useState<null | SearchResponse<T>>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
 
-  const collectionsRef = useRef<string | string[] | undefined>(collections)
-  const onResultsRef = useRef<typeof onResults>(onResults)
-  const onSearchRef = useRef<typeof onSearch>(onSearch)
+  const onResultsRef = useRef(onResults)
+  const onSearchRef = useRef(onSearch)
 
-  useEffect(() => {
-    collectionsRef.current = collections
-  }, [collections])
-
-  useEffect(() => {
-    onResultsRef.current = onResults
-  }, [onResults])
-
-  useEffect(() => {
-    onSearchRef.current = onSearch
-  }, [onSearch])
+  onResultsRef.current = onResults
+  onSearchRef.current = onSearch
 
   const search = useCallback(
     async (searchQuery: string) => {
@@ -53,61 +45,47 @@ export function useSearch<T = Record<string, unknown>>({
       setError(null)
 
       try {
-        const activeCollections = collectionsRef.current
+        const params = new URLSearchParams({
+          per_page: String(perPage),
+          q: searchQuery,
+        })
+
+        if (vector) {
+          params.append('vector', 'true')
+        }
+
         let searchUrl: string
 
-        if (typeof activeCollections === 'string' && activeCollections) {
-          searchUrl = `${baseUrl}/api/search/${activeCollections}?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage}`
-        } else if (Array.isArray(activeCollections) && activeCollections.length > 0) {
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage * 2}`
+        if (Array.isArray(collections) && collections.length > 0) {
+          if (collections.length === 1) {
+            searchUrl = `${baseUrl}/api/search/${collections[0]}?${params.toString()}`
+          } else {
+            params.append('collections', collections.join(','))
+            searchUrl = `${baseUrl}/api/search?${params.toString()}`
+          }
         } else {
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage}`
+          searchUrl = `${baseUrl}/api/search?${params.toString()}`
         }
 
         const response = await fetch(searchUrl)
-
         if (!response.ok) {
           throw new Error(`Search failed: ${response.status} ${response.statusText}`)
         }
 
-        let searchResults: SearchResponse<T> = await response.json()
-
-        if (Array.isArray(activeCollections) && activeCollections.length > 0) {
-          const filteredHits =
-            searchResults.hits?.filter(
-              (hit) => hit.collection && activeCollections.includes(hit.collection)
-            ) || []
-
-          const filteredCollections =
-            searchResults.collections?.filter(
-              (col) => col.collection && activeCollections.includes(col.collection)
-            ) || []
-
-          searchResults = {
-            ...searchResults,
-            collections: filteredCollections,
-            found: filteredHits.length,
-            hits: filteredHits,
-          }
-        }
+        const searchResults: SearchResponse<T> = await response.json()
 
         setResults(searchResults)
         onResultsRef.current?.(searchResults)
         onSearchRef.current?.(searchQuery, searchResults)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Search failed')
+        const errorMessage = err instanceof Error ? err.message : 'Search failed'
+        setError(errorMessage)
         setResults(null)
       } finally {
         setIsLoading(false)
       }
     },
-    [baseUrl, minQueryLength, perPage]
+    [baseUrl, collections, minQueryLength, perPage, vector]
   )
 
   return {

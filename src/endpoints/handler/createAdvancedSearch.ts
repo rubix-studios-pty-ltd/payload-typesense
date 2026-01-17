@@ -28,7 +28,7 @@ export const createAdvancedSearch = (
       return Response.json({ error: 'Missing search parameters in request body' }, { status: 400 })
     }
 
-    const body = request.data
+    const body = request.data as Record<string, unknown>
 
     try {
       const results = await typesenseClient.collections(collection).documents().search(body)

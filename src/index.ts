@@ -12,9 +12,7 @@ export type { TypesenseConfig } from './types.js'
 export const typesenseSearch =
   (pluginOptions: TypesenseConfig) =>
   (config: Config): Config => {
-    if (pluginOptions.disabled) {
-      return config
-    }
+    if (pluginOptions.disabled) return config
 
     const client = createClient(pluginOptions.typesense)
 
@@ -29,9 +27,7 @@ export const typesenseSearch =
     if (shouldAutoSync && hasCollections) {
       config.collections = (config.collections || []).map((collection) => {
         const colConfig = pluginOptions.collections?.[collection.slug]
-        if (!colConfig?.enabled) {
-          return collection
-        }
+        if (!colConfig?.enabled) return collection
 
         return {
           ...collection,

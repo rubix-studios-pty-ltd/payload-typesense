@@ -2,27 +2,41 @@ import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
 import { type TypesenseConfig } from '../types.js'
+import { performVectorSearch } from './vectorSearch.js'
 
 export const getAllCollections = async (
   typesenseClient: Typesense.Client,
   pluginOptions: TypesenseConfig,
   query: string,
   options: {
+    collections?: string[]
     filters: Record<string, unknown>
     page: number
     per_page: number
     sort_by?: string
+    vector?: boolean
   }
 ) => {
   try {
-    const cachedResult = searchCache.get(query, 'universal', options)
+    const cacheKey = {
+      ...options,
+      collections: options.collections ? [...options.collections].sort().join(',') : undefined,
+    }
+
+    const cachedResult = searchCache.get(query, 'universal', cacheKey)
     if (cachedResult) {
       return Response.json(cachedResult)
     }
 
-    const enabledCollections = Object.entries(pluginOptions.collections || {}).filter(
+    let enabledCollections = Object.entries(pluginOptions.collections || {}).filter(
       ([_, config]) => config?.enabled
     )
+
+    if (options.collections && options.collections.length > 0) {
+      enabledCollections = enabledCollections.filter(([collectionName]) =>
+        options.collections!.includes(collectionName)
+      )
+    }
 
     if (enabledCollections.length === 0) {
       return Response.json({ error: 'No collections enabled for search' }, { status: 400 })
@@ -30,21 +44,31 @@ export const getAllCollections = async (
 
     const searchPromises = enabledCollections.map(async ([collectionName, config]) => {
       try {
-        const searchParameters: Record<string, unknown> = {
-          highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
-          num_typos: 0,
-          page: options.page,
-          per_page: Math.ceil(options.per_page / enabledCollections.length),
-          q: query,
-          query_by: config?.searchFields?.join(',') || 'title,content',
-          snippet_threshold: 30,
-          typo_tokens_threshold: 1,
-        }
+        let results
 
-        const results = await typesenseClient
-          .collections(collectionName)
-          .documents()
-          .search(searchParameters)
+        if (options.vector) {
+          results = await performVectorSearch(typesenseClient, query, {
+            collection: collectionName,
+            page: options.page,
+            per_page: options.per_page,
+          })
+        } else {
+          const searchParameters: Record<string, unknown> = {
+            highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
+            num_typos: 0,
+            page: options.page,
+            per_page: options.per_page,
+            q: query,
+            query_by: config?.searchFields?.join(',') || 'title,content',
+            snippet_threshold: 30,
+            typo_tokens_threshold: 1,
+          }
+
+          results = await typesenseClient
+            .collections(collectionName)
+            .documents()
+            .search(searchParameters)
+        }
 
         return {
           collection: collectionName,
@@ -94,7 +118,7 @@ export const getAllCollections = async (
       search_time_ms: 0,
     }
 
-    searchCache.set(query, searchResult, 'universal', options)
+    searchCache.set(query, searchResult, 'universal', cacheKey)
 
     return Response.json(searchResult)
   } catch (error) {

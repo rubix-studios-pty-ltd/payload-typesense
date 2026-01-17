@@ -1,9 +1,10 @@
-import { type BaseDocument, type TypesenseConfig } from '../types.js'
+import { type BaseDocument, type CollectionFieldSchema, type TypesenseConfig } from '../types.js'
 import { extractText } from '../utils/extractText.js'
 
 export const mapCollectionToTypesense = (
   collectionSlug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
+  vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ) => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
@@ -29,9 +30,27 @@ export const mapCollectionToTypesense = (
       facet: true,
     }))
 
+  const fields: CollectionFieldSchema[] = [...baseFields, ...searchFields, ...facetOnlyFields]
+
+  if (vector?.enabled) {
+    const embedFromFields = vector.embedFrom ?? searchableFields
+    const embeddingModel = vector.embeddingModel ?? 'ts/all-MiniLM-L12-v2'
+
+    fields.push({
+      name: 'embedding',
+      type: 'float[]',
+      embed: {
+        from: embedFromFields,
+        model_config: {
+          model_name: embeddingModel,
+        },
+      },
+    })
+  }
+
   const schema = {
     name: collectionSlug,
-    fields: [...baseFields, ...searchFields, ...facetOnlyFields],
+    fields,
   }
 
   return schema
@@ -64,11 +83,22 @@ export const mapToTypesense = (
       const [arrayField, subField] = field.split('.', 2)
       if (arrayField && subField && Array.isArray(doc[arrayField])) {
         const joined = (doc[arrayField] as unknown[])
-          .map((item) =>
-            item && typeof item === 'object' && subField in item
-              ? String((item as Record<string, unknown>)[subField] ?? '')
-              : ''
-          )
+          .map((item) => {
+            if (!item || typeof item !== 'object' || !(subField in item)) return ''
+
+            const raw = (item as Record<string, unknown>)[subField]
+            if (raw == null) return ''
+
+            if (typeof raw === 'string' || typeof raw === 'number') {
+              return String(raw)
+            }
+
+            if (typeof raw === 'object' && 'root' in raw) {
+              return extractText(raw as { root: unknown }) || ''
+            }
+
+            return ''
+          })
           .filter(Boolean)
           .join(' ')
 
@@ -93,14 +123,21 @@ export const mapToTypesense = (
       'root' in value
     ) {
       typesenseDoc[field] = extractText(value as { root: unknown }) || ''
-    } else {
+    } else if (typeof value === 'string' || typeof value === 'number') {
       typesenseDoc[field] = String(value)
+    } else {
+      typesenseDoc[field] = ''
     }
   }
 
   for (const field of facetFields) {
     const value = doc[field]
-    typesenseDoc[field] = value !== undefined && value !== null ? String(value) : 'unknown'
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      typesenseDoc[field] = String(value)
+    } else {
+      typesenseDoc[field] = 'unknown'
+    }
   }
 
   const hasSearchableContent = searchableFields.some((field) => {

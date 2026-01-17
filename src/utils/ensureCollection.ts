@@ -1,9 +1,11 @@
 import type Typesense from 'typesense'
 
+import { type CollectionSchema } from '../types.js'
+
 export const ensureCollection = async (
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  schema: any
+  schema: CollectionSchema
 ): Promise<boolean> => {
   try {
     await typesenseClient.collections(collectionSlug).retrieve()

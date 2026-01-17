@@ -48,6 +48,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     showLoading = true,
     showResultCount = true,
     theme = 'modern',
+    vector = false,
   } = props
 
   const [query, setQuery] = useState('')
@@ -70,6 +71,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     onResults,
     onSearch,
     perPage,
+    vector,
   })
 
   useEffect(() => {
@@ -278,7 +280,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                     renderResultsHeader(results.found)
                   ) : (
                     <RenderedHeader
-                      found={results.hits.length}
+                      found={results.found}
                       resultsHeaderClassName={resultsHeaderClassName}
                       themeConfig={themeConfig}
                     />
@@ -292,7 +294,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                       ) : (
                         <RenderedResult
                           index={index}
-                          key={(result.document as any)?.id || result.id || index}
+                          key={result.document?.id || result.id || index}
                           onResultClick={handleResultClick}
                           renderDate={renderDate}
                           result={result}

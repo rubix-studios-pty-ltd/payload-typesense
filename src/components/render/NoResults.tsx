@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { type ThemeContextValue } from '../themes/types.js'
 
 interface RenderedNoResultsProps {

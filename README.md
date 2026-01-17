@@ -1,10 +1,12 @@
 # PayloadCMS + Typesense Plugin
 
-This plugin is a fork of FrontTribe’s Typesense Search Plugin for Payload CMS.
+Forked from FrontTribe’s Typesense Search Plugin, Rubix Studios implementation has been substantially re-engineered to meet stricter production, deployment, and TypeScript standards. The codebase has been streamlined for improved maintainability, enhanced type safety, and predictable behaviour under load, while preserving full compatibility with Payload CMS and Typesense.
 
-It provides a production-ready integration between Payload CMS and Typesense, delivering fast, typo-tolerant search with real-time synchronization.
+The fork introduces meaningful architectural improvements, including more efficient caching strategies with race-condition mitigation, improved request handling, and deployment-safe defaults. The result is a lighter, more resilient integration.
 
-The Rubix Studios fork introduces targeted enhancements that improve stability, TypeScript precision, and deployment reliability (including full Vercel compatibility) while reducing overall code size by 67% for a lighter, more maintainable build.
+With a modular, tree-shakable structure and optional support for advanced search capabilities such as vector-based querying, the plugin is designed to scale from simple content search implementations to more complex, search-driven applications without unnecessary bloat.
+
+This project is actively maintained by Rubix Studios and is intended for production environments where performance, stability, and code quality are critical.
 
 [![install size](https://packagephobia.com/badge?p=@rubixstudios/payload-typesense)](https://packagephobia.com/result?p=@rubixstudios/payload-typesense)
 **PayloadCMS + Typesense Plugin**
@@ -31,7 +33,13 @@ export default buildConfig({
     typesenseSearch({
       typesense: {
         apiKey: 'xyz',
-        nodes: [{ host: 'localhost', port: 8108, protocol: 'http' }],
+        nodes: [
+          {
+            host: 'localhost',
+            port: 8108,
+            protocol: 'http',
+          },
+        ],
       },
       collections: {
         posts: {
@@ -40,8 +48,14 @@ export default buildConfig({
           facetFields: ['category', 'status'],
           displayName: 'Blog Posts',
           icon: '📝',
-          syncLimit: 500, // overrides default 1000 per page (optional)
+          syncLimit: 500, // Overrides the default per-page sync limit of 1000
         },
+      },
+      // This feature is experimental
+      vectorSearch: {
+        enabled: true, // Enables vector-based semantic search
+        embedFrom: ['title', 'content'], // Omit to fall back to collection searchFields
+        embeddingModel: 'ts/all-MiniLM-L12-v2',
       },
     }),
   ],
@@ -51,27 +65,41 @@ export default buildConfig({
 ```tsx
 import { HeadlessSearchInput } from '@rubixstudios/payload-typesense'
 
-function SearchPage() {
+export function GlobalSearchPage() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
-      theme="modern" // choose from either modern or dark
+      theme="modern" // Available themes: "modern" | "dark"
       placeholder="Search everything..."
       onResultClick={(result) => {
-        console.log('Selected:', result.document)
+        console.log('Selected document:', result.document)
       }}
     />
   )
 }
 
-function CollectionSearch() {
+export function CollectionSearch() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
       collections={['posts', 'products']}
-      placeholder="Search posts & products..."
+      placeholder="Search posts and products..."
       onResultClick={(result) => {
-        console.log('Selected:', result.document)
+        console.log('Selected document:', result.document)
+      }}
+    />
+  )
+}
+
+export function VectorSearch() {
+  return (
+    <HeadlessSearchInput
+      baseUrl="http://localhost:3000"
+      vector={true} // Vector search enabled
+      collections={['posts', 'products']}
+      placeholder="Search posts and products..."
+      onResultClick={(result) => {
+        console.log('Selected document:', result.document)
       }}
     />
   )
@@ -80,15 +108,22 @@ function CollectionSearch() {
 
 ## Features
 
-- **Performance**: Sub-millisecond response times for search queries
-- **Flexible**: Single, multiple, or universal collection search with one component
-- **Modern**: Responsive design implemented with Tailwind CSS
-- **Optimized API**: Automatically routes requests to the most efficient endpoint
-- **Real-Time**: Continuous data sync with Payload CMS
-- **Caching**: In-memory cache with configurable time-to-live settings
-- **Production Ready**: Robust error handling and performance optimization
-- **Responsive**: Mobile-first architecture ensuring compatibility across devices
-- **Tree Shakable**: Modular structure for lightweight builds
+- **Performance**  
+  Sub-millisecond search responses with optimized request handling.
+- **Flexible Search**  
+  Single-collection, multi-collection, or universal search using one component.
+- **Vector Search**  
+  Optional semantic search using embeddings, with graceful fallback to keyword search.
+- **Modern UI**  
+  Headless, responsive implementation compatible with Tailwind CSS.
+- **Real-Time Synchronisation**  
+  Continuous indexing and sync with Payload CMS.
+- **Efficient Caching**  
+  In-memory caching with configurable TTL and race-condition safeguards.
+- **Production Ready**  
+  Robust error handling, deployment-safe defaults, and platform compatibility.
+- **Tree-Shakable Architecture**  
+  Modular design enabling smaller bundles and selective feature usage.
 
 ## Endpoints
 

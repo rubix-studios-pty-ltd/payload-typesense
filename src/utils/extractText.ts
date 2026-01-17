@@ -1,25 +1,23 @@
-export const extractText = (richText: any): string => {
-  if (!richText || !richText.root) {
+export const extractText = (richText: unknown): string => {
+  if (!richText || typeof richText !== 'object' || !('root' in richText)) {
     return ''
   }
 
-  const extract = (node: any): string => {
-    if (typeof node === 'string') {
-      return node
-    }
+  const extract = (node: unknown): string => {
+    if (typeof node === 'string') return node
 
     if (node && typeof node === 'object') {
-      if (node.text) {
-        return node.text
+      if ('text' in node && typeof (node as { text?: unknown }).text === 'string') {
+        return (node as { text: string }).text
       }
 
-      if (node.children && Array.isArray(node.children)) {
-        return node.children.map(extract).join('')
+      if ('children' in node && Array.isArray((node as { children?: unknown }).children)) {
+        return (node as { children: unknown[] }).children.map(extract).join('')
       }
     }
 
     return ''
   }
 
-  return extract(richText.root)
+  return extract((richText as { root: unknown }).root)
 }
