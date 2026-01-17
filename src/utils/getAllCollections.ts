@@ -16,7 +16,12 @@ export const getAllCollections = async (
   }
 ) => {
   try {
-    const cachedResult = searchCache.get(query, 'universal', options)
+    const cacheKey = {
+      ...options,
+      collections: options.collections ? [...options.collections].sort().join(',') : undefined,
+    }
+
+    const cachedResult = searchCache.get(query, 'universal', cacheKey)
     if (cachedResult) {
       return Response.json(cachedResult)
     }
@@ -101,7 +106,7 @@ export const getAllCollections = async (
       search_time_ms: 0,
     }
 
-    searchCache.set(query, searchResult, 'universal', options)
+    searchCache.set(query, searchResult, 'universal', cacheKey)
 
     return Response.json(searchResult)
   } catch (error) {
