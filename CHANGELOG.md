@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.3.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.4...v1.3.0) (2026-01-17)
+
+
+### Bug Fixes
+
+* update cache key assignment in getAllCollections for improved caching ([ed8cd95](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ed8cd95c4e71f7af5c28a7c89a315dba441e0acd))
+* update key assignment in HeadlessSearchInput and refine document type in SearchResult ([9de2b88](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9de2b88b9f82aeb3df19de9ccf264f001b3e78d1))
+
+
+### Features
+
+* add support for filtering by collections in search functionality ([275bc48](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/275bc48ea0d66c008046c720667c3d9a3d6e870b))
+* add vector search functionality with API and UI support ([86db6cd](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/86db6cdaa3ee66f6c59ff26c12d55da9685a17f2))
+* enhance README and implement vector search capabilities with improved caching and request handling ([3811bec](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/3811bece2b493fd23d490d56db862e37c9145148))
+* fix search result count and improve code quality ([8851099](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/885109956da20c4c51c6e9b3bfcfc15e6e88fe77))
+
 ## [1.2.4](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.2.3...v1.2.4) (2026-01-15)
 
 
