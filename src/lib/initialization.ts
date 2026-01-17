@@ -20,6 +20,7 @@ export const initializeTypesense = async (
 
   const isConnected = await testConnection(typesenseClient)
   if (!isConnected) {
+    payload.logger.warn('Typesense connection failed.')
     return
   }
 
@@ -38,17 +39,12 @@ const initializeCollection = async (
   config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {
   const collection = payload.collections[collectionSlug]
-
-  if (!collection) {
-    return
-  }
+  if (!collection) return
 
   const schema = mapCollectionToTypesense(collectionSlug, config)
 
   const exists = await ensureCollection(typesenseClient, collectionSlug, schema)
-  if (!exists) {
-    return
-  }
+  if (!exists) return
 
   await syncExistingDocuments(payload, typesenseClient, collectionSlug, config)
 }
@@ -57,7 +53,7 @@ const syncExistingDocuments = async (
   payload: Payload,
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
+  config: NonNullable<TypesenseConfig['collections']>[string]
 ) => {
   try {
     const limit = config?.syncLimit ?? 1000
@@ -91,13 +87,8 @@ const syncExistingDocuments = async (
         const batch = docs.slice(i, i + batchSize)
         const mapped = batch
           .filter((doc): doc is BaseDocument => {
-            if (typeof doc !== 'object' || doc === null) {
-              return false
-            }
-
-            if (!('id' in doc)) {
-              return false
-            }
+            if (typeof doc !== 'object' || doc === null) return false
+            if (!('id' in doc)) return false
 
             const id = (doc as Record<string, unknown>).id
             return typeof id === 'string'

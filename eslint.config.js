@@ -27,6 +27,7 @@ export default [
   ...payloadEsLintConfig,
   {
     rules: {
+      curly: ['error', 'multi-line', 'consistent'],
       'no-restricted-exports': 'off',
       '@typescript-eslint/unbound-method': 'off',
     },

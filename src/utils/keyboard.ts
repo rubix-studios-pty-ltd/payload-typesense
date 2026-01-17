@@ -5,20 +5,16 @@ export function handleKeyboard(
   options: {
     inputRef: React.RefObject<HTMLInputElement | null>
     isOpen: boolean
-    results: any
+    results: unknown
     resultsRef: React.RefObject<HTMLDivElement | null>
   }
 ) {
   const { inputRef, isOpen, results, resultsRef } = options
 
-  if (!isOpen || !results) {
-    return
-  }
+  if (!isOpen || !results) return
 
   const resultItems = resultsRef.current?.querySelectorAll('[data-result-item]')
-  if (!resultItems) {
-    return
-  }
+  if (!resultItems) return
 
   const currentIndex = Array.from(resultItems).findIndex((item) => item === document.activeElement)
 

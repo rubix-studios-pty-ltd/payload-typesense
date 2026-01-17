@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 
 import { type SearchResponse } from '../types.js'
 
@@ -25,21 +25,12 @@ export function useSearch<T = Record<string, unknown>>({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<null | string>(null)
 
-  const collectionsRef = useRef<string | string[] | undefined>(collections)
-  const onResultsRef = useRef<typeof onResults>(onResults)
-  const onSearchRef = useRef<typeof onSearch>(onSearch)
-
-  useEffect(() => {
-    collectionsRef.current = collections
-  }, [collections])
-
-  useEffect(() => {
-    onResultsRef.current = onResults
-  }, [onResults])
-
-  useEffect(() => {
-    onSearchRef.current = onSearch
-  }, [onSearch])
+  // Keep refs only for callbacks to avoid unnecessary re-renders of search function
+  const onResultsRef = useRef(onResults)
+  const onSearchRef = useRef(onSearch)
+  
+  onResultsRef.current = onResults
+  onSearchRef.current = onSearch
 
   const search = useCallback(
     async (searchQuery: string) => {
@@ -53,46 +44,42 @@ export function useSearch<T = Record<string, unknown>>({
       setError(null)
 
       try {
-        const activeCollections = collectionsRef.current
-        let searchUrl: string
+        const params = new URLSearchParams({
+          per_page: String(perPage),
+          q: searchQuery,
+        })
 
-        if (typeof activeCollections === 'string' && activeCollections) {
-          searchUrl = `${baseUrl}/api/search/${activeCollections}?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage}`
-        } else if (Array.isArray(activeCollections) && activeCollections.length > 0) {
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage * 2}`
-        } else {
-          searchUrl = `${baseUrl}/api/search?q=${encodeURIComponent(
-            searchQuery
-          )}&per_page=${perPage}`
-        }
+        const isSingleCollection = Array.isArray(collections) && collections.length === 1
+        const endpoint = isSingleCollection 
+          ? `${baseUrl}/api/search/${collections[0]}` 
+          : `${baseUrl}/api/search`
+        
+        const searchUrl = `${endpoint}?${params.toString()}`
 
         const response = await fetch(searchUrl)
-
         if (!response.ok) {
           throw new Error(`Search failed: ${response.status} ${response.statusText}`)
         }
 
         let searchResults: SearchResponse<T> = await response.json()
 
-        if (Array.isArray(activeCollections) && activeCollections.length > 0) {
+        if (Array.isArray(collections) && collections.length > 1) {
           const filteredHits =
             searchResults.hits?.filter(
-              (hit) => hit.collection && activeCollections.includes(hit.collection)
+              (hit) => hit.collection && collections.includes(hit.collection)
             ) || []
 
           const filteredCollections =
             searchResults.collections?.filter(
-              (col) => col.collection && activeCollections.includes(col.collection)
+              (col) => col.collection && collections.includes(col.collection)
             ) || []
+
+          const totalFound = filteredCollections.reduce((sum, col) => sum + (col.found || 0), 0)
 
           searchResults = {
             ...searchResults,
             collections: filteredCollections,
-            found: filteredHits.length,
+            found: totalFound,
             hits: filteredHits,
           }
         }
@@ -101,13 +88,14 @@ export function useSearch<T = Record<string, unknown>>({
         onResultsRef.current?.(searchResults)
         onSearchRef.current?.(searchQuery, searchResults)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Search failed')
+        const errorMessage = err instanceof Error ? err.message : 'Search failed'
+        setError(errorMessage)
         setResults(null)
       } finally {
         setIsLoading(false)
       }
     },
-    [baseUrl, minQueryLength, perPage]
+    [baseUrl, collections, minQueryLength, perPage]
   )
 
   return {

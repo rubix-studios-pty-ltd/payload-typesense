@@ -27,7 +27,10 @@ export const createSearch = (
       const q = url.searchParams.get('q') || ''
       const page = Number(url.searchParams.get('page') || 1)
       const per_page = Number(url.searchParams.get('per_page') || 10)
-      const sort_by = url.searchParams.get('sort_by') || undefined
+
+      const sort_by = url.searchParams.has('sort_by')
+        ? url.searchParams.get('sort_by') || ''
+        : undefined
 
       if (isNaN(page) || page < 1) {
         return Response.json({ error: 'Invalid page parameter' }, { status: 400 })
@@ -90,14 +93,16 @@ export const createSearch = (
         ...(sort_by ? { sort_by } : {}),
       }
 
-      const cached = searchCache.get(q, collection, { page, per_page, sort_by })
+      const cacheKey = { fields, page, per_page, sort_by }
+      const cached = searchCache.get(q, collection, cacheKey)
+
       if (cached) {
         return Response.json(cached)
       }
 
       const results = await typesenseClient.collections(collection).documents().search(searchParams)
 
-      searchCache.set(q, results, collection, { page, per_page, sort_by })
+      searchCache.set(q, results, collection, cacheKey)
 
       return Response.json(results)
     } catch (error) {

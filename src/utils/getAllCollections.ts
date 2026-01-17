@@ -34,7 +34,7 @@ export const getAllCollections = async (
           highlight_full_fields: config?.searchFields?.join(',') || 'title,content',
           num_typos: 0,
           page: options.page,
-          per_page: Math.ceil(options.per_page / enabledCollections.length),
+          per_page: options.per_page,
           q: query,
           query_by: config?.searchFields?.join(',') || 'title,content',
           snippet_threshold: 30,

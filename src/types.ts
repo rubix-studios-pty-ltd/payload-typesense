@@ -180,8 +180,9 @@ export interface SearchParams {
 export interface BaseSearchInputProps<T = any> {
   baseUrl: string
   className?: string
-  collections?: string | string[]
+  collections?: string[]
   debounceMs?: number
+  enableSuggestions?: boolean
   errorClassName?: string
   inputClassName?: string
   inputWrapperClassName?: string
@@ -195,6 +196,7 @@ export interface BaseSearchInputProps<T = any> {
   onResults?: (results: SearchResponse<T>) => void
   onSearch?: (query: string, results: SearchResponse<T>) => void
   placeholder?: string
+  renderDate?: boolean
   resultsHeaderClassName?: string
   resultsListClassName?: string
 }
@@ -208,6 +210,11 @@ export interface CacheEntry<T = any> {
 export interface CacheOptions {
   maxSize?: number
   ttl?: number
+}
+
+export interface CacheStats {
+  hits: number
+  misses: number
 }
 
 export interface HealthCheckResponse {
@@ -249,4 +256,53 @@ export interface ApiResponse<T = any> {
     timestamp: string
   }
   success: boolean
+}
+
+export type FieldType =
+  | 'auto'
+  | 'bool'
+  | 'bool[]'
+  | 'float'
+  | 'float[]'
+  | 'geopoint'
+  | 'geopoint[]'
+  | 'geopolygon'
+  | 'image'
+  | 'int32'
+  | 'int32[]'
+  | 'int64'
+  | 'int64[]'
+  | 'object'
+  | 'object[]'
+  | 'string'
+  | 'string*'
+  | 'string[]'
+
+export interface CollectionFieldSchema {
+  [t: string]: unknown
+  facet?: boolean
+  index?: boolean
+  infix?: boolean
+  locale?: string
+  name: string
+  num_dim?: number
+  optional?: boolean
+  range_index?: boolean
+  sort?: boolean
+  stem?: boolean
+  store?: boolean
+  type: FieldType
+}
+
+export type CollectionSchema = {
+  default_sorting_field?: string
+  enable_nested_fields?: boolean
+  fields: CollectionFieldSchema[]
+  metadata?: object
+  name: string
+  symbols_to_index?: string[]
+  token_separators?: string[]
+  voice_query_model?: {
+    model_name?: string
+  }
 }

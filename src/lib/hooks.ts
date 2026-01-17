@@ -2,7 +2,7 @@ import type Typesense from 'typesense'
 
 import { type CollectionAfterChangeHook, type CollectionAfterDeleteHook } from 'payload'
 
-import { type TypesenseConfig } from '../types.js'
+import { type BaseDocument, type TypesenseConfig } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
 
@@ -48,7 +48,7 @@ export const setupHooks = (
 export const syncDocumentToTypesense = async (
   typesenseClient: Typesense.Client,
   collectionSlug: string,
-  doc: any,
+  doc: BaseDocument,
   _operation: 'create' | 'update',
   config: NonNullable<TypesenseConfig['collections']>[string] | undefined
 ) => {

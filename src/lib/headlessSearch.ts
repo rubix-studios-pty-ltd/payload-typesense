@@ -11,7 +11,7 @@ export interface HeadlessSearchInputProps<
   /**
    * Collections to search in
    */
-  collections?: string | string[]
+  collections?: string[]
   /**
    * Enable suggestions
    */
@@ -33,10 +33,10 @@ export interface HeadlessSearchInputProps<
    */
   renderInput?: (props: {
     className: string
-    onBlur: (e: React.FocusEvent) => void
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     onFocus: () => void
-    onKeyDown: (e: React.KeyboardEvent) => void
+    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
     placeholder: string
     ref: React.RefObject<HTMLInputElement | null>
     value: string
@@ -55,7 +55,10 @@ export interface HeadlessSearchInputProps<
   renderResult?: (
     result: SearchResult<T>,
     index: number,
-    handlers: { onClick: (result: SearchResult<T>) => void }
+    handlers: {
+      onClick: (result: SearchResult<T>) => void
+      onHover?: (result: SearchResult<T>) => void
+    }
   ) => React.ReactNode
   /**
    * Custom render function for results header

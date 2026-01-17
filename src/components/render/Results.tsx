@@ -1,3 +1,5 @@
+import React from 'react'
+
 import { type SearchResult } from '../../types.js'
 import { type ThemeContextValue } from '../themes/types.js'
 
@@ -27,7 +29,6 @@ export function RenderedResult({
         backgroundColor: themeConfig.theme.colors.resultBackground,
         borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
         cursor: 'pointer',
-        padding: themeConfig.theme.spacing.itemPadding,
         transition:
           themeConfig.config.enableAnimations !== false
             ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
@@ -60,7 +61,15 @@ export function RenderedResult({
         role="button"
         tabIndex={0}
       >
-        <div style={{ alignItems: 'flex-start', display: 'flex', gap: '12px', padding: '6px' }}>
+        <div
+          style={{
+            alignItems: 'flex-start',
+            display: 'flex',
+            gap: '12px',
+            overflow: 'hidden',
+            padding: '6px',
+          }}
+        >
           <div style={{ flexShrink: 0 }}>
             <div
               style={{
@@ -69,7 +78,7 @@ export function RenderedResult({
                 borderRadius: themeConfig.theme.spacing.inputBorderRadius,
                 color: themeConfig.theme.colors.collectionBadgeText,
                 display: 'flex',
-                fontSize: '14px',
+                fontSize: themeConfig.theme.typography.fontSizeBase,
                 fontWeight: themeConfig.theme.typography.fontWeightMedium,
                 height: '32px',
                 justifyContent: 'center',

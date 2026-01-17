@@ -64,11 +64,22 @@ export const mapToTypesense = (
       const [arrayField, subField] = field.split('.', 2)
       if (arrayField && subField && Array.isArray(doc[arrayField])) {
         const joined = (doc[arrayField] as unknown[])
-          .map((item) =>
-            item && typeof item === 'object' && subField in item
-              ? String((item as Record<string, unknown>)[subField] ?? '')
-              : ''
-          )
+          .map((item) => {
+            if (!item || typeof item !== 'object' || !(subField in item)) return ''
+
+            const raw = (item as Record<string, unknown>)[subField]
+            if (raw == null) return ''
+
+            if (typeof raw === 'string' || typeof raw === 'number') {
+              return String(raw)
+            }
+
+            if (typeof raw === 'object' && 'root' in raw) {
+              return extractText(raw as { root: unknown }) || ''
+            }
+
+            return ''
+          })
           .filter(Boolean)
           .join(' ')
 
@@ -93,14 +104,21 @@ export const mapToTypesense = (
       'root' in value
     ) {
       typesenseDoc[field] = extractText(value as { root: unknown }) || ''
-    } else {
+    } else if (typeof value === 'string' || typeof value === 'number') {
       typesenseDoc[field] = String(value)
+    } else {
+      typesenseDoc[field] = ''
     }
   }
 
   for (const field of facetFields) {
     const value = doc[field]
-    typesenseDoc[field] = value !== undefined && value !== null ? String(value) : 'unknown'
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      typesenseDoc[field] = String(value)
+    } else {
+      typesenseDoc[field] = 'unknown'
+    }
   }
 
   const hasSearchableContent = searchableFields.some((field) => {
