@@ -47,7 +47,7 @@ export const getAllCollections = async (
         let results
 
         if (options.vector) {
-          results = await performVectorSearch(typesenseClient, pluginOptions, query, {
+          results = await performVectorSearch(typesenseClient, query, {
             collection: collectionName,
             page: options.page,
             per_page: options.per_page,

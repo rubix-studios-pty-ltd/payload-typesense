@@ -4,7 +4,7 @@ import { extractText } from '../utils/extractText.js'
 export const mapCollectionToTypesense = (
   collectionSlug: string,
   config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
-  pluginOptions?: TypesenseConfig
+  vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ) => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
@@ -32,13 +32,12 @@ export const mapCollectionToTypesense = (
 
   const fields: CollectionFieldSchema[] = [...baseFields, ...searchFields, ...facetOnlyFields]
 
-  if (pluginOptions?.vectorSearch?.enabled) {
-    const vectorFieldName = pluginOptions.vectorSearch.defaultVectorField ?? 'embedding'
-    const embedFromFields = pluginOptions.vectorSearch.embedFrom ?? searchableFields
-    const embeddingModel = pluginOptions.vectorSearch.embeddingModel ?? 'ts/all-MiniLM-L12-v2'
+  if (vector?.enabled) {
+    const embedFromFields = vector.embedFrom ?? searchableFields
+    const embeddingModel = vector.embeddingModel ?? 'ts/all-MiniLM-L12-v2'
 
     fields.push({
-      name: vectorFieldName,
+      name: 'embedding',
       type: 'float[]',
       embed: {
         from: embedFromFields,

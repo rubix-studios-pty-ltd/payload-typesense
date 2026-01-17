@@ -15,6 +15,7 @@ export const setupHooks = (
   } = {}
 ) => {
   const hooks = { ...existingHooks }
+  const vector = pluginOptions.vectorSearch
 
   for (const [collectionSlug, config] of Object.entries(pluginOptions.collections || {})) {
     if (!config?.enabled) {
@@ -22,14 +23,7 @@ export const setupHooks = (
     }
 
     const changeHook: CollectionAfterChangeHook = async ({ doc, operation }) => {
-      await syncDocumentToTypesense(
-        typesenseClient,
-        collectionSlug,
-        doc,
-        operation,
-        config,
-        pluginOptions
-      )
+      await syncDocumentToTypesense(typesenseClient, collectionSlug, doc, operation, config, vector)
     }
 
     hooks.afterChange = {
@@ -58,10 +52,10 @@ export const syncDocumentToTypesense = async (
   doc: BaseDocument,
   _operation: 'create' | 'update',
   config: NonNullable<TypesenseConfig['collections']>[string] | undefined,
-  pluginOptions?: TypesenseConfig
+  vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ) => {
   try {
-    const schema = mapCollectionToTypesense(collectionSlug, config, pluginOptions)
+    const schema = mapCollectionToTypesense(collectionSlug, config, vector)
 
     await ensureCollection(typesenseClient, collectionSlug, schema)
 

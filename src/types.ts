@@ -142,7 +142,6 @@ export type TypesenseConfig = {
   }
 
   vectorSearch?: {
-    defaultVectorField?: string
     embeddingModel?: string
     embedFrom?: string[]
     enabled?: boolean

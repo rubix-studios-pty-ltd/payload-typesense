@@ -86,7 +86,7 @@ export const createSearch = (
 
       if (vector) {
         try {
-          const results = await performVectorSearch(typesenseClient, pluginOptions, q, {
+          const results = await performVectorSearch(typesenseClient, q, {
             collection,
             page,
             per_page,
