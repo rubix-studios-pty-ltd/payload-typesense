@@ -1,6 +1,5 @@
-import type Typesense from 'typesense'
-
 import { type PayloadHandler, type PayloadRequest } from 'payload'
+import type Typesense from 'typesense'
 
 import { type TypesenseConfig } from '../../types.js'
 

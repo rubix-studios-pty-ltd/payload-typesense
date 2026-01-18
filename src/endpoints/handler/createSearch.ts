@@ -1,6 +1,5 @@
-import type Typesense from 'typesense'
-
 import { type PayloadHandler, type PayloadRequest } from 'payload'
+import type Typesense from 'typesense'
 
 import { searchCache } from '../../lib/cache.js'
 import { getValidationErrors, validateSearchParams } from '../../lib/validation.js'

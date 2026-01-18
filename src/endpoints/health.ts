@@ -1,6 +1,5 @@
-import type Typesense from 'typesense'
-
 import { type PayloadHandler } from 'payload'
+import type Typesense from 'typesense'
 
 import pkg from '../../package.json' with { type: 'json' }
 import { type HealthCheckResponse, type TypesenseConfig } from '../types.js'

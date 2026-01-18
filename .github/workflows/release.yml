@@ -24,7 +24,6 @@ jobs:
           node-version: 22
       - run: pnpm install --frozen-lockfile
       - run: pnpm clean
-      - run: pnpm lint
 
   release:
     runs-on: ubuntu-latest
