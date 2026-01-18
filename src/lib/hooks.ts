@@ -59,6 +59,7 @@ export const syncDocumentToTypesense = async (
     await ensureCollection(typesenseClient, collectionSlug, schema)
 
     const typesenseDoc = mapToTypesense(doc, collectionSlug, config)
+    if (!typesenseDoc) return
 
     await typesenseClient.collections(collectionSlug).documents().upsert(typesenseDoc)
   } catch {
