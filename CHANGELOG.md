@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.3.2...v1.3.3) (2026-01-18)
+
+
+### Bug Fixes
+
+* prevent upsert of undefined document in syncDocumentToTypesense ([6f06871](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/6f06871c7f242baace30b58dd40e13794a66603e))
+* streamline document mapping and connection validation in Typesense integration ([52d0ca1](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/52d0ca140124199e5622888ab96e33949ee7615d))
+
 ## [1.3.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.3.1...v1.3.2) (2026-01-17)
 
 
