@@ -1,6 +1,5 @@
-import type Typesense from 'typesense'
-
 import { type Payload } from 'payload'
+import type Typesense from 'typesense'
 
 import { type BaseDocument, type ImportError, type TypesenseConfig } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'

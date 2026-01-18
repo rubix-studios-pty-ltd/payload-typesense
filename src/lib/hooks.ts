@@ -1,6 +1,5 @@
-import type Typesense from 'typesense'
-
 import { type CollectionAfterChangeHook, type CollectionAfterDeleteHook } from 'payload'
+import type Typesense from 'typesense'
 
 import { type BaseDocument, type TypesenseConfig } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
