@@ -58,8 +58,8 @@ export const mapCollectionToTypesense = (
 export const mapToTypesense = (
   doc: BaseDocument,
   _collectionSlug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string] | undefined
-) => {
+  config: NonNullable<TypesenseConfig['collections']>[string]
+): Record<string, number | string> | null => {
   const searchableFields = config?.searchFields || ['title', 'content', 'description']
   const facetFields = config?.facetFields || []
 
@@ -145,9 +145,7 @@ export const mapToTypesense = (
   })
 
   if (!hasSearchableContent) {
-    if (!typesenseDoc.title) {
-      typesenseDoc.title = `Document ${doc.id}`
-    }
+    return null
   }
 
   return typesenseDoc
