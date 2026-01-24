@@ -7,26 +7,26 @@ import { initializeTypesense } from './lib/initialization.js'
 import { type TypesenseConfig } from './types.js'
 
 export * from './components/index.js'
-export type { TypesenseConfig } from './types.js'
+export { type TypesenseConfig } from './types.js'
 
 export const typesenseSearch =
-  (pluginOptions: TypesenseConfig) =>
-  (config: Config): Config => {
-    if (pluginOptions.disabled) return config
+  (pluginConfig: TypesenseConfig) =>
+  (incomingConfig: Config): Config => {
+    if (pluginConfig.disabled) return incomingConfig
 
-    const client = createClient(pluginOptions.typesense)
+    const client = createClient(pluginConfig.typesense)
 
-    config.endpoints = [
-      ...(config.endpoints || []),
-      ...createSearchEndpoints(client, pluginOptions, Date.now()),
+    incomingConfig.endpoints = [
+      ...(incomingConfig.endpoints || []),
+      ...createSearchEndpoints(client, pluginConfig, Date.now()),
     ]
 
-    const shouldAutoSync = pluginOptions.settings?.autoSync !== false
-    const hasCollections = !!pluginOptions.collections
+    const shouldAutoSync = pluginConfig.settings?.autoSync !== false
+    const hasCollections = !!pluginConfig.collections
 
     if (shouldAutoSync && hasCollections) {
-      config.collections = (config.collections || []).map((collection) => {
-        const colConfig = pluginOptions.collections?.[collection.slug]
+      incomingConfig.collections = (incomingConfig.collections || []).map((collection) => {
+        const colConfig = pluginConfig.collections?.[collection.slug]
         if (!colConfig?.enabled) return collection
 
         return {
@@ -47,13 +47,14 @@ export const typesenseSearch =
       })
     }
 
-    const existingOnInit = config.onInit
-    config.onInit = async (payload) => {
+    const existingOnInit = incomingConfig.onInit
+
+    incomingConfig.onInit = async (payload) => {
       if (existingOnInit) {
         await existingOnInit(payload)
       }
-      await initializeTypesense(payload, client, pluginOptions)
+      await initializeTypesense(payload, client, pluginConfig)
     }
 
-    return config
+    return incomingConfig
   }
