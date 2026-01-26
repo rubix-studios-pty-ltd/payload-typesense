@@ -48,7 +48,7 @@ export default buildConfig({
           facetFields: ['category', 'status'],
           displayName: 'Blog Posts',
           icon: '📝',
-          syncLimit: 500, // Overrides the default per-page sync limit of 1000
+          syncLimit: 500, // Overrides the default sync limit of 1000
         },
       },
       // This feature is experimental
