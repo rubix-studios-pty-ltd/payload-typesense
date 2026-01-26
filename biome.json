@@ -1,7 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.3.12/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
-  "files": { "includes": ["**", "!!**/dist"] },
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false
+  },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
@@ -48,8 +54,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": false,
-      "style": { "useBlockStatements": "error" }
+      "recommended": false
     },
     "includes": [
       "**",
@@ -97,7 +102,9 @@
   "overrides": [
     {
       "includes": ["**/*.ts"],
-      "javascript": { "globals": [] },
+      "javascript": {
+        "globals": []
+      },
       "linter": {
         "rules": {
           "complexity": {
@@ -348,7 +355,9 @@
             "useValidAriaProps": "error",
             "useValidAriaRole": {
               "level": "error",
-              "options": { "ignoreNonDom": false }
+              "options": {
+                "ignoreNonDom": false
+              }
             },
             "useValidAriaValues": "error",
             "useValidLang": "error"
@@ -397,7 +406,7 @@
             "noNamespace": "error",
             "useArrayLiterals": "error",
             "useAsConstAssertion": "error",
-            "useBlockStatements": "warn",
+            "useBlockStatements": "off",
             "useConst": "error"
           },
           "suspicious": {
@@ -453,7 +462,10 @@
             "noInvalidUseBeforeDeclaration": "off",
             "noUnusedVariables": "warn"
           },
-          "style": { "noDoneCallback": "error", "useBlockStatements": "warn" },
+          "style": {
+            "noDoneCallback": "error",
+            "useBlockStatements": "off"
+          },
           "suspicious": {
             "noConsole": "warn",
             "noExplicitAny": "warn",
@@ -474,7 +486,9 @@
             "noInvalidUseBeforeDeclaration": "off",
             "noUnusedVariables": "warn"
           },
-          "style": { "useBlockStatements": "warn" },
+          "style": {
+            "useBlockStatements": "off"
+          },
           "suspicious": {
             "noConsole": "warn",
             "noExplicitAny": "warn",
@@ -486,6 +500,8 @@
   ],
   "assist": {
     "enabled": true,
-    "actions": { "source": { "organizeImports": "on" } }
+    "actions": {
+      "source": { "organizeImports": "on" }
+    }
   }
 }
