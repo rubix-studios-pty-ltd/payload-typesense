@@ -52,20 +52,20 @@
     "release": "semantic-release"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.13",
+    "@biomejs/biome": "2.3.14",
     "@payloadcms/eslint-config": "^3.28.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@swc/cli": "^0.7.10",
+    "@swc/cli": "^0.8.0",
     "@swc/core": "^1.15.11",
-    "@types/react": "19.2.10",
-    "payload": "^3.74.0",
+    "@types/react": "19.2.13",
+    "payload": "^3.75.0",
     "rimraf": "^6.1.2",
-    "semantic-release": "^25.0.2",
+    "semantic-release": "^25.0.3",
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "payload": "^3.72.0"
+    "payload": "^3.75.0"
   },
   "engines": {
     "node": ">=24",
@@ -85,7 +85,7 @@
     }
   },
   "dependencies": {
-    "typesense": "^2.1.0",
+    "typesense": "^3.0.1",
     "zod": "^4.3.6"
   },
   "packageManager": "pnpm@10.28.2"
