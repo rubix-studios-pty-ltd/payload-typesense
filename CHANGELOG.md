@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.4.2...v1.4.3) (2026-02-06)
+
+
+### Bug Fixes
+
+* **deps:** raise Next.js peer minimums to patched versions (CVE) ([a94a318](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/a94a318ac7fc18fe75f2897baaa892702733533f))
+
 ## [1.4.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.4.1...v1.4.2) (2026-01-30)
 
 
