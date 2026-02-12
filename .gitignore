@@ -1,30 +1,92 @@
-# Node modules
+# system
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+Thumbs.db
+
+# security
+*.pem
+*.key
+*.crt
+
+# environment
+.env
+.env.*
+.env*.local
+.infisical.json
+!.env.example
+
+# dependencies
+jspm_packages/
 node_modules/
+web_modules/
+.pnpm-store/
+.pnpm-debug.log*
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Build output
-dist/
-*.tsbuildinfo
-
-# Turbo cache
-.turbo/
-
-# Logs
+# debug
+logs/
+*.log
 npm-debug.log*
-pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 turbo.log*
 
-# Environment files
-.env
-.env.local
-.env.*.local
+# diagnostic
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Editor settings
-.vscode/
-.idea/
+# runtime
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# OS/system files
-.DS_Store
-Thumbs.db
+# build
+.nuxt/
+.next/
+out/
+build/
 dist/
+lib-cov/
+coverage/
+*.lcov
+.grunt/
+.turbo/
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# editors
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+.idea/
+*.swp
+*.swo
+
+# docker
+.dockerignore
+docker-compose.override.yml
+
+# deployment
+.vercel
+
+# cache
+.cache/
+.eslintcache
+
+# custom
+debug/
+.npmrc.local
