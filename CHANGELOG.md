@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.5.0...v1.5.1) (2026-02-19)
+
+
+### Bug Fixes
+
+* update biome.json schema version and format package.json files array ([c28e39b](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/c28e39b3741d220701168a932ebdc1e6e4ee73d6))
+* update biome.json to ignore specific directories and upgrade dependencies in pnpm-lock.yaml ([9e741eb](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9e741eb62f6ceba6f2450d093813d9bfc85b3517))
+* update payload and related dependencies to latest versions ([4618e5f](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/4618e5faa9ea06001872ff908cbee068d1f71688))
+
 # [1.5.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.4.3...v1.5.0) (2026-02-13)
 
 
