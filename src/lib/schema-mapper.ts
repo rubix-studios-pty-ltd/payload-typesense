@@ -115,12 +115,7 @@ export const mapToTypesense = (
       continue
     }
 
-    if (
-      (field === 'content' || field === 'description') &&
-      typeof value === 'object' &&
-      value !== null &&
-      'root' in value
-    ) {
+    if (typeof value === 'object' && value !== null && 'root' in value) {
       typesenseDoc[field] = extractText(value as { root: unknown }) || ''
     } else if (typeof value === 'string' || typeof value === 'number') {
       typesenseDoc[field] = String(value)
