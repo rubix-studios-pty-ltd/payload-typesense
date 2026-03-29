@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.4](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.5.3...v1.5.4) (2026-03-29)
+
+
+### Bug Fixes
+
+* initialization doesn't happen when 'id' is type 'number' ([babde32](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/babde329b97e47200b9904736637bbf9a017301f)), closes [#59](https://github.com/rubix-studios-pty-ltd/payload-typesense/issues/59)
+
+## [1.5.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.5.2...v1.5.3) (2026-03-29)
+
+
+### Bug Fixes
+
+* all rich text fields that appear in searchFields should be extractText()'d ([6d272e0](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/6d272e08358e3dc824fc310e554296635f178ed2)), closes [#57](https://github.com/rubix-studios-pty-ltd/payload-typesense/issues/57)
+
+## [1.5.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.5.1...v1.5.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* **release:** raise minimum dependancies to ensure security ([2ff5140](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/2ff5140d34a6a93e2020f297c784ba9f951e8c51))
+
+## [1.5.1](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.5.0...v1.5.1) (2026-02-19)
+
+
+### Bug Fixes
+
+* update biome.json schema version and format package.json files array ([c28e39b](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/c28e39b3741d220701168a932ebdc1e6e4ee73d6))
+* update biome.json to ignore specific directories and upgrade dependencies in pnpm-lock.yaml ([9e741eb](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9e741eb62f6ceba6f2450d093813d9bfc85b3517))
+* update payload and related dependencies to latest versions ([4618e5f](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/4618e5faa9ea06001872ff908cbee068d1f71688))
+
+# [1.5.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.4.3...v1.5.0) (2026-02-13)
+
+
+### Bug Fixes
+
+* force CVE-2026-23864 coverage. ([0c74ff8](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/0c74ff84e74fb62080d846602ff0dcbd3bcba330))
+
+
+### Features
+
+* update .gitignore and upgrade dependencies ([ee11af3](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ee11af30ef51a23a7dae61d52887b6956563c427))
+
 ## [1.4.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.4.2...v1.4.3) (2026-02-06)
 
 
