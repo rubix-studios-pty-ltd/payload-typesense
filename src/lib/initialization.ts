@@ -88,8 +88,8 @@ const syncExistingDocuments = async (
           .filter((doc): doc is BaseDocument => {
             if (typeof doc !== 'object' || doc === null) return false
             if (!('id' in doc)) return false
-            return (typeof (doc as Record<string, unknown>).id === 'string' ||
-		   typeof (doc as Record<string, unknown>).id === 'number')
+			const id = (doc as Record<string, unknown>).id
+			return typeof id === 'string' || typeof id === 'number'
           })
           .map((doc) => mapToTypesense(doc, collectionSlug, config))
           .filter((doc): doc is Record<string, number | string> => doc !== null)
