@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "target": "esnext",
     "lib": ["esnext", "dom", "dom.iterable"],
     "outDir": "dist",
@@ -20,7 +19,6 @@
     "moduleResolution": "nodenext",
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "ignoreDeprecations": "6.0",
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
