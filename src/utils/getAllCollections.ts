@@ -2,7 +2,7 @@ import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
 import { type TypesenseConfig } from '../types.js'
-import { performVectorSearch } from './vectorSearch.js'
+import { vectorSearch } from './vectorSearch.js'
 
 export const getAllCollections = async (
   typesenseClient: Typesense.Client,
@@ -46,8 +46,8 @@ export const getAllCollections = async (
       try {
         let results
 
-        if (options.vector) {
-          results = await performVectorSearch(typesenseClient, query, {
+        if (options.vector && pluginOptions.vectorSearch?.enabled === true) {
+          results = await vectorSearch(typesenseClient, query, {
             collection: collectionName,
             page: options.page,
             per_page: options.per_page,

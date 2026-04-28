@@ -145,6 +145,7 @@ export type TypesenseConfig = {
     embeddingModel?: string
     embedFrom?: string[]
     enabled?: boolean
+    modelConfig?: Record<string, unknown>
   }
 }
 

@@ -42,6 +42,7 @@ export const mapCollectionToTypesense = (
         from: embedFromFields,
         model_config: {
           model_name: embeddingModel,
+          ...(vector.modelConfig || {}),
         },
       },
     })

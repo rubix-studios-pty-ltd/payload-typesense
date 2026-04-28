@@ -5,7 +5,7 @@ import { searchCache } from '../../lib/cache.js'
 import { getValidationErrors, validateSearchParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
 import { getAllCollections } from '../../utils/getAllCollections.js'
-import { performVectorSearch } from '../../utils/vectorSearch.js'
+import { vectorSearch } from '../../utils/vectorSearch.js'
 
 export const createSearch = (
   typesenseClient: Typesense.Client,
@@ -29,7 +29,10 @@ export const createSearch = (
       const per_page = Number(url.searchParams.get('per_page') || 10)
       const collectionsParam = url.searchParams.get('collections')
       const collections = collectionsParam ? collectionsParam.split(',').filter(Boolean) : undefined
-      const vector = url.searchParams.get('vector') === 'true'
+
+      const vectorParams = url.searchParams.get('vector') === 'true'
+      const vectorConfig = pluginOptions.vectorSearch?.enabled === true
+      const vector = vectorParams && vectorConfig
 
       const sort_by = url.searchParams.has('sort_by')
         ? url.searchParams.get('sort_by') || ''
@@ -85,7 +88,7 @@ export const createSearch = (
 
       if (vector) {
         try {
-          const results = await performVectorSearch(typesenseClient, q, {
+          const results = await vectorSearch(typesenseClient, q, {
             collection,
             page,
             per_page,
