@@ -55,8 +55,11 @@ export default buildConfig({
       vectorSearch: {
         enabled: true, // Enables vector-based semantic search
         embedFrom: ['title', 'content'], // Omit to fall back to collection searchFields
-        embeddingModel: 'ts/all-MiniLM-L12-v2',
-      },
+        embeddingModel: 'azure/text-embedding-ada-002',
+        modelConfig: {
+          api_key: 'your-api-key',
+          url: 'https://modelendpoint.com/openai',
+        },
     }),
   ],
 })

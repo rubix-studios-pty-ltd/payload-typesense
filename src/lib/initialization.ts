@@ -42,7 +42,7 @@ const initializeCollection = async (
 
   const schema = mapCollectionToTypesense(collectionSlug, config, vector)
 
-  const exists = await ensureCollection(typesenseClient, collectionSlug, schema)
+  const exists = await ensureCollection(typesenseClient, collectionSlug, schema, vector)
   if (!exists) return
 
   await syncExistingDocuments(payload, typesenseClient, collectionSlug, config)
