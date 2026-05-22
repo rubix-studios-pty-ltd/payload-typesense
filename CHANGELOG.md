@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.4](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.3...v1.6.4) (2026-05-22)
+
+
+### Bug Fixes
+
+* release pipeline and update packages ([bd62041](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/bd62041db67fffe9a7323254c13c50e59dba7c5b))
+* update copyright information and author name in documentation files ([0d18ec3](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/0d18ec3e8e6f22e3af87d877bf6d22682c4815e5))
+* update imports to use type-only imports and enhance linter rules ([1ca1384](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/1ca13840b4790a55cd999289cace4a3540544755))
+
 ## [1.6.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.2...v1.6.3) (2026-04-28)
 
 
