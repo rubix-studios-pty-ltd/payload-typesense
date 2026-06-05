@@ -1,18 +1,8 @@
 # PayloadCMS + Typesense Plugin
 
-Forked from FrontTribe’s Typesense Search Plugin, Rubix Studios implementation has been substantially re-engineered to meet stricter production, deployment, and TypeScript standards. The codebase has been streamlined for improved maintainability, enhanced type safety, and predictable behaviour under load, while preserving full compatibility with Payload CMS and Typesense.
+Rubix Studios' Typesense integration for Payload CMS is built for production search workflows, with a lightweight, modular structure and optional support for advanced capabilities such as vector querying.
 
-The fork introduces meaningful architectural improvements, including more efficient caching strategies with race-condition mitigation, improved request handling, and deployment-safe defaults. The result is a lighter, more resilient integration.
-
-With a modular, tree-shakable structure and optional support for advanced search capabilities such as vector-based querying, the plugin is designed to scale from simple content search implementations to more complex, search-driven applications without unnecessary bloat.
-
-This project is actively maintained by Rubix Studios and is intended for production environments where performance, stability, and code quality are critical.
-
-[![install size](https://packagephobia.com/badge?p=@rubixstudios/payload-typesense)](https://packagephobia.com/result?p=@rubixstudios/payload-typesense)
-**PayloadCMS + Typesense Plugin**
-
-[![install size](https://packagephobia.com/badge?p=typesense-search-plugin)](https://packagephobia.com/result?p=typesense-search-plugin)
-**FrontTribe's Typesense Search Plugin**
+The plugin is actively maintained by Rubix Studios.
 
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 ![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
