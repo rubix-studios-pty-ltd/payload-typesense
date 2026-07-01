@@ -1,3 +1,6 @@
 allowBuilds:
   '@swc/core': true
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@payloadcms/translations@3.85.2'
+  - payload@3.85.2
