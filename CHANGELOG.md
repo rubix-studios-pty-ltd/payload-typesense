@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.7](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.6...v1.6.7) (2026-07-01)
+
+
+### Performance Improvements
+
+* update devDependencies to latest versions in package.json and pnpm-lock.yaml ([bae49a6](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/bae49a6926a4ddc9290016af4f914f385e919ca5))
+
 ## [1.6.6](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.5...v1.6.6) (2026-05-26)
 
 
