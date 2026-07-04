@@ -12,9 +12,9 @@ We take the security of PayloadCMS + Typesense Plugin seriously. If you believe 
 
 1. **DO NOT** create a public GitHub issue for the vulnerability.
 2. Contact us directly at one of the following:
-   - X: [@rubixvi](https://x.com/rubixvi)
+   - X: [@rubixstory](https://x.com/rubixstory)
    - Email: [Contact Form](https://rubixstudios.com.au/contact)
-   - Facebook: [rubixvi](https://www.facebook.com/rubixvi/)
+   - Facebook: [rubixstudios](https://www.facebook.com/rubixstudios)
 
 Please include the following details in your report:
 
@@ -45,7 +45,7 @@ When using PayloadCMS + Typesense Plugin in production:
 2. Use secure environment variables for sensitive data
 3. Regularly backup your database
 4. Monitor your application logs for suspicious activity
-5. Follow security best practices for Next.js and MongoDB deployments
+5. Follow security best practices for Next.js deployments
 6. Implement proper authentication and authorization
 
 ## Security Monitoring
