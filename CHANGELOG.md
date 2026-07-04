@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.9](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.8...v1.6.9) (2026-07-04)
+
+
+### Bug Fixes
+
+* simplify GitHub release configuration in .releaserc.json ([7cb252f](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/7cb252f3a22461529b8d6ed1dc02f829994c5b4c))
+
 ## [1.6.8](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.7...v1.6.8) (2026-07-04)
 
 
