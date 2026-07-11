@@ -1,11 +1,11 @@
-export { type HeadlessSearchInputProps } from '../lib/headlessSearch.js'
-export {
-  type BaseSearchInputProps,
-  type HealthCheckResponse,
-  type SearchResponse,
-  type SearchResult,
-  type SearchResultProps,
-  type TypesenseSearchConfig,
+export type { HeadlessSearchInputProps } from '../lib/headlessSearch.js'
+export type {
+  BaseSearchInputProps,
+  HealthCheckResponse,
+  SearchResponse,
+  SearchResult,
+  SearchResultProps,
+  TypesenseSearchConfig,
 } from '../types.js'
 export { default as HeadlessSearchInput } from './HeadlessSearchInput.js'
 export {

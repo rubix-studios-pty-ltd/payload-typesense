@@ -34,7 +34,7 @@ export const getAllCollections = async (
 
     if (options.collections && options.collections.length > 0) {
       enabledCollections = enabledCollections.filter(([collectionName]) =>
-        options.collections!.includes(collectionName)
+        options.collections?.includes(collectionName)
       )
     }
 

@@ -16,7 +16,7 @@ export function handleKeyboard(
   const resultItems = resultsRef.current?.querySelectorAll('[data-result-item]')
   if (!resultItems) return
 
-  const currentIndex = Array.from(resultItems).findIndex((item) => item === document.activeElement)
+  const currentIndex = Array.from(resultItems).indexOf(document.activeElement)
 
   switch (e.key) {
     case 'ArrowDown': {

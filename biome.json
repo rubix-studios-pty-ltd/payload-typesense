@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.2/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -14,7 +14,11 @@
       "!dist",
       "!build",
       "!out",
-      "!src/components/ui/**/*"
+      "!src/components/ui/**/*",
+      "!payload/payload-types.ts",
+      "!**/*.svg",
+      "!**/*.png",
+      "!**/*.ico"
     ]
   },
   "formatter": {
@@ -63,10 +67,16 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "none",
+      "preset": "recommended",
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "off"
+      },
       "style": {
         "useImportType": {
-          "level": "off",
+          "level": "on",
           "options": {
             "style": "inlineType"
           }
@@ -101,10 +111,7 @@
       "trailingCommas": "es5",
       "semicolons": "asNeeded",
       "arrowParentheses": "always",
-      "bracketSameLine": false,
-      "quoteStyle": "single",
-      "attributePosition": "auto",
-      "bracketSpacing": true
+      "quoteStyle": "single"
     },
     "globals": ["exports"]
   },
@@ -122,14 +129,28 @@
           "level": "on",
           "options": {
             "groups": [
-              [":NODE:", ":BUN:", "react", "react/**", "react-*", "react-*/**", ":PACKAGE:"],
+              ":NODE:",
+              ":BUN:",
+              ["node", "node:*"],
+              ["react", "react/**"],
+              ["next", "next/**", "next-*", "next-*/**"],
+              ["payload"],
+              ["@payloadcms", "@payloadcms/**"],
+              ":PACKAGE:",
               ":BLANK_LINE:",
-              ["**", "!**/*.css", "!**/*.scss"],
+              ["**", "!:STYLE:"],
               ":BLANK_LINE:",
-              ["**/*.css", "**/*.scss"]
+              [":STYLE:"]
             ]
           }
-        }
+        },
+        "useSortedAttributes": {
+          "level": "on",
+          "options": {
+            "sortOrder": "natural"
+          }
+        },
+        "useSortedInterfaceMembers": "on"
       }
     }
   }

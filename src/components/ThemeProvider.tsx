@@ -1,6 +1,7 @@
 'use client'
 
-import React, { createContext, use } from 'react'
+import type React from 'react'
+import { createContext, use } from 'react'
 
 import { useThemeConfig } from './themes/hooks.js'
 import { type ThemeConfig, type ThemeContextValue } from './themes/types.js'
