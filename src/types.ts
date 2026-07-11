@@ -1,21 +1,21 @@
 export interface BaseDocument {
-  [key: string]: unknown
   _status?: 'draft' | 'published'
   createdAt: Date | string
   id: number | string
   slug?: string
   updatedAt: Date | string
+  [key: string]: unknown
 }
 
 export interface RichTextNode {
-  [key: string]: unknown
   children?: RichTextNode[]
   text?: string
+  [key: string]: unknown
 }
 
 export interface RichText {
-  [key: string]: unknown
   root?: RichTextNode
+  [key: string]: unknown
 }
 
 export interface SearchResult<T = any> {
@@ -286,7 +286,6 @@ export type FieldType =
   | 'string[]'
 
 export interface CollectionFieldSchema {
-  [t: string]: unknown
   embed?: {
     from: string[]
     model_config: {
@@ -305,6 +304,7 @@ export interface CollectionFieldSchema {
   stem?: boolean
   store?: boolean
   type: FieldType
+  [t: string]: unknown
 }
 
 export type CollectionSchema = {
