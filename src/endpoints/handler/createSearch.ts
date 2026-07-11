@@ -38,11 +38,11 @@ export const createSearch = (
         ? url.searchParams.get('sort_by') || ''
         : undefined
 
-      if (isNaN(page) || page < 1) {
+      if (Number.isNaN(page) || page < 1) {
         return Response.json({ error: 'Invalid page parameter' }, { status: 400 })
       }
 
-      if (isNaN(per_page) || per_page < 1 || per_page > 250) {
+      if (Number.isNaN(per_page) || per_page < 1 || per_page > 250) {
         return Response.json({ error: 'Invalid per_page parameter' }, { status: 400 })
       }
 

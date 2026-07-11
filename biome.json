@@ -67,7 +67,13 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "preset": "none",
+      "preset": "recommended",
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "off"
+      },
       "style": {
         "useImportType": {
           "level": "on",
