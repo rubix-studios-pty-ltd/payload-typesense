@@ -69,10 +69,15 @@
     "rules": {
       "preset": "recommended",
       "a11y": {
-        "noSvgWithoutTitle": "off"
+        "noSvgWithoutTitle": "off",
+        "useMediaCaption": "off",
+        "useSemanticElements": "off"
       },
       "correctness": {
         "noUnusedImports": "off"
+      },
+      "suspicious": {
+        "noImplicitAnyLet": "off"
       },
       "style": {
         "useImportType": {
