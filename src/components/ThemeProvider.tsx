@@ -1,6 +1,6 @@
 'use client'
 
-import type React from 'react'
+import React from 'react'
 import { createContext, use } from 'react'
 
 import { useThemeConfig } from './themes/hooks.js'
