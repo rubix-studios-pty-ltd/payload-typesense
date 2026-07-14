@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.12](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.11...v1.6.12) (2026-07-14)
+
+
+### Bug Fixes
+
+* remove type import for React in HeadlessSearchInput and ThemeProvider components ([ff217eb](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ff217eb22995905f78aa731e3b7d7bc3bed66de8))
+
 ## [1.6.11](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.10...v1.6.11) (2026-07-11)
 
 
