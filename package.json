@@ -54,17 +54,17 @@
     "release": "semantic-release"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.3",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
+    "@biomejs/biome": "2.5.5",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1",
     "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.15.43",
+    "@swc/core": "^1.15.46",
     "@types/react": "19.2.17",
     "conventional-changelog-conventionalcommits": "^10.2.1",
     "payload": "^3.86.0",
     "rimraf": "^6.1.3",
-    "semantic-release": "^25.0.7",
-    "typescript": "6.0.3"
+    "semantic-release": "^25.0.8",
+    "typescript": "7.0.2"
   },
   "peerDependencies": {
     "payload": "^3.86.0"
@@ -90,5 +90,5 @@
     "typesense": "^3.0.6",
     "zod": "^4.4.3"
   },
-  "packageManager": "pnpm@11.13.0"
+  "packageManager": "pnpm@11.17.0"
 }
