@@ -89,7 +89,6 @@ export function RenderedResult({
             </div>
           </div>
 
-          {/* Content */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div
               style={{
