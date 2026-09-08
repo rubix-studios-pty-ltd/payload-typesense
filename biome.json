@@ -80,12 +80,7 @@
         "noImplicitAnyLet": "off"
       },
       "style": {
-        "useImportType": {
-          "level": "on",
-          "options": {
-            "style": "inlineType"
-          }
-        }
+        "useImportType": "off"
       }
     },
     "includes": [
