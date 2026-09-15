@@ -57,17 +57,17 @@ export const createSearch = (
         )
       }
 
-      if (!collection) {
-        if (!q.trim()) {
-          return Response.json(
-            {
-              details: 'Use /api/search?q=keyword',
-              error: 'Query parameter "q" is required',
-            },
-            { status: 400 }
-          )
-        }
+      if (!q.trim()) {
+        return Response.json(
+          {
+            details: 'Use /api/search?q=keyword',
+            error: 'Query parameter "q" is required',
+          },
+          { status: 400 }
+        )
+      }
 
+      if (!collection) {
         return getAllCollections(typesenseClient, pluginOptions, q, {
           collections,
           filters: {},
@@ -80,10 +80,6 @@ export const createSearch = (
 
       if (!pluginOptions.collections?.[collection]?.enabled) {
         return Response.json({ error: 'Collection not enabled for search' }, { status: 400 })
-      }
-
-      if (!q.trim()) {
-        return Response.json({ error: 'Query parameter "q" is required' }, { status: 400 })
       }
 
       if (vector) {
