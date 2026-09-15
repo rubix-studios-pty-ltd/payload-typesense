@@ -138,8 +138,8 @@ importers:
         specifier: ^10.4.0
         version: 10.4.0
       payload:
-        specifier: ^3.88.0
-        version: 3.88.0(graphql@16.14.0)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^3.89.0
+        version: 3.89.0(graphql@16.14.0)(supports-color@7.2.0)(typescript@7.0.2)
       rimraf:
         specifier: ^6.1.3
         version: 6.1.3
@@ -580,8 +580,8 @@ packages:
   '@octokit/types@17.0.0':
     resolution: {integrity: sha512-ByP1v7YL5SMveFPP7+sj0/ZuWCOOg/Chs4NafOMpq6WNIM/hdGY0S7C0TCGDBWu1aGmOxmUIhMx3cO+IdwYZ1Q==}
 
-  '@payloadcms/translations@3.88.0':
-    resolution: {integrity: sha512-AZVQjjW5pKxO+K9ODeh6yw6/EfXK1hxGPw55KzzDC5srO3hjNskgyWtkauKvbz+S0+xFspANbRc4OD/Rg/74WA==}
+  '@payloadcms/translations@3.89.0':
+    resolution: {integrity: sha512-XLPOdv9NoPcqr21zBTu0uyJk0qGRIF7JVl2H2UTecpweQSMlQCackhUKWz1LKBO7QcKgkNSVHFnMNcizRDcPDg==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -2064,8 +2064,8 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  payload@3.88.0:
-    resolution: {integrity: sha512-O7zuS80bvEGLte+7xZjwN05+ox5BCsGcQT2M6+CTote07JQOOvHJoiuoyQFw6cUElcFTWGMC5dy03w7J7sTYGg==}
+  payload@3.89.0:
+    resolution: {integrity: sha512-n0rDsMDTlKkNDqNllSLow1xEn2XaktD2oyi6Gl7i/LAD7xRBaS+tj27ca9EeNM5QmoGSd734UCHYj5Vr4JQYNA==}
     engines: {node: ^18.20.2 || >=20.9.0}
     hasBin: true
     peerDependencies:
@@ -2951,7 +2951,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 28.0.0
 
-  '@payloadcms/translations@3.88.0':
+  '@payloadcms/translations@3.89.0':
     dependencies:
       date-fns: 4.1.0
 
@@ -4338,10 +4338,10 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  payload@3.88.0(graphql@16.14.0)(supports-color@7.2.0)(typescript@7.0.2):
+  payload@3.89.0(graphql@16.14.0)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       '@next/env': 15.5.23
-      '@payloadcms/translations': 3.88.0
+      '@payloadcms/translations': 3.89.0
       '@types/busboy': 1.5.4
       ajv: 8.18.0
       bson-objectid: 2.0.4
