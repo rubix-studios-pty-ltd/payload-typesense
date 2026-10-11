@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo } from 'react'
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from 'react'
 
 import { type Theme, type ThemeConfig, type ThemeContextValue } from './types.js'
 import {
@@ -14,14 +14,34 @@ import {
 
 const ThemeContext = createContext<null | ThemeContextValue>(null)
 
+const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)'
+
+function getSystemTheme(): 'dark' | 'light' {
+  return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light'
+}
+
+function getServerTheme(): 'dark' | 'light' {
+  return 'light'
+}
+
+function subscribeSystemTheme(callback: () => void): () => void {
+  const media = window.matchMedia(SYSTEM_THEME_QUERY)
+
+  media.addEventListener('change', callback)
+
+  return () => media.removeEventListener('change', callback)
+}
+
 /**
  * Hook to access theme context
  */
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext)
+
   if (!context) {
     throw new Error('useTheme must be used within a ThemeProvider')
   }
+
   return context
 }
 
@@ -65,33 +85,27 @@ export function useThemeStyles(config: ThemeConfig): Record<string, string> {
  */
 export function useResponsiveTheme(baseConfig: ThemeConfig, isMobile: boolean): ThemeConfig {
   return useMemo(() => {
-    if (!baseConfig.responsive) {
+    if (!baseConfig.responsive || !isMobile) {
       return baseConfig
     }
 
-    const mobileConfig = {
+    return {
       ...baseConfig,
       spacing: {
         ...baseConfig.spacing,
-        // Adjust spacing for mobile
         headerPadding: '0.75rem 1rem',
-        inputFontSize: '16px', // Prevents zoom on iOS
+        inputFontSize: '16px',
         inputPadding: '0.875rem 1rem',
         itemPadding: '0.875rem 1rem',
         resultsMaxHeight: '20rem',
       },
-      // Disable animations on mobile for better performance
-      animations: isMobile
-        ? {
-            ...baseConfig.animations,
-            transitionFast: '0s',
-            transitionNormal: '0s',
-            transitionSlow: '0s',
-          }
-        : baseConfig.animations,
+      animations: {
+        ...baseConfig.animations,
+        transitionFast: '0s',
+        transitionNormal: '0s',
+        transitionSlow: '0s',
+      },
     } as ThemeConfig
-
-    return mobileConfig
   }, [baseConfig, isMobile])
 }
 
@@ -103,27 +117,16 @@ export function useThemeToggle(
   darkConfig: ThemeConfig,
   isDark: boolean
 ): ThemeConfig {
-  return useMemo(() => {
-    return isDark ? darkConfig : lightConfig
-  }, [lightConfig, darkConfig, isDark])
+  return isDark ? darkConfig : lightConfig
 }
 
 /**
  * Hook to create theme-aware CSS classes
  */
-export function useThemeClasses(config: ThemeConfig): Record<string, string> {
+export function useThemeClasses(config: ThemeConfig): ReturnType<typeof generateThemeClasses> {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
-    const classes = generateThemeClasses(theme, config)
-
-    // Convert to a more usable format
-    const classMap: Record<string, string> = {}
-
-    Object.entries(classes).forEach(([key, value]) => {
-      classMap[key] = value
-    })
-
-    return classMap
+    return generateThemeClasses(theme, config)
   }, [config])
 }
 
@@ -161,13 +164,7 @@ export function useThemeTypography(config: ThemeConfig): Theme['typography'] {
  * Hook to detect system theme preference
  */
 export function useSystemTheme(): 'dark' | 'light' {
-  return useMemo(() => {
-    if (typeof window === 'undefined') {
-      return 'light'
-    }
-
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-  }, [])
+  return useSyncExternalStore(subscribeSystemTheme, getSystemTheme, getServerTheme)
 }
 
 /**
@@ -176,9 +173,7 @@ export function useSystemTheme(): 'dark' | 'light' {
 export function useAutoTheme(lightTheme: string, darkTheme: string): string {
   const systemTheme = useSystemTheme()
 
-  return useMemo(() => {
-    return systemTheme === 'dark' ? darkTheme : lightTheme
-  }, [systemTheme, lightTheme, darkTheme])
+  return systemTheme === 'dark' ? darkTheme : lightTheme
 }
 
 /**
@@ -188,12 +183,13 @@ export function useCustomTheme(
   baseThemeName: string,
   overrides: Partial<ThemeConfig>
 ): ThemeConfig {
-  return useMemo(() => {
-    return {
+  return useMemo(
+    () => ({
       theme: baseThemeName,
       ...overrides,
-    }
-  }, [baseThemeName, overrides])
+    }),
+    [baseThemeName, overrides]
+  )
 }
 
 export { ThemeContext }

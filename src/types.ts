@@ -1,3 +1,82 @@
+/** Plugin */
+
+export type TypesenseNode = {
+  host: string
+  port: number | string
+  protocol: 'http' | 'https'
+}
+
+export type TypesenseCollectionConfig = {
+  displayName?: string
+  enabled: boolean
+  facetFields?: string[]
+  icon?: string
+  searchFields?: string[]
+  sortFields?: string[]
+  syncLimit?: number
+}
+
+export type TypesenseConfig = {
+  collections?: Record<string, TypesenseCollectionConfig>
+
+  disabled?: boolean
+
+  settings?: {
+    autoSync?: boolean
+    batchSize?: number
+    categorized?: boolean
+    searchEndpoint?: string
+  }
+
+  typesense: {
+    apiKey: string
+    connectionTimeoutSeconds?: number
+    nodes: TypesenseNode[]
+  }
+
+  vectorSearch?: {
+    embeddingModel?: string
+    embedFrom?: string[]
+    enabled?: boolean
+    modelConfig?: Record<string, unknown>
+  }
+}
+
+/** Search */
+
+export interface CollectionConfig<T = any> {
+  displayName?: string
+  enabled?: boolean
+  facetFields?: Array<keyof T | string>
+  fieldMapping?: Record<string, string>
+  icon?: string
+  searchFields?: Array<keyof T | string>
+}
+
+export interface TypesenseSearchConfig<T = Record<string, any>> {
+  collections: Record<string, CollectionConfig<T>>
+  settings?: {
+    cache?: {
+      maxSize?: number
+      ttl?: number
+    }
+    categorized?: boolean
+  }
+  typesense: {
+    apiKey: string
+    connectionTimeoutSeconds?: number
+    nodes: Array<{
+      host: string
+      port: number
+      protocol: 'http' | 'https'
+    }>
+    numRetries?: number
+    retryIntervalSeconds?: number
+  }
+}
+
+/** Document */
+
 export interface BaseDocument {
   _status?: 'draft' | 'published'
   createdAt: Date | string
@@ -16,6 +95,78 @@ export interface RichTextNode {
 export interface RichText {
   root?: RichTextNode
   [key: string]: unknown
+}
+
+/** Schema */
+
+export type FieldType =
+  | 'auto'
+  | 'bool'
+  | 'bool[]'
+  | 'float'
+  | 'float[]'
+  | 'geopoint'
+  | 'geopoint[]'
+  | 'geopolygon'
+  | 'image'
+  | 'int32'
+  | 'int32[]'
+  | 'int64'
+  | 'int64[]'
+  | 'object'
+  | 'object[]'
+  | 'string'
+  | 'string*'
+  | 'string[]'
+
+export interface CollectionFieldSchema {
+  embed?: {
+    from: string[]
+    model_config: {
+      model_name: string
+    }
+  }
+  facet?: boolean
+  index?: boolean
+  infix?: boolean
+  locale?: string
+  name: string
+  num_dim?: number
+  optional?: boolean
+  range_index?: boolean
+  sort?: boolean
+  stem?: boolean
+  store?: boolean
+  type: FieldType
+  [t: string]: unknown
+}
+
+export type CollectionSchema = {
+  default_sorting_field?: string
+  enable_nested_fields?: boolean
+  fields: CollectionFieldSchema[]
+  metadata?: object
+  name: string
+  symbols_to_index?: string[]
+  token_separators?: string[]
+  voice_query_model?: {
+    model_name?: string
+  }
+}
+
+/** Result */
+
+export interface SearchParams {
+  facets?: string[]
+  filters?: Record<string, any>
+  highlight_fields?: string[]
+  num_typos?: number
+  page?: number
+  per_page?: number
+  q: string
+  snippet_threshold?: number
+  sort_by?: string
+  typo_tokens_threshold?: number
 }
 
 export interface SearchResult<T = any> {
@@ -80,11 +231,6 @@ export interface SuggestResult<T = any> {
   text_match?: number
 }
 
-export type SearchResultProps<T = any> = {
-  onClick?: (result: SearchResult<T>) => void
-  result: SearchResult<T>
-}
-
 export interface SuggestResponse<T = any> {
   found: number
   hits: SuggestResult<T>[]
@@ -97,91 +243,11 @@ export interface SuggestResponse<T = any> {
   search_time_ms: number
 }
 
-export interface CollectionConfig<T = any> {
-  displayName?: string
-  enabled?: boolean
-  facetFields?: Array<keyof T | string>
-  fieldMapping?: Record<string, string>
-  icon?: string
-  searchFields?: Array<keyof T | string>
-}
+/** Components */
 
-export type TypesenseConfig = {
-  collections?: Partial<
-    Record<
-      string,
-      {
-        displayName?: string
-        enabled: boolean
-        facetFields?: string[]
-        icon?: string
-        searchFields?: string[]
-        sortFields?: string[]
-        syncLimit?: number
-      }
-    >
-  >
-
-  disabled?: boolean
-
-  settings?: {
-    autoSync?: boolean
-    batchSize?: number
-    categorized?: boolean
-    searchEndpoint?: string
-  }
-
-  typesense: {
-    apiKey: string
-    connectionTimeoutSeconds?: number
-    nodes: Array<{
-      host: string
-      port: number | string
-      protocol: 'http' | 'https'
-    }>
-  }
-
-  vectorSearch?: {
-    embeddingModel?: string
-    embedFrom?: string[]
-    enabled?: boolean
-    modelConfig?: Record<string, unknown>
-  }
-}
-
-export interface TypesenseSearchConfig<T = Record<string, any>> {
-  collections: Record<string, CollectionConfig<T>>
-  settings?: {
-    cache?: {
-      maxSize?: number
-      ttl?: number
-    }
-    categorized?: boolean
-  }
-  typesense: {
-    apiKey: string
-    connectionTimeoutSeconds?: number
-    nodes: Array<{
-      host: string
-      port: number
-      protocol: 'http' | 'https'
-    }>
-    numRetries?: number
-    retryIntervalSeconds?: number
-  }
-}
-
-export interface SearchParams {
-  facets?: string[]
-  filters?: Record<string, any>
-  highlight_fields?: string[]
-  num_typos?: number
-  page?: number
-  per_page?: number
-  q: string
-  snippet_threshold?: number
-  sort_by?: string
-  typo_tokens_threshold?: number
+export type SearchResultProps<T = any> = {
+  onClick?: (result: SearchResult<T>) => void
+  result: SearchResult<T>
 }
 
 export interface BaseSearchInputProps<T = any> {
@@ -208,6 +274,8 @@ export interface BaseSearchInputProps<T = any> {
   resultsListClassName?: string
 }
 
+/** Cache */
+
 export interface CacheEntry<T = any> {
   data: T
   timestamp: number
@@ -222,6 +290,26 @@ export interface CacheOptions {
 export interface CacheStats {
   hits: number
   misses: number
+}
+
+/** API */
+
+export interface ApiResponse<T = any> {
+  data?: T
+  error?: ErrorResponse
+  meta?: {
+    cached?: boolean
+    requestId?: string
+    timestamp: string
+  }
+  success: boolean
+}
+
+export interface ErrorResponse {
+  code?: string
+  details?: string
+  error: string
+  timestamp?: string
 }
 
 export interface HealthCheckResponse {
@@ -239,83 +327,10 @@ export interface HealthCheckResponse {
   }
 }
 
-export interface ErrorResponse {
-  code?: string
-  details?: string
-  error: string
-  timestamp?: string
-}
-
 export interface ImportError extends Error {
   importResults?: Array<{
     document?: Record<string, unknown>
     error?: string
     success: boolean
   }>
-}
-
-export interface ApiResponse<T = any> {
-  data?: T
-  error?: ErrorResponse
-  meta?: {
-    cached?: boolean
-    requestId?: string
-    timestamp: string
-  }
-  success: boolean
-}
-
-export type FieldType =
-  | 'auto'
-  | 'bool'
-  | 'bool[]'
-  | 'float'
-  | 'float[]'
-  | 'geopoint'
-  | 'geopoint[]'
-  | 'geopolygon'
-  | 'image'
-  | 'int32'
-  | 'int32[]'
-  | 'int64'
-  | 'int64[]'
-  | 'object'
-  | 'object[]'
-  | 'string'
-  | 'string*'
-  | 'string[]'
-
-export interface CollectionFieldSchema {
-  embed?: {
-    from: string[]
-    model_config: {
-      model_name: string
-    }
-  }
-  facet?: boolean
-  index?: boolean
-  infix?: boolean
-  locale?: string
-  name: string
-  num_dim?: number
-  optional?: boolean
-  range_index?: boolean
-  sort?: boolean
-  stem?: boolean
-  store?: boolean
-  type: FieldType
-  [t: string]: unknown
-}
-
-export type CollectionSchema = {
-  default_sorting_field?: string
-  enable_nested_fields?: boolean
-  fields: CollectionFieldSchema[]
-  metadata?: object
-  name: string
-  symbols_to_index?: string[]
-  token_separators?: string[]
-  voice_query_model?: {
-    model_name?: string
-  }
 }

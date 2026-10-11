@@ -1,6 +1,12 @@
 'use client'
 
-import type React from 'react'
+import {
+  type ChangeEvent,
+  type FocusEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 
 import { type ThemeConfig } from '../components/themes/types.js'
 import { type BaseSearchInputProps, type SearchResult } from '../types.js'
@@ -11,45 +17,58 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    * Collections to search in
    */
   collections?: string[]
+
   /**
-   * Enable suggestions
+   * Enable search suggestions
    */
   enableSuggestions?: boolean
+
+  /**
+   * Callback when a search result is hovered
+   */
+  onResultHover?: (result: SearchResult<T>) => void
+
   /**
    * Number of results to show per page
    */
   perPage?: number
+
   /**
-   * Show date in search results
+   * Show dates in search results
    */
   renderDate?: boolean
+
   /**
    * Custom render function for error state
    */
-  renderError?: (error: string) => React.ReactNode
+  renderError?: (error: string) => ReactNode
+
   /**
-   * Custom input element (for complete control)
+   * Custom input element for complete rendering control
    */
   renderInput?: (props: {
     className: string
-    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+    onBlur: (event: FocusEvent<HTMLInputElement>) => void
+    onChange: (event: ChangeEvent<HTMLInputElement>) => void
     onFocus: () => void
-    onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void
+    onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void
     placeholder: string
-    ref: React.RefObject<HTMLInputElement | null>
+    ref: RefObject<HTMLInputElement | null>
     value: string
-  }) => React.ReactNode
+  }) => ReactNode
+
   /**
    * Custom render function for loading state
    */
-  renderLoading?: () => React.ReactNode
+  renderLoading?: () => ReactNode
+
   /**
    * Custom render function for no results
    */
-  renderNoResults?: (query: string) => React.ReactNode
+  renderNoResults?: (query: string) => ReactNode
+
   /**
-   * Custom render function for results
+   * Custom render function for individual search results
    */
   renderResult?: (
     result: SearchResult<T>,
@@ -58,37 +77,45 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
       onClick: (result: SearchResult<T>) => void
       onHover?: (result: SearchResult<T>) => void
     }
-  ) => React.ReactNode
+  ) => ReactNode
+
   /**
    * Custom render function for results header
    */
-  renderResultsHeader?: (found: number) => React.ReactNode
+  renderResultsHeader?: (found: number) => ReactNode
+
   /**
    * Custom CSS class for individual result items
    */
   resultItemClassName?: string
+
   /**
-   * Custom CSS class for the results container
+   * Custom CSS class for the results content
    */
   resultsClassName?: string
+
   /**
-   * Custom CSS class for results container
+   * Custom CSS class for the outer results container
    */
   resultsContainerClassName?: string
+
   /**
-   * Show loading state
+   * Show loading indicator during searches
    */
   showLoading?: boolean
+
   /**
-   * Show result count
+   * Show the total number of search results
    */
   showResultCount?: boolean
+
   /**
    * Theme configuration
    */
   theme?: string | ThemeConfig
+
   /**
-   * Enable vector search mode (replaces text search)
+   * Enable vector search instead of text search
    */
   vector?: boolean
 }

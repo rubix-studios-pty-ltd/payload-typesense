@@ -1,50 +1,57 @@
-import type React from 'react'
+import { type KeyboardEvent, type RefObject } from 'react'
 
 export function handleKeyboard(
-  e: React.KeyboardEvent,
+  event: KeyboardEvent,
   options: {
-    inputRef: React.RefObject<HTMLInputElement | null>
+    inputRef: RefObject<HTMLInputElement | null>
     isOpen: boolean
     results: unknown
-    resultsRef: React.RefObject<HTMLDivElement | null>
+    resultsRef: RefObject<HTMLDivElement | null>
   }
-) {
+): void {
   const { inputRef, isOpen, results, resultsRef } = options
+
+  if (event.key === 'Escape') {
+    if (isOpen) {
+      inputRef.current?.blur()
+    }
+
+    return
+  }
 
   if (!isOpen || !results) return
 
-  const resultItems = resultsRef.current?.querySelectorAll('[data-result-item]')
-  if (!resultItems) return
+  const items = Array.from(
+    resultsRef.current?.querySelectorAll<HTMLElement>('[data-result-item]') ?? []
+  )
 
-  const items = Array.from(resultItems)
+  if (!items.length) return
+
   const activeElement = document.activeElement
-  const currentIndex = activeElement ? items.indexOf(activeElement) : -1
+  const currentIndex = activeElement instanceof HTMLElement ? items.indexOf(activeElement) : -1
 
-  switch (e.key) {
+  switch (event.key) {
     case 'ArrowDown': {
-      e.preventDefault()
-      const nextIndex = currentIndex < resultItems.length - 1 ? currentIndex + 1 : 0
-      ;(resultItems[nextIndex] as HTMLElement)?.focus()
+      event.preventDefault()
+
+      const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0
+      items[nextIndex]?.focus()
       break
     }
 
     case 'ArrowUp': {
-      e.preventDefault()
-      const prevIndex = currentIndex > 0 ? currentIndex - 1 : resultItems.length - 1
-      ;(resultItems[prevIndex] as HTMLElement)?.focus()
+      event.preventDefault()
+
+      const previousIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1
+      items[previousIndex]?.focus()
       break
     }
 
     case 'Enter': {
-      e.preventDefault()
-      if (currentIndex >= 0 && resultItems[currentIndex]) {
-        ;(resultItems[currentIndex] as HTMLElement)?.click()
-      }
-      break
-    }
+      if (currentIndex < 0) return
 
-    case 'Escape': {
-      inputRef.current?.blur()
+      event.preventDefault()
+      items[currentIndex]?.click()
       break
     }
   }

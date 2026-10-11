@@ -9,59 +9,63 @@ import { getCollectionInfo } from '../utils/getCollectionInfo.js'
 import { testConnection } from '../utils/testConnection.js'
 
 export const createHealthCheck = (
-  typesenseClient: Typesense.Client,
-  _pluginOptions: TypesenseConfig,
+  client: Typesense.Client,
+  _config: TypesenseConfig,
   lastSyncTime?: number
 ): PayloadHandler => {
   return async (): Promise<Response> => {
     const start = Date.now()
 
     try {
-      const isTypesenseHealthy = await testConnection(typesenseClient)
-      const collections = isTypesenseHealthy ? await getCollectionInfo(typesenseClient) : []
-      const cacheStats = getCacheStats()
-      const isHealthy = isTypesenseHealthy && collections.length > 0
+      const health = await testConnection(client)
+      const collections = health ? await getCollectionInfo(client) : []
+      const isHealthy = health && collections.length > 0
+      const error = buildError(health, collections.length > 0)
 
-      const base: HealthCheckResponse = {
-        cache: cacheStats,
+      const response: HealthCheckResponse = {
+        cache: getCacheStats(),
         collections,
         status: isHealthy ? 'healthy' : 'unhealthy',
-        typesense: { ok: isTypesenseHealthy, version: 'unknown' },
+        typesense: { ok: health, version: 'unknown' },
         ...(lastSyncTime !== undefined && { lastSync: lastSyncTime }),
-      }
-
-      const error = buildError(isTypesenseHealthy, collections.length > 0)
-      const responseTime = Date.now() - start
-
-      return Response.json({
-        ...base,
         ...(error && { error }),
-        responseTime,
-        timestamp: new Date().toISOString(),
-        version: pkg.version,
-      })
-    } catch (err) {
-      const errorResponse: HealthCheckResponse = {
-        cache: getCacheStats(),
-        error: err instanceof Error ? err.message : 'Unknown error',
-        status: 'unhealthy',
       }
 
-      return Response.json(errorResponse, { status: 500 })
+      return Response.json(
+        {
+          ...response,
+          responseTime: Date.now() - start,
+          timestamp: new Date().toISOString(),
+          version: pkg.version,
+        },
+        { status: isHealthy ? 200 : 503 }
+      )
+    } catch (error) {
+      return Response.json(
+        {
+          cache: getCacheStats(),
+          error: error instanceof Error ? error.message : 'Unknown error',
+          responseTime: Date.now() - start,
+          status: 'unhealthy',
+          timestamp: new Date().toISOString(),
+          version: pkg.version,
+        },
+        { status: 500 }
+      )
     }
   }
 }
 
 export const createDetailedHealthCheck = (
-  typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseConfig,
+  client: Typesense.Client,
+  config: TypesenseConfig,
   lastSyncTime?: number
 ): PayloadHandler => {
   return async (): Promise<Response> => {
     const start = Date.now()
 
     try {
-      const isTypesenseHealthy = await testConnection(typesenseClient)
+      const health = await testConnection(client)
 
       let collectionDetails: Array<{
         createdAt: number
@@ -70,70 +74,68 @@ export const createDetailedHealthCheck = (
         numDocuments: number
       }> = []
 
-      if (isTypesenseHealthy) {
+      let collectionError: string | undefined
+
+      if (health) {
         try {
-          const collectionsData = await typesenseClient.collections().retrieve()
-          collectionDetails = collectionsData.map((col) => ({
-            name: col.name,
-            createdAt: col.created_at,
-            fields: col.fields?.length || 0,
-            numDocuments: col.num_documents,
+          const collectionsData = await client.collections().retrieve()
+
+          collectionDetails = collectionsData.map((collection) => ({
+            createdAt: collection.created_at,
+            fields: collection.fields?.length || 0,
+            name: collection.name,
+            numDocuments: collection.num_documents,
           }))
         } catch {
-          // ignore detailed retrieval error
+          collectionError = 'Failed to retrieve collection details'
         }
       }
 
-      const collections = collectionDetails.map((c) => c.name)
-      const cacheStats = getCacheStats()
+      const collections = collectionDetails.map((collection) => collection.name)
+      const isHealthy = health && !collectionError && collections.length > 0
+      const error = collectionError || buildError(health, collections.length > 0)
 
       const configInfo = {
-        enabledCollections: Object.entries(pluginOptions.collections || {})
-          .filter(([_, config]) => config?.enabled)
-          .map(([name, config]) => ({
+        enabledCollections: Object.entries(config.collections || {})
+          .filter(([, collection]) => collection?.enabled)
+          .map(([name, collection]) => ({
             name,
-            displayName: config?.displayName,
-            facetFields: config?.facetFields || [],
-            searchFields: config?.searchFields || [],
+            displayName: collection?.displayName,
+            facetFields: collection?.facetFields || [],
+            searchFields: collection?.searchFields || [],
           })),
-        settings: pluginOptions.settings,
-        totalCollections: Object.keys(pluginOptions.collections || {}).length,
+        totalCollections: Object.keys(config.collections || {}).length,
       }
 
-      const isHealthy = isTypesenseHealthy && collectionDetails.length > 0
-
       const response = {
-        cache: cacheStats,
+        cache: getCacheStats(),
         collectionDetails,
         collections,
         config: configInfo,
-        lastSync: lastSyncTime,
-        responseTime: Date.now() - start,
         status: isHealthy ? 'healthy' : 'unhealthy',
-        timestamp: new Date().toISOString(),
         typesense: {
-          ok: isTypesenseHealthy,
+          ok: health,
           version: 'unknown',
         },
-        version: pkg.version,
-        ...(isHealthy
-          ? {}
-          : {
-              error: [
-                !isTypesenseHealthy && 'Typesense connection failed',
-                collectionDetails.length === 0 && 'No collections available',
-              ]
-                .filter(Boolean)
-                .join(', '),
-            }),
+        ...(lastSyncTime !== undefined && { lastSync: lastSyncTime }),
+        ...(error && { error }),
       }
 
-      return Response.json(response)
+      return Response.json(
+        {
+          ...response,
+          responseTime: Date.now() - start,
+          timestamp: new Date().toISOString(),
+          version: pkg.version,
+        },
+        { status: isHealthy ? 200 : 503 }
+      )
     } catch (error) {
       return Response.json(
         {
           cache: getCacheStats(),
           error: error instanceof Error ? error.message : 'Unknown error',
+          responseTime: Date.now() - start,
           status: 'unhealthy',
           timestamp: new Date().toISOString(),
           version: pkg.version,

@@ -2,64 +2,72 @@ import Typesense from 'typesense'
 
 import { type TypesenseConfig } from '../types.js'
 
-const offline = new Error('Typesense offline')
+const error = new Error('Typesense offline')
 
-let client: null | Typesense.Client = null
-
-const isOffline = (): boolean => {
+const offline = (): boolean => {
   const evt = process.env.npm_lifecycle_event || ''
+
   if (evt.includes('build') || evt === 'tsc') return true
 
-  if (process.argv.some((a) => /(?:^|:|\/)(?:build|tsc)(?::|$)/i.test(a))) return true
+  if (process.argv.some((arg) => /(?:^|:|\/)(?:build|tsc)(?::|$)/i.test(arg))) {
+    return true
+  }
 
   if (process.env.CI === 'true') return true
 
   return false
 }
 
-const createOfflineClient = (): Typesense.Client => {
+const offlineClient = (): Typesense.Client => {
+  const reject = () => Promise.reject(error)
+
+  const documents = () => ({
+    delete: reject,
+    import: reject,
+    search: reject,
+    upsert: reject,
+  })
+
+  const collections = Object.assign(
+    () => ({
+      documents,
+      retrieve: reject,
+      update: reject,
+    }),
+    {
+      create: reject,
+      retrieve: reject,
+    }
+  )
+
   return {
     analytics: {
-      retrieve: () => {
-        return Promise.reject(offline)
-      },
+      retrieve: reject,
     },
-    collections: () => {
-      return {
-        retrieve: () => {
-          return Promise.reject(offline)
-        },
-      }
-    },
+    collections,
     health: {
-      retrieve: () => {
-        return Promise.reject(offline)
-      },
+      retrieve: reject,
+    },
+    multiSearch: {
+      perform: reject,
     },
     operations: {
-      get: () => {
-        return Promise.reject(offline)
-      },
+      get: reject,
     },
   } as unknown as Typesense.Client
 }
 
-export const createClient = (typesenseConfig: TypesenseConfig['typesense']): Typesense.Client => {
-  if (client) return client
-
-  if (isOffline()) {
-    client = createOfflineClient()
-    return client
+export const createClient = (config: TypesenseConfig['typesense']): Typesense.Client => {
+  if (offline()) {
+    return offlineClient()
   }
 
-  client = new Typesense.Client({
-    apiKey: typesenseConfig.apiKey,
-    connectionTimeoutSeconds: typesenseConfig.connectionTimeoutSeconds || 2,
-    nodes: typesenseConfig.nodes.map((node) => ({
+  return new Typesense.Client({
+    apiKey: config.apiKey,
+    connectionTimeoutSeconds: config.connectionTimeoutSeconds ?? 2,
+    nodes: config.nodes.map((node) => ({
       ...node,
       port: typeof node.port === 'string' ? parseInt(node.port, 10) : node.port,
     })),
   })
-
-  return client
 }

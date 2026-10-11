@@ -2,11 +2,11 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
+import { useDebounce } from '../hooks/useDebounce.js'
+import { useSearch } from '../hooks/useSearch.js'
 import { type HeadlessSearchInputProps } from '../lib/headlessSearch.js'
 import { type SearchResult } from '../types.js'
 import { handleKeyboard } from '../utils/keyboard.js'
-import { useDebounce } from '../utils/useDebounce.js'
-import { useSearch } from '../utils/useSearch.js'
 import {
   RenderedHeader,
   RenderedNoResults,
@@ -23,7 +23,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     className = '',
     collections,
     debounceMs = 300,
-    enableSuggestions: _enableSuggestions = true,
+    enableSuggestions = true,
     errorClassName = '',
     inputClassName = '',
     inputWrapperClassName = '',
@@ -34,9 +34,11 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     onSearch,
     perPage = 10,
     placeholder = 'Search...',
+    onResultHover,
     renderDate = true,
     renderError,
     renderInput,
+    renderLoading,
     renderNoResults,
     renderResult,
     renderResultsHeader,
@@ -75,19 +77,18 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
   })
 
   useEffect(() => {
-    if (debouncedQuery.length >= minQueryLength) {
-      void search(debouncedQuery)
-    }
-  }, [debouncedQuery, minQueryLength, search])
+    void search(debouncedQuery)
+  }, [debouncedQuery, search])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+
     setQuery(value)
-    setIsOpen(value.length >= minQueryLength)
+    setIsOpen(enableSuggestions && value.length >= minQueryLength)
   }
 
   const handleInputFocus = () => {
-    if (query.length >= minQueryLength) {
+    if (enableSuggestions && query.length >= minQueryLength) {
       setIsOpen(true)
     }
   }
@@ -104,6 +105,10 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     onResultClick?.(result)
     setIsOpen(false)
     setQuery('')
+  }
+
+  const handleResultHover = (result: SearchResult<T>) => {
+    onResultHover?.(result)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -192,41 +197,52 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
           />
         )}
 
-        {isLoading && showLoading && (
-          <div
-            style={{
-              position: 'absolute',
-              right: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-            }}
-          >
-            <style>
-              {`
-                @keyframes spin {
-                  0% { transform: rotate(0deg); }
-                  100% { transform: rotate(360deg); }
-                }
-              `}
-            </style>
+        {isLoading &&
+          showLoading &&
+          (renderLoading ? (
+            renderLoading()
+          ) : (
             <div
-              data-testid="loading-spinner"
               style={{
-                animation: `spin 1s linear infinite`,
-                border: `2px solid ${themeConfig.theme.colors.inputBorder}`,
-                borderRadius: '50%',
-                borderTop: `2px solid ${themeConfig.theme.colors.inputBorderFocus}`,
-                height: '16px',
-                width: '16px',
+                position: 'absolute',
+                right: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
               }}
-            />
-          </div>
-        )}
+            >
+              <style>
+                {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+              </style>
+
+              <div
+                data-testid="loading-spinner"
+                style={{
+                  animation: 'spin 1s linear infinite',
+                  border: `2px solid ${themeConfig.theme.colors.inputBorder}`,
+                  borderRadius: '50%',
+                  borderTop: `2px solid ${themeConfig.theme.colors.inputBorderFocus}`,
+                  height: '16px',
+                  width: '16px',
+                }}
+              />
+            </div>
+          ))}
       </div>
 
-      {isOpen && results && (
+      {enableSuggestions && isOpen && (results || error) && (
+        // biome-ignore lint/a11y/noStaticElementInteractions: Handle keyboard navigation
         <div
           className={resultsContainerClassName}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+              handleKeyDown(event)
+            }
+          }}
           ref={resultsRef}
           style={{
             backgroundColor: themeConfig.theme.colors.resultsBackground,
@@ -290,12 +306,16 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                   <div className={resultsListClassName}>
                     {results.hits.map((result, index) =>
                       renderResult ? (
-                        renderResult(result, index, { onClick: handleResultClick })
+                        renderResult(result, index, {
+                          onClick: handleResultClick,
+                          onHover: handleResultHover,
+                        })
                       ) : (
                         <RenderedResult
                           index={index}
                           key={result.document?.id || result.id || index}
                           onResultClick={handleResultClick}
+                          onResultHover={() => handleResultHover(result)}
                           renderDate={renderDate}
                           result={result}
                           resultItemClassName={resultItemClassName}

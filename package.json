@@ -58,7 +58,7 @@
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^11.0.1",
     "@swc/cli": "^0.8.1",
-    "@swc/core": "^1.16.13",
+    "@swc/core": "^1.16.17",
     "@types/react": "19.3.0",
     "conventional-changelog-conventionalcommits": "^10.4.1",
     "payload": "^3.90.2",
@@ -67,7 +67,7 @@
     "typescript": "^7.0.2"
   },
   "peerDependencies": {
-    "payload": "^3.90.2"
+    "payload": "^3.90.0"
   },
   "engines": {
     "node": ">=24",
