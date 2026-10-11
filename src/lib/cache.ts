@@ -9,16 +9,31 @@ export class SearchCache<T = unknown> {
   constructor(options: CacheOptions = {}) {
     this.defaultTTL = options.ttl ?? 5 * 60 * 1000
     this.maxSize = options.maxSize ?? 1000
+
+    if (!Number.isFinite(this.defaultTTL) || this.defaultTTL < 0) {
+      throw new RangeError('Cache TTL must be a non-negative number')
+    }
+
+    if (!Number.isSafeInteger(this.maxSize) || this.maxSize < 0) {
+      throw new RangeError('Cache maxSize must be a non-negative integer')
+    }
   }
 
   private evict(): void {
+    if (this.cache.size < this.maxSize) {
+      return
+    }
+
     this.cleanup()
 
-    if (this.cache.size < this.maxSize) return
+    if (this.cache.size < this.maxSize) {
+      return
+    }
 
-    const oldestKey = this.cache.keys().next().value
-    if (oldestKey) {
-      this.cache.delete(oldestKey)
+    const oldest = this.cache.keys().next()
+
+    if (!oldest.done) {
+      this.cache.delete(oldest.value)
     }
   }
 
@@ -27,13 +42,11 @@ export class SearchCache<T = unknown> {
     collection?: string,
     params?: Record<string, unknown>
   ): string {
-    const base = `${this.normalize(collection)}:${query}`
-    const serializedParams = this.serialize(params)
-    return serializedParams ? `${base}:${serializedParams}` : base
+    return `${this.normalize(collection)}:${JSON.stringify([query, this.serialize(params)])}`
   }
 
   private isExpired(entry: CacheEntry<T>): boolean {
-    return Date.now() - entry.timestamp > entry.ttl
+    return Date.now() - entry.timestamp >= entry.ttl
   }
 
   private lookup(
@@ -63,14 +76,17 @@ export class SearchCache<T = unknown> {
   }
 
   private serialize(params?: Record<string, unknown>): string {
-    if (!params || Object.keys(params).length === 0) return ''
+    if (!params || Object.keys(params).length === 0) {
+      return ''
+    }
 
-    const sorted = Object.keys(params)
-      .sort()
-      .map((key) => `${key}=${JSON.stringify(params[key])}`)
-      .join('&')
+    return JSON.stringify(params, (_key, value) => {
+      if (value && typeof value === 'object' && !Array.isArray(value)) {
+        return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)))
+      }
 
-    return sorted
+      return value
+    })
   }
 
   cleanup(): void {
@@ -82,18 +98,22 @@ export class SearchCache<T = unknown> {
   }
 
   clear(pattern?: RegExp | string): void {
-    if (!pattern) {
+    if (pattern === undefined) {
       this.cache.clear()
       return
     }
 
-    const matcher =
-      typeof pattern === 'string'
-        ? (key: string) => key.includes(pattern)
-        : (key: string) => pattern.test(key)
-
     for (const key of this.cache.keys()) {
-      if (matcher(key)) {
+      let matches: boolean
+
+      if (typeof pattern === 'string') {
+        matches = key.includes(pattern)
+      } else {
+        pattern.lastIndex = 0
+        matches = pattern.test(key)
+      }
+
+      if (matches) {
         this.cache.delete(key)
       }
     }
@@ -112,7 +132,10 @@ export class SearchCache<T = unknown> {
   }
 
   getStats(): { hitRate: number; maxSize: number; size: number } {
+    this.cleanup()
+
     const total = this.stats.hits + this.stats.misses
+
     return {
       hitRate: total === 0 ? 0 : this.stats.hits / total,
       maxSize: this.maxSize,
@@ -121,18 +144,7 @@ export class SearchCache<T = unknown> {
   }
 
   has(query: string, collection?: string, params?: Record<string, unknown>): boolean {
-    const key = this.generateKey(query, collection, params)
-    const entry = this.cache.get(key)
-
-    if (!entry || this.isExpired(entry)) {
-      if (entry) {
-        this.cache.delete(key)
-      }
-
-      return false
-    }
-
-    return true
+    return this.lookup(query, collection, params) !== null
   }
 
   set(
@@ -142,14 +154,29 @@ export class SearchCache<T = unknown> {
     params?: Record<string, unknown>,
     ttl?: number
   ): void {
+    const duration = ttl ?? this.defaultTTL
+
+    if (!Number.isFinite(duration) || duration < 0) {
+      throw new RangeError('Cache TTL must be a non-negative number')
+    }
+
     const key = this.generateKey(query, collection, params)
 
-    this.evict()
+    if (this.maxSize === 0 || duration === 0) {
+      this.cache.delete(key)
+      return
+    }
+
+    if (this.cache.has(key)) {
+      this.cache.delete(key)
+    } else {
+      this.evict()
+    }
 
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl: ttl ?? this.defaultTTL,
+      ttl: duration,
     })
   }
 }

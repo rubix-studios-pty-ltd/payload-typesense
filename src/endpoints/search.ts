@@ -1,3 +1,4 @@
+import { type Endpoint } from 'payload'
 import type Typesense from 'typesense'
 
 import { type TypesenseConfig } from '../types.js'
@@ -8,45 +9,46 @@ import { createSuggest } from './handler/createSuggest.js'
 import { createDetailedHealthCheck, createHealthCheck } from './health.js'
 
 export const createSearchEndpoints = (
-  typesenseClient: Typesense.Client,
-  pluginOptions: TypesenseConfig,
-  lastSyncTime?: number
-) => {
+  client: Typesense.Client,
+  config: TypesenseConfig
+): Endpoint[] => {
+  const search = createSearch(client, config)
+
   return [
     {
-      handler: createCollections(pluginOptions),
-      method: 'get' as const,
+      handler: createCollections(config),
+      method: 'get',
       path: '/search/collections',
     },
     {
-      handler: createSuggest(typesenseClient, pluginOptions),
-      method: 'get' as const,
-      path: '/search/:collectionName/suggest',
-    },
-    {
-      handler: createSearch(typesenseClient, pluginOptions),
-      method: 'get' as const,
-      path: '/search/:collectionName',
-    },
-    {
-      handler: createAdvancedSearch(typesenseClient, pluginOptions),
-      method: 'post' as const,
-      path: '/search/:collectionName',
-    },
-    {
-      handler: createSearch(typesenseClient, pluginOptions),
-      method: 'get' as const,
-      path: '/search',
-    },
-    {
-      handler: createHealthCheck(typesenseClient, pluginOptions, lastSyncTime),
-      method: 'get' as const,
+      handler: createHealthCheck(client, config),
+      method: 'get',
       path: '/search/health',
     },
     {
-      handler: createDetailedHealthCheck(typesenseClient, pluginOptions, lastSyncTime),
-      method: 'get' as const,
+      handler: createDetailedHealthCheck(client, config),
+      method: 'get',
       path: '/search/health/detailed',
+    },
+    {
+      handler: createSuggest(client, config),
+      method: 'get',
+      path: '/search/:collectionName/suggest',
+    },
+    {
+      handler: search,
+      method: 'get',
+      path: '/search/:collectionName',
+    },
+    {
+      handler: createAdvancedSearch(client, config),
+      method: 'post',
+      path: '/search/:collectionName',
+    },
+    {
+      handler: search,
+      method: 'get',
+      path: '/search',
     },
   ]
 }

@@ -1,11 +1,11 @@
-import React from 'react'
-
 import { type SearchResult } from '../../types.js'
+import { ClockIcon, CollectionIcon } from '../icons/index.js'
 import { type ThemeContextValue } from '../themes/types.js'
 
-interface RenderedResultProps {
+type Props = {
   index: number
   onResultClick: (result: SearchResult) => void
+  onResultHover?: (result: SearchResult) => void
   renderDate?: boolean
   result: SearchResult
   resultItemClassName?: string
@@ -16,12 +16,13 @@ interface RenderedResultProps {
 export function RenderedResult({
   index,
   onResultClick,
+  onResultHover,
   renderDate = true,
   result,
   resultItemClassName = '',
   resultsContainerClassName = '',
   themeConfig,
-}: RenderedResultProps) {
+}: Props) {
   return (
     <div
       className={resultsContainerClassName}
@@ -52,8 +53,9 @@ export function RenderedResult({
             onResultClick(result)
           }
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundHover
+        onMouseEnter={(event) => {
+          event.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundHover
+          onResultHover?.(result)
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
@@ -147,33 +149,16 @@ export function RenderedResult({
             >
               {result.collection && (
                 <span style={{ alignItems: 'center', display: 'inline-flex' }}>
-                  <svg
-                    fill="currentColor"
-                    style={{ height: '12px', marginRight: '4px', width: '12px' }}
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                      fillRule="evenodd"
-                    />
-                  </svg>
+                  <CollectionIcon />
+
                   {result.collection}
                 </span>
               )}
+
               {renderDate && (result.document?.updatedAt || result.updatedAt) && (
                 <span style={{ alignItems: 'center', display: 'inline-flex' }}>
-                  <svg
-                    fill="currentColor"
-                    style={{ height: '12px', marginRight: '4px', width: '12px' }}
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      clipRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                      fillRule="evenodd"
-                    />
-                  </svg>
+                  <ClockIcon />
+
                   {new Date(result.document?.updatedAt || result.updatedAt).toLocaleDateString()}
                 </span>
               )}

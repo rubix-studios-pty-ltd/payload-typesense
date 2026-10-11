@@ -1,11 +1,9 @@
-# PayloadCMS + Typesense Plugin
+# Payload CMS + Typesense
 
-Rubix Studios' Typesense integration for Payload CMS is built for production search workflows, with a lightweight, modular structure and optional support for advanced capabilities such as vector querying.
-
-The plugin is actively maintained by Rubix Studios.
+A Typesense search plugin for Payload CMS, maintained by [Rubix Studios](https://rubixstudios.com.au). It provides automatic document synchronisation, configurable search endpoints, optional vector search, and a React search component with customisable themes.
 
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
-![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)
+[![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml)
 
 ## Installation
 
@@ -13,16 +11,18 @@ The plugin is actively maintained by Rubix Studios.
 pnpm add @rubixstudios/payload-typesense
 ```
 
+Add the plugin to your Payload configuration and specify the collections you want indexed.
+
 ```typescript
 // payload.config.ts
-import { buildConfig } from 'payload/config'
+import { buildConfig } from 'payload'
 import { typesenseSearch } from '@rubixstudios/payload-typesense'
 
 export default buildConfig({
   plugins: [
     typesenseSearch({
       typesense: {
-        apiKey: 'xyz',
+        apiKey: process.env.TYPESENSE_API_KEY!,
         nodes: [
           {
             host: 'localhost',
@@ -38,31 +38,30 @@ export default buildConfig({
           facetFields: ['category', 'status'],
           displayName: 'Blog Posts',
           icon: '📝',
-          syncLimit: 500, // Overrides the default sync limit of 1000
+          syncLimit: 500,
         },
       },
-      // This feature is experimental
-      vectorSearch: {
-        enabled: true, // Enables vector-based semantic search
-        embedFrom: ['title', 'content'], // Omit to fall back to collection searchFields
-        embeddingModel: 'azure/text-embedding-ada-002',
-        modelConfig: {
-          api_key: 'your-api-key',
-          url: 'https://modelendpoint.com/openai',
-        },
     }),
   ],
 })
 ```
 
+The plugin initialises enabled collections in Typesense and synchronises existing documents during startup. Subsequent document changes and deletions are handled through Payload collection hooks when automatic synchronisation is enabled.
+
+### React search component
+
+`HeadlessSearchInput` provides a configurable search interface with keyboard navigation, loading states, result callbacks, and custom rendering support.
+
 ```tsx
+'use client'
+
 import { HeadlessSearchInput } from '@rubixstudios/payload-typesense'
 
-export function GlobalSearchPage() {
+export function GlobalSearch() {
   return (
     <HeadlessSearchInput
       baseUrl="http://localhost:3000"
-      theme="modern" // Available themes: "modern" | "dark"
+      theme="modern"
       placeholder="Search everything..."
       onResultClick={(result) => {
         console.log('Selected document:', result.document)
@@ -70,85 +69,67 @@ export function GlobalSearchPage() {
     />
   )
 }
-
-export function CollectionSearch() {
-  return (
-    <HeadlessSearchInput
-      baseUrl="http://localhost:3000"
-      collections={['posts', 'products']}
-      placeholder="Search posts and products..."
-      onResultClick={(result) => {
-        console.log('Selected document:', result.document)
-      }}
-    />
-  )
-}
-
-export function VectorSearch() {
-  return (
-    <HeadlessSearchInput
-      baseUrl="http://localhost:3000"
-      vector={true} // Vector search enabled
-      collections={['posts', 'products']}
-      placeholder="Search posts and products..."
-      onResultClick={(result) => {
-        console.log('Selected document:', result.document)
-      }}
-    />
-  )
-}
 ```
+
+Search all enabled collections by default, or use the `collections` prop to restrict results.
+
+```tsx
+<HeadlessSearchInput
+  baseUrl="http://localhost:3000"
+  collections={['posts', 'products']}
+  placeholder="Search posts and products..."
+/>
+```
+
+Vector search can also be requested using the `vector` prop when embedding support is configured.
 
 ## Features
 
-- **Performance**  
-  Sub-millisecond search responses with optimized request handling.
-- **Flexible Search**  
-  Single-collection, multi-collection, or universal search using one component.
-- **Vector Search**  
-  Optional semantic search using embeddings, with graceful fallback to keyword search.
-- **Modern UI**  
-  Headless, responsive implementation compatible with Tailwind CSS.
-- **Real-Time Synchronisation**  
-  Continuous indexing and sync with Payload CMS.
-- **Efficient Caching**  
-  In-memory caching with configurable TTL and race-condition safeguards.
-- **Production Ready**  
-  Robust error handling, deployment-safe defaults, and platform compatibility.
-- **Tree-Shakable Architecture**  
-  Modular design enabling smaller bundles and selective feature usage.
+The plugin supports keyword search across individual or multiple collections, with configurable searchable fields, filtering, sorting, faceting, and highlighting through Typesense. Search endpoints include in-memory caching to reduce repeated requests.
 
-## Endpoints
+Document synchronisation is handled through Payload hooks, while existing documents are indexed during initialisation. Optional vector search enables embedding-based queries through supported models and Typesense configuration.
 
-- `GET /api/search` - Universal search across all collections
-- `GET /api/search/{collection}` - Search specific collection
-- `POST /api/search/{collection}` - Advanced search with filters
-- `GET /api/search/{collection}/suggest` - Search suggestions
-- `GET /api/search/collections` - Collection metadata
-- `GET /api/search/health` - Health check
+The included React component provides modern and dark themes, responsive styling, and custom rendering options without requiring a separate search UI library.
 
-## Components
+## API endpoints
 
-- **HeadlessSearchInput**: Single component supporting all search patterns:
-- **Collections**: `collections={['posts', 'products']}` - Smart filtering with universal search
-- **Universal Search**: No collection props - Search across all collections
-- **Complete UI Control**: Customizable rendering with comprehensive theme system
+Search endpoints are registered under Payload's `/api` path by default.
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/search` | Search across collections |
+| GET | `/api/search/{collection}` | Search a collection |
+| POST | `/api/search/{collection}` | Advanced search |
+| GET | `/api/search/{collection}/suggest` | Search suggestions |
+| GET | `/api/search/collections` | Available collections |
+| GET | `/api/search/health` | Health status |
+| GET | `/api/search/health/detailed` | Detailed health information |
+
+Requests support pagination and the relevant Typesense search parameters. Vector search is available through the `vector=true` query parameter when enabled.
+
+## Vector search
+
+Vector search is optional and experimental. Configure an embedding model and the fields used to generate embeddings.
+
+```typescript
+vectorSearch: {
+  enabled: true,
+  embedFrom: ['title', 'content'],
+  embeddingModel: 'azure/text-embedding-ada-002',
+  modelConfig: {
+    api_key: process.env.EMBEDDING_API_KEY!,
+    url: 'https://modelendpoint.com/openai',
+  },
+},
+```
+
+When `embedFrom` is omitted, the plugin uses the collection's configured search fields. Embedding model credentials and endpoint settings depend on the selected provider.
+
+To request vector search from the React component, pass `vector={true}`.
 
 ## Themes
 
-The plugin includes a powerful theme system with 2 pre-built themes and unlimited customization:
-
-### Pre-built
-
-```tsx
-// Modern theme (default)
-<HeadlessSearchInput theme="modern" />
-
-// Dark theme
-<HeadlessSearchInput theme="dark" />
-```
-
-### Custom
+Two themes are included, `modern` (default) and `dark`. Both can be customised using theme configuration options for colours, spacing, typography, shadows, and animations.
 
 ```tsx
 const customTheme = {
@@ -166,47 +147,22 @@ const customTheme = {
   enableShadows: true,
 }
 
-<HeadlessSearchInput theme={customTheme} />
+<HeadlessSearchInput
+  baseUrl="http://localhost:3000"
+  theme={customTheme}
+/>
 ```
 
-### Theme Features
-
-- **2 Pre-built Themes**: Modern, Dark
-- **Unlimited Customization**: Override any color, spacing, typography, or animation
-- **Performance Options**: Disable animations/shadows for better performance
-- **Responsive Design**: Automatic mobile optimization
-- **CSS Variables**: Advanced styling with CSS custom properties
-- **TypeScript Support**: Full type safety for all theme configurations
-
-## Production
-
-- **Race Condition Protection**: `ensureCollection` prevents startup crashes
-- **Type Safety**: Proper Payload CMS types prevent runtime errors
-- **Document Validation**: Filters malformed data before sync
-- **Graceful Degradation**: Silent failures don't break Payload operations
-
-## Developer
-
-- **Smaller Components**: Easier to understand and maintain
-- **Maintainable**: Single Responsibility Principle enforced
-- **Well-Documented**: Clear separation of concerns
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+The component also supports custom class names and rendering callbacks for more control over the search interface.
 
 ## Support
 
-For support or inquiries:
+For issues, questions, or feature requests, visit [GitHub Issues](https://github.com/rubix-studios-pty-ltd/payload-typesense/issues) or contact [Rubix Studios](https://rubixstudios.com.au).
 
-- LinkedIn: [rubixvi](https://www.linkedin.com/in/rubixvi/)
-- Website: [Rubix Studios](https://rubixstudios.com.au)
+## License
 
-## Author
+Licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-Rubix Studios  
-[https://rubixstudios.com.au](https://rubixstudios.com.au)
+## Credits
 
-## Acknowledgments
-
-- [FrontTribe](https://github.com/FrontTribe/typesense-search)
+Developed and maintained by [Rubix Studios](https://rubixstudios.com.au). Based on the original [FrontTribe Typesense Search](https://github.com/FrontTribe/typesense-search) project.

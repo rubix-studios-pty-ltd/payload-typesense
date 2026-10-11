@@ -5,19 +5,24 @@ export const extractText = (richText: unknown): string => {
 
   const extract = (node: unknown): string => {
     if (typeof node === 'string') return node
+    if (!node || typeof node !== 'object') return ''
 
-    if (node && typeof node === 'object') {
-      if ('text' in node && typeof (node as { text?: unknown }).text === 'string') {
-        return (node as { text: string }).text
-      }
+    if ('type' in node && node.type === 'linebreak') {
+      return '\n'
+    }
 
-      if ('children' in node && Array.isArray((node as { children?: unknown }).children)) {
-        return (node as { children: unknown[] }).children.map(extract).join('')
-      }
+    if ('text' in node && typeof node.text === 'string') {
+      return node.text
+    }
+
+    if ('children' in node && Array.isArray(node.children)) {
+      const separator = 'type' in node && (node.type === 'root' || node.type === 'list') ? '\n' : ''
+
+      return node.children.map(extract).filter(Boolean).join(separator)
     }
 
     return ''
   }
 
-  return extract((richText as { root: unknown }).root)
+  return extract(richText.root).trim()
 }

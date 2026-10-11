@@ -1,18 +1,15 @@
 import React from 'react'
 
+import { SearchIcon } from '../icons/index.js'
 import { type ThemeContextValue } from '../themes/types.js'
 
-interface RenderedHeaderProps {
+type Props = {
   found: number
   resultsHeaderClassName?: string
   themeConfig: ThemeContextValue
 }
 
-export const RenderedHeader = ({
-  found,
-  resultsHeaderClassName = '',
-  themeConfig,
-}: RenderedHeaderProps) => (
+export const RenderedHeader = ({ found, resultsHeaderClassName = '', themeConfig }: Props) => (
   <div
     className={resultsHeaderClassName}
     style={{
@@ -29,17 +26,8 @@ export const RenderedHeader = ({
     }}
   >
     <div style={{ alignItems: 'center', display: 'flex', gap: '8px' }}>
-      <svg
-        fill="currentColor"
-        style={{ color: themeConfig.theme.colors.metaText, height: '16px', width: '16px' }}
-        viewBox="0 0 20 20"
-      >
-        <path
-          clipRule="evenodd"
-          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-          fillRule="evenodd"
-        />
-      </svg>
+      <SearchIcon color={themeConfig.theme.colors.metaText} />
+
       <span
         style={{
           color: themeConfig.theme.colors.headerText,

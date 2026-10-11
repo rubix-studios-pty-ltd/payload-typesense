@@ -3,45 +3,54 @@ import type Typesense from 'typesense'
 import { type CollectionSchema, type TypesenseConfig } from '../types.js'
 
 export const ensureCollection = async (
-  typesenseClient: Typesense.Client,
-  collectionSlug: string,
+  client: Typesense.Client,
+  slug: string,
   schema: CollectionSchema,
   vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ): Promise<boolean> => {
+  let existing
+
   try {
-    const existing = await typesenseClient.collections(collectionSlug).retrieve()
-
-    if (vector?.enabled) {
-      const hasEmbeddingField = (existing.fields as Array<{ name: string }> | undefined)?.some(
-        (f) => f.name === 'embedding'
-      )
-
-      if (!hasEmbeddingField) {
-        const embeddingField = schema.fields.find((f) => f.name === 'embedding')
-
-        if (embeddingField) {
-          try {
-            await typesenseClient.collections(collectionSlug).update({
-              fields: [embeddingField],
-            })
-          } catch (patchError) {
-            console.warn(
-              `Could not add embedding field to collection ${collectionSlug}: ${
-                patchError instanceof Error ? patchError.message : 'Unknown error'
-              }`
-            )
-          }
-        }
-      }
+    existing = await client.collections(slug).retrieve()
+  } catch (error) {
+    if (
+      !error ||
+      typeof error !== 'object' ||
+      !('httpStatus' in error) ||
+      error.httpStatus !== 404
+    ) {
+      return false
     }
 
-    return true
-  } catch {
     try {
-      await typesenseClient.collections().create(schema)
+      await client.collections().create(schema)
       return true
     } catch {
       return false
     }
+  }
+
+  if (!vector?.enabled) return true
+
+  const hasField = existing.fields?.some((field) => field.name === 'embedding')
+  if (hasField) return true
+
+  const field = schema.fields.find((field) => field.name === 'embedding')
+  if (!field) return false
+
+  try {
+    await client.collections(slug).update({
+      fields: [field],
+    })
+
+    return true
+  } catch (error) {
+    console.warn(
+      `Could not add embedding field to collection ${slug}: ${
+        error instanceof Error ? error.message : 'Unknown error'
+      }`
+    )
+
+    return false
   }
 }

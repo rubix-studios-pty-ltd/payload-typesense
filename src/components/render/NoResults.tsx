@@ -1,8 +1,9 @@
 import React from 'react'
 
+import { NoResultsIcon } from '../icons/index.js'
 import { type ThemeContextValue } from '../themes/types.js'
 
-interface RenderedNoResultsProps {
+type Props = {
   noResultsClassName?: string
   query: string
   themeConfig: ThemeContextValue
@@ -12,7 +13,7 @@ export const RenderedNoResults = ({
   noResultsClassName = '',
   query: _query,
   themeConfig,
-}: RenderedNoResultsProps) => (
+}: Props) => (
   <div
     className={noResultsClassName}
     style={{
@@ -24,24 +25,8 @@ export const RenderedNoResults = ({
     }}
   >
     <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
-      <svg
-        fill="none"
-        stroke="currentColor"
-        style={{
-          color: themeConfig.theme.colors.metaText,
-          height: '48px',
-          marginBottom: '12px',
-          width: '48px',
-        }}
-        viewBox="0 0 24 24"
-      >
-        <path
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1}
-        />
-      </svg>
+      <NoResultsIcon color={themeConfig.theme.colors.metaText} />
+
       <h3
         style={{
           color: themeConfig.theme.colors.titleText,
@@ -53,6 +38,7 @@ export const RenderedNoResults = ({
       >
         No results found
       </h3>
+
       <p
         style={{
           color: themeConfig.theme.colors.descriptionText,
