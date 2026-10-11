@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from 'react'
+import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
 import { type Theme, type ThemeConfig, type ThemeContextValue } from './types.js'
 import {
@@ -11,8 +11,6 @@ import {
   isLightTheme,
   mergeThemeConfig,
 } from './utils.js'
-
-const ThemeContext = createContext<null | ThemeContextValue>(null)
 
 const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)'
 
@@ -32,22 +30,6 @@ function subscribeSystemTheme(callback: () => void): () => void {
   return () => media.removeEventListener('change', callback)
 }
 
-/**
- * Hook to access theme context
- */
-export function useTheme(): ThemeContextValue {
-  const context = useContext(ThemeContext)
-
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider')
-  }
-
-  return context
-}
-
-/**
- * Hook to create theme configuration
- */
 export function useThemeConfig(config: ThemeConfig): ThemeContextValue {
   const theme = useMemo(() => mergeThemeConfig(config), [config])
   const classes = useMemo(() => generateThemeClasses(theme, config), [theme, config])
@@ -70,19 +52,14 @@ export function useThemeConfig(config: ThemeConfig): ThemeContextValue {
   )
 }
 
-/**
- * Hook to apply theme styles to CSS variables
- */
 export function useThemeStyles(config: ThemeConfig): Record<string, string> {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
+
     return getThemeVariables(theme)
   }, [config])
 }
 
-/**
- * Hook to get responsive theme configuration
- */
 export function useResponsiveTheme(baseConfig: ThemeConfig, isMobile: boolean): ThemeConfig {
   return useMemo(() => {
     if (!baseConfig.responsive || !isMobile) {
@@ -109,9 +86,6 @@ export function useResponsiveTheme(baseConfig: ThemeConfig, isMobile: boolean): 
   }, [baseConfig, isMobile])
 }
 
-/**
- * Hook to toggle between light and dark themes
- */
 export function useThemeToggle(
   lightConfig: ThemeConfig,
   darkConfig: ThemeConfig,
@@ -120,65 +94,48 @@ export function useThemeToggle(
   return isDark ? darkConfig : lightConfig
 }
 
-/**
- * Hook to create theme-aware CSS classes
- */
 export function useThemeClasses(config: ThemeConfig): ReturnType<typeof generateThemeClasses> {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
+
     return generateThemeClasses(theme, config)
   }, [config])
 }
 
-/**
- * Hook to get theme-aware color values
- */
 export function useThemeColors(config: ThemeConfig): Theme['colors'] {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
+
     return theme.colors
   }, [config])
 }
 
-/**
- * Hook to get theme-aware spacing values
- */
 export function useThemeSpacing(config: ThemeConfig): Theme['spacing'] {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
+
     return theme.spacing
   }, [config])
 }
 
-/**
- * Hook to get theme-aware typography values
- */
 export function useThemeTypography(config: ThemeConfig): Theme['typography'] {
   return useMemo(() => {
     const theme = mergeThemeConfig(config)
+
     return theme.typography
   }, [config])
 }
 
-/**
- * Hook to detect system theme preference
- */
 export function useSystemTheme(): 'dark' | 'light' {
   return useSyncExternalStore(subscribeSystemTheme, getSystemTheme, getServerTheme)
 }
 
-/**
- * Hook to create auto theme configuration based on system preference
- */
 export function useAutoTheme(lightTheme: string, darkTheme: string): string {
   const systemTheme = useSystemTheme()
 
   return systemTheme === 'dark' ? darkTheme : lightTheme
 }
 
-/**
- * Hook to create theme with custom overrides
- */
 export function useCustomTheme(
   baseThemeName: string,
   overrides: Partial<ThemeConfig>
@@ -191,5 +148,3 @@ export function useCustomTheme(
     [baseThemeName, overrides]
   )
 }
-
-export { ThemeContext }

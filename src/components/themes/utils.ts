@@ -1,33 +1,33 @@
 import { defaultTheme, themes } from './themes.js'
 import { type Theme, type ThemeClasses, type ThemeConfig } from './types.js'
 
-export function getTheme(themeName: string): Theme {
-  return themes[themeName] || defaultTheme
+export function getTheme(name: string): Theme {
+  return Object.hasOwn(themes, name) ? (themes[name] ?? defaultTheme) : defaultTheme
 }
 
 export function mergeThemeConfig(config: ThemeConfig): Theme {
-  const baseTheme = typeof config.theme === 'string' ? getTheme(config.theme) : config.theme
+  const base = typeof config.theme === 'string' ? getTheme(config.theme) : config.theme
 
   return {
-    ...baseTheme,
+    ...base,
     animations: {
-      ...baseTheme.animations,
+      ...base.animations,
       ...config.animations,
     },
     colors: {
-      ...baseTheme.colors,
+      ...base.colors,
       ...config.colors,
     },
     shadows: {
-      ...baseTheme.shadows,
+      ...base.shadows,
       ...config.shadows,
     },
     spacing: {
-      ...baseTheme.spacing,
+      ...base.spacing,
       ...config.spacing,
     },
     typography: {
-      ...baseTheme.typography,
+      ...base.typography,
       ...config.typography,
     },
   }
@@ -38,9 +38,9 @@ export function css(
 ): string {
   const toKebab = (key: string) => key.replace(/([A-Z])/g, '-$1').toLowerCase()
 
-  const serialize = (obj: Record<string, number | string>) =>
-    Object.entries(obj)
-      .map(([prop, val]) => `${toKebab(prop)}: ${val}`)
+  const serialize = (styles: Record<string, number | string>) =>
+    Object.entries(styles)
+      .map(([key, value]) => `${toKebab(key)}: ${value}`)
       .join('; ')
 
   return Object.entries(styles)
@@ -48,6 +48,7 @@ export function css(
       if (typeof value === 'object' && value !== null) {
         return `${toKebab(key)} { ${serialize(value)} }`
       }
+
       return `${toKebab(key)}: ${value}`
     })
     .join('; ')
@@ -258,7 +259,7 @@ export function generateThemeClasses(
   })
 
   const loadingSpinnerStyles = css({
-    animation: enableAnimations ? `spin 1s linear infinite` : 'none',
+    animation: enableAnimations ? 'spin 1s linear infinite' : 'none',
     border: `2px solid ${theme.colors.inputBorder}`,
     borderRadius: '50%',
     borderTop: `2px solid ${theme.colors.inputBorderFocus}`,
@@ -336,74 +337,65 @@ export function generateThemeClasses(
   })
 
   return {
-    // Container classes
     container: containerStyles,
     inputContainer: inputContainerStyles,
     resultsContainer: resultsContainerStyles,
 
-    // Input classes
     input: inputStyles,
     inputDisabled: '',
     inputFocus: '',
 
-    // Results classes
     results: resultsStyles,
     resultsHeader: resultsHeaderStyles,
     resultsList: resultsListStyles,
 
-    // Item classes
     resultItem: resultItemStyles,
     resultItemActive: '',
     resultItemFocus: '',
     resultItemHover: '',
 
-    // Content classes
     resultDescription: resultDescriptionStyles,
     resultHighlight: resultHighlightStyles,
     resultMeta: resultMetaStyles,
     resultTitle: resultTitleStyles,
 
-    // Badge classes
     collectionBadge: collectionBadgeStyles,
     scoreBadge: scoreBadgeStyles,
 
-    // State classes
     error: errorStyles,
     loading: loadingStyles,
     loadingSpinner: loadingSpinnerStyles,
     noResults: noResultsStyles,
 
-    // Facet classes
     facetContainer: facetContainerStyles,
     facetItem: facetItemStyles,
     facetItemActive: facetItemActiveStyles,
 
-    // Utility classes
     focusable: focusableStyles,
     hidden: hiddenStyles,
     visible: visibleStyles,
   }
 }
 
-/**
- * Apply theme to a CSS class with optional variant
- */
-export function applyTheme(theme: Theme, element: string, variant?: string): string {
-  const classes = generateThemeClasses(theme)
+export function applyTheme(
+  theme: Theme,
+  element: string,
+  variant?: string,
+  config: Partial<ThemeConfig> = {}
+): string {
+  const classes = generateThemeClasses(theme, config)
+  const base = classes[element as keyof ThemeClasses] ?? ''
 
-  if (variant) {
-    const variantKey = `${element}${
-      variant.charAt(0).toUpperCase() + variant.slice(1)
-    }` as keyof ThemeClasses
-    return `${classes[element] || ''} ${classes[variantKey] || ''}`
+  if (!variant) {
+    return base
   }
 
-  return classes[element as keyof ThemeClasses] || ''
+  const variantKey =
+    `${element}${variant.charAt(0).toUpperCase()}${variant.slice(1)}` as keyof ThemeClasses
+
+  return [base, classes[variantKey]].filter(Boolean).join('; ')
 }
 
-/**
- * Check if theme is dark mode
- */
 export function isDarkTheme(theme: Theme): boolean {
   return (
     theme.name === 'dark' ||
@@ -412,16 +404,10 @@ export function isDarkTheme(theme: Theme): boolean {
   )
 }
 
-/**
- * Check if theme is light mode
- */
 export function isLightTheme(theme: Theme): boolean {
   return !isDarkTheme(theme)
 }
 
-/**
- * Get theme-specific CSS variables
- */
 export function getThemeVariables(theme: Theme): Record<string, string> {
   return {
     '--search-collection-badge': theme.colors.collectionBadge,

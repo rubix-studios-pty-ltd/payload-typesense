@@ -54,55 +54,54 @@ const baseTheme = {
     lineHeightRelaxed: '1.625',
     lineHeightTight: '1.25',
   },
-}
+} satisfies Pick<Theme, 'animations' | 'shadows' | 'spacing' | 'typography'>
 
-// Modern theme - clean, professional, with subtle shadows
 export const modernTheme: Theme = {
   name: 'modern',
   colors: {
-    // Input colors
+    // Input
     inputBackground: '#ffffff',
     inputBorder: '#d1d5db',
     inputBorderFocus: '#3b82f6',
     inputPlaceholder: '#6b7280',
     inputText: '#111827',
 
-    // Results container colors
+    // Results
     resultsBackground: '#ffffff',
     resultsBorder: '#d1d5db',
     resultsShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
 
-    // Header colors
+    // Header
     headerBackground: '#f9fafb',
     headerBorder: '#e5e7eb',
     headerText: '#6b7280',
 
-    // Result item colors
+    // Result items
     resultBackground: '#ffffff',
     resultBackgroundFocus: '#eff6ff',
     resultBackgroundHover: '#f8fafc',
     resultBorder: '#f3f4f6',
 
-    // Text colors
+    // Text
     descriptionText: '#6b7280',
     highlightBackground: '#fef3c7',
     highlightText: '#92400e',
     metaText: '#9ca3af',
     titleText: '#111827',
 
-    // Interactive elements
+    // Interactive
     collectionBadge: '#dbeafe',
     collectionBadgeText: '#1e40af',
     scoreBadge: '#dcfce7',
     scoreBadgeText: '#166534',
 
-    // State colors
+    // States
     errorBackground: '#fef2f2',
     errorText: '#dc2626',
     loadingText: '#6b7280',
     noResultsText: '#6b7280',
 
-    // Facet colors
+    // Facets
     facetActiveBackground: '#3b82f6',
     facetActiveText: '#ffffff',
     facetBackground: '#f3f4f6',
@@ -112,53 +111,52 @@ export const modernTheme: Theme = {
   ...baseTheme,
 }
 
-// Dark theme - perfect for dark mode applications
 export const darkTheme: Theme = {
   name: 'dark',
   colors: {
-    // Input colors
+    // Input
     inputBackground: '#1f2937',
     inputBorder: '#374151',
     inputBorderFocus: '#3b82f6',
     inputPlaceholder: '#9ca3af',
     inputText: '#f9fafb',
 
-    // Results container colors
+    // Results
     resultsBackground: '#1f2937',
     resultsBorder: '#374151',
     resultsShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
 
-    // Header colors
+    // Header
     headerBackground: '#111827',
     headerBorder: '#374151',
     headerText: '#9ca3af',
 
-    // Result item colors
+    // Result items
     resultBackground: '#1f2937',
     resultBackgroundFocus: '#1e3a8a',
     resultBackgroundHover: '#111827',
     resultBorder: '#374151',
 
-    // Text colors
+    // Text
     descriptionText: '#d1d5db',
     highlightBackground: '#451a03',
     highlightText: '#fbbf24',
     metaText: '#9ca3af',
     titleText: '#f9fafb',
 
-    // Interactive elements
+    // Interactive
     collectionBadge: '#1e3a8a',
     collectionBadgeText: '#93c5fd',
     scoreBadge: '#064e3b',
     scoreBadgeText: '#6ee7b7',
 
-    // State colors
+    // States
     errorBackground: '#7f1d1d',
     errorText: '#fca5a5',
     loadingText: '#9ca3af',
     noResultsText: '#9ca3af',
 
-    // Facet colors
+    // Facets
     facetActiveBackground: '#3b82f6',
     facetActiveText: '#ffffff',
     facetBackground: '#374151',
@@ -168,11 +166,9 @@ export const darkTheme: Theme = {
   ...baseTheme,
 }
 
-// All available themes
 export const themes: Record<string, Theme> = {
   dark: darkTheme,
   modern: modernTheme,
 }
 
-// Default theme
 export const defaultTheme = modernTheme

@@ -1,81 +1,74 @@
 export interface ThemeColors {
-  // Interactive elements
+  // Interactive
   collectionBadge: string
   collectionBadgeText: string
+
+  // Text
   descriptionText: string
+
+  // States
   errorBackground: string
   errorText: string
 
+  // Facets
   facetActiveBackground: string
   facetActiveText: string
-  // Facet colors (if enabled)
   facetBackground: string
-
   facetBorder: string
   facetText: string
-  // Header colors
-  headerBackground: string
 
+  // Header
+  headerBackground: string
   headerBorder: string
   headerText: string
   highlightBackground: string
   highlightText: string
-
-  // Input colors
+  // Input
   inputBackground: string
   inputBorder: string
   inputBorderFocus: string
   inputPlaceholder: string
   inputText: string
-
-  // State colors
   loadingText: string
   metaText: string
   noResultsText: string
-  // Result item colors
-  resultBackground: string
 
+  // Result items
+  resultBackground: string
   resultBackgroundFocus: string
   resultBackgroundHover: string
   resultBorder: string
-  // Results container colors
-  resultsBackground: string
 
+  // Results
+  resultsBackground: string
   resultsBorder: string
   resultsShadow: string
   scoreBadge: string
   scoreBadgeText: string
-  // Text colors
   titleText: string
 }
 
 export interface ThemeSpacing {
   headerFontSize: string
-  // Header spacing
   headerPadding: string
+
   inputBorderRadius: string
-
   inputFontSize: string
-  // Input spacing
   inputPadding: string
+
   itemBorderRadius: string
-
   itemMargin: string
-  // Item spacing
   itemPadding: string
+
   metaFontSize: string
-
-  // Meta spacing
   metaPadding: string
-  resultsBorderRadius: string
 
+  resultsBorderRadius: string
   resultsMaxHeight: string
-  // Results spacing
   resultsPadding: string
 }
 
 export interface ThemeTypography {
-  // Font families
   fontFamily: string
   fontFamilyMono: string
 
@@ -83,47 +76,39 @@ export interface ThemeTypography {
   fontSizeBase: string
   fontSizeLg: string
   fontSizeSm: string
-
   fontSizeXl: string
-  // Font sizes
   fontSizeXs: string
+
   fontWeightBold: string
   fontWeightMedium: string
-  // Font weights
   fontWeightNormal: string
   fontWeightSemibold: string
 
   lineHeightNormal: string
   lineHeightRelaxed: string
-  // Line heights
   lineHeightTight: string
 }
 
 export interface ThemeAnimations {
-  // Animation durations
   animationFast: string
   animationNormal: string
   animationSlow: string
 
-  // Easing functions
   easeIn: string
   easeInOut: string
   easeOut: string
 
-  // Transition durations
   transitionFast: string
   transitionNormal: string
   transitionSlow: string
 }
 
 export interface ThemeShadows {
-  // Focus shadows
   focusShadow: string
   focusShadowColor: string
+
   shadowLg: string
   shadowMd: string
-
-  // Shadow definitions
   shadowSm: string
   shadowXl: string
 }
@@ -139,69 +124,61 @@ export interface Theme {
 
 export interface ThemeConfig {
   animations?: Partial<ThemeAnimations>
-
-  // Custom overrides
   colors?: Partial<ThemeColors>
-  // Feature toggles
+
   enableAnimations?: boolean
   enableRoundedCorners?: boolean
   enableShadows?: boolean
-  mobileOptimized?: boolean
 
-  // Responsive settings
+  mobileOptimized?: boolean
   responsive?: boolean
   shadows?: Partial<ThemeShadows>
   spacing?: Partial<ThemeSpacing>
-
-  // Theme selection
   theme: string | Theme
   typography?: Partial<ThemeTypography>
 }
 
 export interface ThemeClasses {
-  // Badge classes
+  // Badges
   collectionBadge: string
-  // Container classes
+  // Containers
   container: string
+
+  // States
   error: string
 
-  // Facet classes (if enabled)
+  // Facets
   facetContainer: string
   facetItem: string
   facetItemActive: string
 
+  // Utilities
   focusable: string
-  // Utility classes
   hidden: string
-  // Input classes
-  input: string
 
+  // Input
+  input: string
   inputContainer: string
   inputDisabled: string
   inputFocus: string
-  // State classes
   loading: string
-
   loadingSpinner: string
   noResults: string
+
+  // Content
   resultDescription: string
   resultHighlight: string
 
-  // Item classes
+  // Result items
   resultItem: string
   resultItemActive: string
-
   resultItemFocus: string
   resultItemHover: string
   resultMeta: string
-  // Results classes
   results: string
-
   resultsContainer: string
   resultsHeader: string
   resultsList: string
-
-  // Content classes
   resultTitle: string
   scoreBadge: string
   visible: string
