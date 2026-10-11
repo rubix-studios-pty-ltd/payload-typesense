@@ -9,7 +9,7 @@ import { extractText } from '../utils/extractText.js'
 
 const defaultSearchFields = ['title', 'content', 'description']
 
-export const mapCollectionToTypesense = (
+export const mapCollection = (
   slug: string,
   config: TypesenseCollectionConfig,
   vector?: NonNullable<TypesenseConfig['vectorSearch']>
@@ -74,7 +74,7 @@ export const mapCollectionToTypesense = (
   }
 }
 
-export const mapToTypesense = (
+export const mapDoc = (
   doc: BaseDocument,
   _slug: string,
   config: TypesenseCollectionConfig

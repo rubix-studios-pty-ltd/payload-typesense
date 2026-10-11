@@ -97,6 +97,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
             collection,
             page,
             per_page,
+            sort_by,
           })
 
           return Response.json(results)

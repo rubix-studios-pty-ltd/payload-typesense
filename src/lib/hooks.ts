@@ -6,7 +6,7 @@ import {
   type TypesenseConfig,
 } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
-import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
+import { mapCollection, mapDoc } from './schema-mapper.js'
 
 export const syncDoc = async (
   client: Typesense.Client,
@@ -16,13 +16,13 @@ export const syncDoc = async (
   vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ): Promise<void> => {
   try {
-    const document = mapToTypesense(doc, slug, config)
+    const document = mapDoc(doc, slug, config)
     if (!document) return
 
-    const schema = mapCollectionToTypesense(slug, config, vector)
-    const exists = await ensureCollection(client, slug, schema, vector)
+    const schema = mapCollection(slug, config, vector)
+    const { available } = await ensureCollection(client, slug, schema, vector)
 
-    if (!exists) return
+    if (!available) return
 
     await client.collections(slug).documents().upsert(document)
   } catch {

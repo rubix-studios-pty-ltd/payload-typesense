@@ -15,5 +15,5 @@ export {
   RenderedResult,
   RenderedResultError,
 } from './render/index.js'
-export { ThemeProvider } from './ThemeProvider.js'
+export { ThemeProvider, useTheme } from './ThemeProvider.js'
 export * from './themes/index.js'

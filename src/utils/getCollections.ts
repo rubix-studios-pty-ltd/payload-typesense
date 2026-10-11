@@ -2,6 +2,7 @@ import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
 import { type TypesenseConfig } from '../types.js'
+import { getComparator } from './sortResults.js'
 import { vectorSearch } from './vectorSearch.js'
 
 export const getCollections = async (
@@ -27,6 +28,24 @@ export const getCollections = async (
       return Response.json({ error: 'No collections enabled for search' }, { status: 400 })
     }
 
+    const multiple = enabledCollections.length > 1
+    const vector = Boolean(options.vector && config.vectorSearch?.enabled)
+    let compare: ReturnType<typeof getComparator> | undefined
+
+    if (multiple) {
+      try {
+        compare = getComparator(options.sort_by, vector)
+      } catch (error) {
+        return Response.json(
+          { error: error instanceof Error ? error.message : 'Invalid sort_by parameter' },
+          { status: 400 }
+        )
+      }
+    }
+
+    const limit = multiple ? options.page * options.per_page : options.per_page
+    const perPage = Math.min(limit, 250)
+
     const cacheKey = {
       ...options,
       collections: enabledCollections
@@ -46,46 +65,60 @@ export const getCollections = async (
       const icon = collection.icon || '📄'
 
       try {
-        let results
+        const fields = collection.searchFields?.join(',') || 'title,content,description'
+        const search = (page: number) =>
+          vector
+            ? vectorSearch(client, query, {
+                collection: slug,
+                page,
+                per_page: perPage,
+                sort_by: options.sort_by,
+              })
+            : client
+                .collections(slug)
+                .documents()
+                .search({
+                  highlight_full_fields: fields,
+                  num_typos: 0,
+                  page,
+                  per_page: perPage,
+                  q: query,
+                  query_by: fields,
+                  snippet_threshold: 30,
+                  typo_tokens_threshold: 1,
+                  ...(options.sort_by ? { sort_by: options.sort_by } : {}),
+                })
 
-        if (options.vector && config.vectorSearch?.enabled) {
-          results = await vectorSearch(client, query, {
-            collection: slug,
-            page: options.page,
-            per_page: options.per_page,
-          })
-        } else {
-          const fields = collection.searchFields?.join(',') || 'title,content,description'
+        let page = multiple ? 1 : options.page
+        const results = await search(page)
+        const hits = [...(results.hits ?? [])]
+        let cutoff = results.search_cutoff
+        let time = results.search_time_ms
 
-          results = await client
-            .collections(slug)
-            .documents()
-            .search({
-              highlight_full_fields: fields,
-              num_typos: 0,
-              page: options.page,
-              per_page: options.per_page,
-              q: query,
-              query_by: fields,
-              snippet_threshold: 30,
-              typo_tokens_threshold: 1,
-              ...(options.sort_by ? { sort_by: options.sort_by } : {}),
-            })
+        while (multiple && hits.length < Math.min(limit, results.found) && !cutoff) {
+          const next = await search(++page)
+          const batch = next.hits ?? []
+
+          cutoff ||= next.search_cutoff
+          time += next.search_time_ms
+          hits.push(...batch)
+
+          if (batch.length < perPage) break
         }
 
         return {
           collection: slug,
           displayName,
           found: results.found,
-          hits: (results.hits ?? []).map((hit) => ({
+          hits: hits.slice(0, limit).map((hit) => ({
             ...hit,
             collection: slug,
             displayName,
             icon,
           })),
           icon,
-          search_cutoff: results.search_cutoff,
-          search_time_ms: results.search_time_ms,
+          search_cutoff: cutoff,
+          search_time_ms: time,
         }
       } catch (error) {
         return {
@@ -106,7 +139,9 @@ export const getCollections = async (
     const hits = results.flatMap((result) => result.hits)
     const found = results.reduce((total, result) => total + result.found, 0)
 
-    hits.sort((a, b) => (b.text_match ?? 0) - (a.text_match ?? 0))
+    if (compare) hits.sort(compare)
+
+    const offset = multiple ? (options.page - 1) * options.per_page : 0
 
     const response = {
       collections: results.map((result) => ({
@@ -117,7 +152,7 @@ export const getCollections = async (
         icon: result.icon,
       })),
       found,
-      hits: hits.slice(0, options.per_page),
+      hits: hits.slice(offset, offset + options.per_page),
       page: options.page,
       request_params: {
         page: options.page,
