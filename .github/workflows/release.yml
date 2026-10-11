@@ -1,3 +1,4 @@
+
 name: Release
 
 on:
@@ -8,7 +9,7 @@ on:
 
 concurrency:
   group: npm-release-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   id-token: write
@@ -18,26 +19,8 @@ permissions:
   packages: write
 
 jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6.1.0
-      - uses: actions/setup-node@v7.0.0
-        with:
-          node-version: 24
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm clean
-
   release:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: write
-      issues: write
-      pull-requests: write
-      packages: write
-    needs: [lint]
 
     steps:
       - uses: actions/checkout@v7
@@ -46,19 +29,26 @@ jobs:
 
       - uses: pnpm/action-setup@v6.1.0
 
-      - uses: actions/setup-node@v7.0.0
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org/
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm exec biome check .
+
+      - name: Build
+        run: pnpm build
 
       - name: Upgrade npm for OIDC
-        run: |
-          npm install -g npm@latest
-          echo "npm version: $(npm --version)"
+        run: npm install -g npm@latest
 
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
-      - run: pnpm release
+      - name: Release
+        run: pnpm release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
