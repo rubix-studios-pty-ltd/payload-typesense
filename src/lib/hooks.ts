@@ -17,7 +17,11 @@ export const syncDoc = async (
 ): Promise<void> => {
   try {
     const document = mapDoc(doc, slug, config)
-    if (!document) return
+
+    if (!document) {
+      await deleteDoc(client, slug, String(doc.id))
+      return
+    }
 
     const schema = mapCollection(slug, config, vector)
     const { available } = await ensureCollection(client, slug, schema, vector)
