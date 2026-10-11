@@ -8,7 +8,10 @@
     "target": "esnext",
     "transform": {
       "legacyDecorator": true,
-      "decoratorMetadata": true
+      "decoratorMetadata": true,
+      "react": {
+        "runtime": "automatic"
+      }
     }
   },
   "module": {

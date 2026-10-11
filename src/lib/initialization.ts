@@ -9,7 +9,7 @@ import {
 } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
 import { testConnection } from '../utils/testConnection.js'
-import { mapCollectionToTypesense, mapToTypesense } from './schema-mapper.js'
+import { mapCollection, mapDoc } from './schema-mapper.js'
 
 export const initializeTypesense = async (
   payload: Payload,
@@ -39,10 +39,10 @@ const initializeCollection = async (
 ): Promise<void> => {
   if (!payload.collections[slug]) return
 
-  const schema = mapCollectionToTypesense(slug, config, vector)
-  const exists = await ensureCollection(client, slug, schema, vector)
+  const schema = mapCollection(slug, config, vector)
+  const { available } = await ensureCollection(client, slug, schema, vector, true)
 
-  if (!exists || !autoSync) return
+  if (!available || !autoSync) return
 
   await syncExistingDocuments(payload, client, slug, config)
 }
@@ -80,7 +80,7 @@ const syncExistingDocuments = async (
             const id = (doc as Record<string, unknown>).id
             return typeof id === 'string' || typeof id === 'number'
           })
-          .map((doc) => mapToTypesense(doc, slug, config))
+          .map((doc) => mapDoc(doc, slug, config))
           .filter((doc): doc is Record<string, number | string> => doc !== null)
 
         if (!mapped.length) continue

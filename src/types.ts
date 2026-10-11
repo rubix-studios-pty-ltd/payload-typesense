@@ -99,6 +99,11 @@ export interface RichText {
 
 /** Schema */
 
+export type Readiness = {
+  available: boolean
+  embedding: boolean
+}
+
 export type FieldType =
   | 'auto'
   | 'bool'
@@ -155,6 +160,19 @@ export type CollectionSchema = {
 }
 
 /** Result */
+
+export type Hit = {
+  document: object
+  text_match?: number
+  text_match_info?: { score: string }
+  vector_distance?: number
+}
+
+export type Sort = {
+  direction: number
+  field: string
+  missing?: string
+}
 
 export interface SearchParams {
   facets?: string[]
