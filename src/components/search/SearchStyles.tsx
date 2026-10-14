@@ -1,5 +1,5 @@
-import { type ThemeContextValue } from './themes/types.js'
-import { generateThemeStyles } from './themes/utils.js'
+import { type ThemeContextValue } from '../themes/types.js'
+import { generateThemeStyles } from '../themes/utils.js'
 
 export function SearchStyles({
   themeConfig,

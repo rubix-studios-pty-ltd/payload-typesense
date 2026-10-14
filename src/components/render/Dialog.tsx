@@ -40,7 +40,7 @@ export function RenderedDialog<T = Record<string, unknown>>({
   renderDialogHeader,
   dialogHeaderClassName = '',
   closeButtonClassName = '',
-  closeLabel = 'Close',
+  closeLabel = 'X',
   dialogContentClassName = '',
   renderDialogContent,
   dialogId,

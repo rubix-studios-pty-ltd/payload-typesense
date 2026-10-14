@@ -14,16 +14,18 @@ export type {
   TypesenseSearchConfig,
   TypoTolerance,
 } from '../types.js'
-export { default as HeadlessSearchDialog } from './HeadlessSearchDialog.js'
-export { default as HeadlessSearchInput } from './HeadlessSearchInput.js'
 export { ClockIcon, CollectionIcon, ErrorIcon, NoResultsIcon, SearchIcon } from './icons/index.js'
 export {
   Highlight,
+  RenderedContent,
+  RenderedDialog,
   RenderedHeader,
   RenderedNoResults,
   RenderedResult,
   RenderedResultError,
 } from './render/index.js'
-export { SearchStyles } from './SearchThemeStyles.js'
+export { default as HeadlessSearchDialog } from './search/HeadlessDialog.js'
+export { default as HeadlessSearchInput } from './search/HeadlessInput.js'
+export { SearchStyles } from './search/SearchStyles.js'
 export { ThemeProvider, useTheme } from './ThemeProvider.js'
 export * from './themes/index.js'

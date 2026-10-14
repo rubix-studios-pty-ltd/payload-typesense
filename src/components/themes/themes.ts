@@ -36,7 +36,7 @@ const baseTheme = {
     resultsBorderRadius: '0.5rem',
     resultsMaxHeight: '24rem',
     resultsOffset: '10px',
-    resultsPadding: '0',
+    resultsPadding: '4px',
     resultsZIndex: 1000,
 
     // Results header
@@ -76,7 +76,7 @@ const baseTheme = {
     triggerBorderRadius: '0.5rem',
 
     // Dialog
-    dialogWidth: '640px',
+    dialogWidth: '550px',
     dialogMaxHeight: '80vh',
     dialogPadding: '1rem',
     dialogBorderRadius: '0.75rem',
@@ -94,10 +94,6 @@ const baseTheme = {
     paginationBorderRadius: '0.375rem',
   },
   typography: {
-    fontFamily:
-      'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    fontFamilyMono:
-      'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
     fontSize2xl: '1.5rem',
     fontSizeBase: '1rem',
     fontSizeLg: '1.125rem',

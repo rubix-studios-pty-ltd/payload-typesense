@@ -123,9 +123,6 @@ export interface ThemeSpacing {
 }
 
 export interface ThemeTypography {
-  fontFamily: string
-  fontFamilyMono: string
-
   fontSize2xl: string
   fontSizeBase: string
   fontSizeLg: string

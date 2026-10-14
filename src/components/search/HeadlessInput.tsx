@@ -12,19 +12,19 @@ import React, {
   useState,
 } from 'react'
 
-import { useDebounce } from '../hooks/useDebounce.js'
-import { useSearch } from '../hooks/useSearch.js'
-import { type SearchInputProps } from '../lib/search-input.js'
-import { type SearchResult } from '../types.js'
-import { handleKeyboard } from '../utils/keyboard.js'
+import { useDebounce } from '../../hooks/useDebounce.js'
+import { useSearch } from '../../hooks/useSearch.js'
+import { type SearchInputProps } from '../../lib/search-input.js'
+import { type SearchResult } from '../../types.js'
+import { handleKeyboard } from '../../utils/keyboard.js'
 import {
   RenderedHeader,
   RenderedNoResults,
   RenderedResult,
   RenderedResultError,
-} from './render/index.js'
-import { SearchStyles } from './SearchThemeStyles.js'
-import { useComponentTheme } from './ThemeProvider.js'
+} from '../render/index.js'
+import { useComponentTheme } from '../ThemeProvider.js'
+import { SearchStyles } from './SearchStyles.js'
 
 export function HeadlessSearchInput<T = Record<string, unknown>>(
   props: SearchInputProps<T>

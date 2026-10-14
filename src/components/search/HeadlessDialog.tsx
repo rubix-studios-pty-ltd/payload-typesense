@@ -13,15 +13,16 @@ import React, {
   useState,
 } from 'react'
 
-import { useDebounce } from '../hooks/useDebounce.js'
-import { useSearch } from '../hooks/useSearch.js'
-import { type SearchDialogProps } from '../lib/search-dialog.js'
-import { type SearchPaginationProps } from '../lib/search-pagination.js'
-import { type SearchResult } from '../types.js'
-import { handleKeyboard } from '../utils/keyboard.js'
-import { RenderedContent, RenderedDialog } from './render/index.js'
-import { SearchStyles } from './SearchThemeStyles.js'
-import { useComponentTheme } from './ThemeProvider.js'
+import { useDebounce } from '../../hooks/useDebounce.js'
+import { useSearch } from '../../hooks/useSearch.js'
+import { type SearchDialogProps } from '../../lib/search-dialog.js'
+import { type SearchPaginationProps } from '../../lib/search-pagination.js'
+import { type SearchResult } from '../../types.js'
+import { handleKeyboard } from '../../utils/keyboard.js'
+import { SearchIcon } from '../icons/index.js'
+import { RenderedContent, RenderedDialog } from '../render/index.js'
+import { useComponentTheme } from '../ThemeProvider.js'
+import { SearchStyles } from './SearchStyles.js'
 
 export function HeadlessSearchDialog<T = Record<string, unknown>>(
   props: SearchDialogProps<T>
@@ -45,7 +46,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     defaultOpen = false,
     onOpenChange,
     initialQuery = '',
-    triggerLabel = 'Search',
+    triggerLabel,
     closeOnResultClick = true,
     clearOnClose = false,
     onPageChange,
@@ -105,6 +106,19 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
   )
 
   const close = useCallback(() => changeOpen(false), [changeOpen])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const root = document.documentElement
+    const previousOverflow = root.style.overflow
+
+    root.style.overflow = 'hidden'
+
+    return () => {
+      root.style.overflow = previousOverflow
+    }
+  }, [isOpen])
 
   useEffect(() => {
     const dialog = dialogRef.current
@@ -221,6 +235,8 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     ...triggerProps,
     type: 'button' as const,
     ref: triggerRef,
+    'aria-label':
+      triggerProps?.['aria-label'] ?? (typeof triggerLabel === 'string' ? triggerLabel : 'Search'),
     'aria-haspopup': 'dialog' as const,
     'aria-expanded': isOpen,
     'aria-controls': dialogId,
@@ -229,7 +245,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
       triggerProps?.onClick?.(event)
       if (!event.defaultPrevented) changeOpen(true)
     },
-    children: triggerLabel,
+    children: triggerLabel ?? <SearchIcon />,
   }
 
   const pagination: SearchPaginationProps = {
