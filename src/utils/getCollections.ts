@@ -93,8 +93,10 @@ export const getCollections = async (
             )
 
         let page = multiple ? 1 : options.page
+
         const results = await search(page)
         const hits = [...(results.hits ?? [])]
+
         let cutoff = results.search_cutoff
         let time = results.search_time_ms
 

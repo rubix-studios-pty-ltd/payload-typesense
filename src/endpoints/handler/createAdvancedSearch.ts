@@ -143,7 +143,17 @@ export const createAdvancedSearch = (
         .documents()
         .search(searchParams as { q: string; query_by: string | string[] })
 
-      return Response.json(results)
+      const response = {
+        ...results,
+        hits:
+          results.hits?.map((hit) => ({
+            ...hit,
+            collection,
+            displayName: settings.displayName ?? collection,
+          })) ?? [],
+      }
+
+      return Response.json(response)
     } catch {
       return Response.json({ error: 'Advanced search failed' }, { status: 500 })
     }

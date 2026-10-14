@@ -85,12 +85,25 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
       const searchParams = buildParameters(config, fields, params)
       const cached = searchCache.get(params.q, collection, searchParams)
 
-      if (cached) return Response.json(cached)
+      const search = () => client.collections(collection).documents().search(searchParams)
 
-      const results = await client.collections(collection).documents().search(searchParams)
-      searchCache.set(params.q, results, collection, searchParams)
+      const results = cached ? (cached as Awaited<ReturnType<typeof search>>) : await search()
 
-      return Response.json(results)
+      const response = {
+        ...results,
+        hits:
+          results.hits?.map((hit) => ({
+            ...hit,
+            collection,
+            displayName: settings.displayName ?? collection,
+          })) ?? [],
+      }
+
+      if (!cached) {
+        searchCache.set(params.q, response, collection, searchParams)
+      }
+
+      return Response.json(response)
     } catch (error) {
       return Response.json(
         {

@@ -42,7 +42,18 @@ export const createSuggest = (
         .collections(collection)
         .documents()
         .search(buildParameters(config, fields, { q, per_page: limit, search_mode: 'keyword' }))
-      return Response.json(results)
+
+      const response = {
+        ...results,
+        hits:
+          results.hits?.map((hit) => ({
+            ...hit,
+            collection,
+            displayName: settings.displayName ?? collection,
+          })) ?? [],
+      }
+
+      return Response.json(response)
     } catch {
       return Response.json({ error: 'Suggest failed' }, { status: 500 })
     }
