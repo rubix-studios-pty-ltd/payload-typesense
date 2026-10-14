@@ -4,7 +4,7 @@ import React, { useEffect, useId, useRef, useState } from 'react'
 
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useSearch } from '../hooks/useSearch.js'
-import { type HeadlessSearchInputProps } from '../lib/headlessSearch.js'
+import { type SearchInputProps } from '../lib/search-input.js'
 import { type SearchResult } from '../types.js'
 import { handleKeyboard } from '../utils/keyboard.js'
 import {
@@ -17,7 +17,7 @@ import { SearchStyles } from './SearchThemeStyles.js'
 import { useComponentTheme } from './ThemeProvider.js'
 
 export function HeadlessSearchInput<T = Record<string, unknown>>(
-  props: HeadlessSearchInputProps<T>
+  props: SearchInputProps<T>
 ): React.ReactElement {
   const {
     baseUrl,

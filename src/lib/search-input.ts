@@ -11,8 +11,7 @@ import {
 import { type ThemeConfig } from '../components/themes/types.js'
 import { type BaseSearchInputProps, type SearchResult } from '../types.js'
 
-export interface HeadlessSearchInputProps<T = Record<string, unknown>>
-  extends BaseSearchInputProps<T> {
+export interface SearchInputProps<T = Record<string, unknown>> extends BaseSearchInputProps<T> {
   /**
    * Collections to search in
    */

@@ -1,9 +1,9 @@
-export type { HeadlessSearchInputProps } from '../lib/headlessSearch.js'
 export type {
-  HeadlessSearchDialogProps,
   SearchDialogContentProps,
-  SearchPaginationProps,
-} from '../lib/headlessSearchDialog.js'
+  SearchDialogProps,
+} from '../lib/search-dialog.js'
+export type { SearchInputProps } from '../lib/search-input.js'
+export type { SearchPaginationProps } from '../lib/search-pagination.js'
 export type {
   BaseSearchInputProps,
   HealthCheckResponse,

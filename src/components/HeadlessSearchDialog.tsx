@@ -1,13 +1,23 @@
 'use client'
 
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react'
+import React, {
+  type ChangeEvent,
+  type FocusEvent,
+  Fragment,
+  type KeyboardEvent,
+  type MouseEvent,
+  type ReactElement,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useSearch } from '../hooks/useSearch.js'
-import {
-  type HeadlessSearchDialogProps,
-  type SearchPaginationProps,
-} from '../lib/headlessSearchDialog.js'
+import { type SearchDialogProps } from '../lib/search-dialog.js'
+import { type SearchPaginationProps } from '../lib/search-pagination.js'
 import { type SearchResult } from '../types.js'
 import { handleKeyboard } from '../utils/keyboard.js'
 import {
@@ -20,8 +30,8 @@ import { SearchStyles } from './SearchThemeStyles.js'
 import { useComponentTheme } from './ThemeProvider.js'
 
 export function HeadlessSearchDialog<T = Record<string, unknown>>(
-  props: HeadlessSearchDialogProps<T>
-): React.ReactElement {
+  props: SearchDialogProps<T>
+): ReactElement {
   const {
     baseUrl,
     collections,
@@ -235,14 +245,14 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     ref: inputRef,
     value: query,
     placeholder,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
       reset()
       setQuery(event.target.value)
       setPage(1)
     },
     onFocus: () => {},
-    onBlur: (_event: React.FocusEvent<HTMLInputElement>) => {},
-    onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+    onBlur: (_event: FocusEvent<HTMLInputElement>) => {},
+    onKeyDown: (event: KeyboardEvent<HTMLInputElement>) => {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         handleKeyboard(event, { inputRef, isOpen, results, resultsRef })
       }
@@ -257,7 +267,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     'aria-expanded': isOpen,
     'aria-controls': dialogId,
     className: `${classes.trigger} ${triggerClassName} ${triggerProps?.className ?? ''}`,
-    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick: (event: MouseEvent<HTMLButtonElement>) => {
       triggerProps?.onClick?.(event)
       if (!event.defaultPrevented) changeOpen(true)
     },
@@ -284,6 +294,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
           <input {...inputProps} autoComplete="off" type="search" />
         )}
       </div>
+
       {showLoading &&
         isLoading &&
         (renderLoading ? (
@@ -334,7 +345,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
               {results.hits.length > 0 ? (
                 <div className={`${classes.resultsList} ${resultsListClassName}`}>
                   {results.hits.map((result, index) => (
-                    <React.Fragment
+                    <Fragment
                       key={`${result.collection ?? ''}:${result.document?.id ?? result.id ?? index}`}
                     >
                       {renderResult ? (
@@ -353,7 +364,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
                           themeConfig={themeConfig}
                         />
                       )}
-                    </React.Fragment>
+                    </Fragment>
                   ))}
                 </div>
               ) : renderNoResults ? (

@@ -8,52 +8,8 @@ import {
 } from 'react'
 
 import { type SearchResponse } from '../types.js'
-import { type HeadlessSearchInputProps } from './headlessSearch.js'
-
-/**
- * State and navigation supplied to a custom pagination renderer.
- */
-export type SearchPaginationProps = {
-  /**
-   * Current one-based page number.
-   */
-  page: number
-
-  /**
-   * Number of results requested per page.
-   */
-  perPage: number
-
-  /**
-   * Total matches reported by the current search response.
-   */
-  found: number
-
-  /**
-   * Number of pages calculated from the match count and page size.
-   */
-  totalPages: number
-
-  /**
-   * Whether a search request is currently loading.
-   */
-  isLoading: boolean
-
-  /**
-   * Whether a page exists before the current page.
-   */
-  hasPreviousPage: boolean
-
-  /**
-   * Whether a page exists after the current page.
-   */
-  hasNextPage: boolean
-
-  /**
-   * Requests a different page. Invalid, unchanged or loading-state requests are ignored.
-   */
-  onPageChange: (page: number) => void
-}
+import { type SearchInputProps } from './search-input.js'
+import { type SearchPaginationProps } from './search-pagination.js'
 
 /**
  * Search state and default content supplied to a custom dialog content renderer.
@@ -98,8 +54,8 @@ export type SearchDialogContentProps<T> = {
 /**
  * Configuration for a button that opens a modal search dialog.
  */
-export interface HeadlessSearchDialogProps<T = Record<string, unknown>>
-  extends Omit<HeadlessSearchInputProps<T>, 'enableSuggestions' | 'maxResults'> {
+export interface SearchDialogProps<T = Record<string, unknown>>
+  extends Omit<SearchInputProps<T>, 'enableSuggestions' | 'maxResults'> {
   /**
    * Clear the query and reset pagination when the dialog closes. Defaults to false.
    */

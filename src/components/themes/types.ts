@@ -4,12 +4,11 @@ export interface ThemeColors {
   // Interactive
   collectionBadge: string
   collectionBadgeText: string
-
-  // Text
-  titleText: string
   descriptionText: string
-  metaText: string
-  noResultsText: string
+
+  // Dialog
+  dialogBackdrop?: string
+  dialogBackground?: string
 
   // States
   errorBackground: string
@@ -38,6 +37,8 @@ export interface ThemeColors {
   inputPlaceholder: string
   inputText: string
   loadingText: string
+  metaText: string
+  noResultsText: string
 
   paginationBackground?: string
   paginationBorder?: string
@@ -56,17 +57,19 @@ export interface ThemeColors {
   scoreBadge: string
   scoreBadgeText: string
 
+  // Text
+  titleText: string
+
   // Dialog button
   triggerBackground?: string
   triggerBorder?: string
   triggerText?: string
-
-  // Dialog
-  dialogBackdrop?: string
-  dialogBackground?: string
 }
 
 export interface ThemeSpacing {
+  // Dialog close
+  closeButtonBorderRadius?: string
+  closeButtonPadding?: string
   containerMargin?: string
   containerMaxWidth?: string
   descriptionLineClamp?: number
@@ -77,10 +80,6 @@ export interface ThemeSpacing {
   dialogMaxHeight?: string
   dialogPadding?: string
   dialogWidth?: string
-
-  // Dialog close
-  closeButtonBorderRadius?: string
-  closeButtonPadding?: string
 
   errorGap?: string
   errorPadding?: string
