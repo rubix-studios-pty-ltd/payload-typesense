@@ -56,14 +56,14 @@ export interface ThemeColors {
   scoreBadge: string
   scoreBadgeText: string
 
-  // Dialog
-  dialogBackdrop?: string
-  dialogBackground?: string
-
   // Dialog button
   triggerBackground?: string
   triggerBorder?: string
   triggerText?: string
+
+  // Dialog
+  dialogBackdrop?: string
+  dialogBackground?: string
 }
 
 export interface ThemeSpacing {

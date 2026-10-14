@@ -31,7 +31,7 @@ const baseTheme = {
     inputFontSize: '1rem',
     inputPadding: '0.5rem 0.75rem',
 
-    // Results Container
+    // Results container
     resultsBorderWidth: '1px',
     resultsBorderRadius: '0.5rem',
     resultsMaxHeight: '24rem',
@@ -39,12 +39,12 @@ const baseTheme = {
     resultsPadding: '0',
     resultsZIndex: 1000,
 
-    // Results Header
+    // Results header
     headerFontSize: '0.875rem',
     headerPadding: '0.75rem 1rem',
     headerGap: '8px',
 
-    // Results List
+    // Results list
     resultsListPadding: '2px',
     itemBorderRadius: '0',
     itemMargin: '0',
@@ -55,7 +55,7 @@ const baseTheme = {
     resultDescriptionMargin: '4px 0 0',
     descriptionLineClamp: 2,
 
-    // Result Metadata
+    // Result metadata
     metaFontSize: '0.75rem',
     metaPadding: '0.5rem 0',
 
@@ -68,10 +68,10 @@ const baseTheme = {
     errorPadding: '16px',
     errorGap: '8px',
 
-    // No Results
+    // No results
     noResultsPadding: '40px 20px',
 
-    // Dialog Trigger
+    // Dialog trigger button
     triggerPadding: '0.5rem 0.75rem',
     triggerBorderRadius: '0.5rem',
 
@@ -83,7 +83,7 @@ const baseTheme = {
     dialogHeaderPadding: '0 0 1rem',
     dialogGap: '0.75rem',
 
-    // Dialog Close Button
+    // Dialog close button
     closeButtonPadding: '0.25rem 0.5rem',
     closeButtonBorderRadius: '0.375rem',
 
