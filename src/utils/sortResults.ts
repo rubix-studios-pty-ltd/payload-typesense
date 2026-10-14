@@ -1,6 +1,12 @@
-import { type Hit, type Sort } from '../types.js'
+import { type Hit, type SearchMode, type Sort } from '../types.js'
 
-export const getComparator = (sortBy?: string, vector = false) => {
+export function getCompare(
+  sortBy?: string,
+  mode: SearchMode | boolean = 'keyword'
+): (a: Hit, b: Hit) => number {
+  const vector = mode === true || mode === 'semantic'
+  const hybrid = mode === 'hybrid'
+  const relevance = vector ? '_vector_distance' : '_text_match'
   const sorts: Sort[] = []
 
   if (sortBy?.trim()) {
@@ -31,15 +37,21 @@ export const getComparator = (sortBy?: string, vector = false) => {
   }
 
   if (!sorts.length) {
-    sorts.push({ direction: vector ? 1 : -1, field: vector ? '_vector_distance' : '_text_match' })
-  } else if (sorts.length < 3 && !sorts.some((sort) => sort.field === '_text_match')) {
-    sorts.push({ direction: -1, field: '_text_match' })
+    sorts.push({ direction: vector ? 1 : -1, field: relevance })
+  } else if (sorts.length < 3 && !sorts.some((sort) => sort.field === relevance)) {
+    sorts.push({ direction: vector ? 1 : -1, field: relevance })
   }
 
   return (a: Hit, b: Hit): number => {
     for (const sort of sorts) {
-      const left = getValue(a, sort.field)
-      const right = getValue(b, sort.field)
+      const left =
+        hybrid && sort.field === '_text_match'
+          ? (a.hybrid_search_info?.rank_fusion_score ?? 0)
+          : getValue(a, sort.field)
+      const right =
+        hybrid && sort.field === '_text_match'
+          ? (b.hybrid_search_info?.rank_fusion_score ?? 0)
+          : getValue(b, sort.field)
       const leftMissing = left === undefined || left === null || left === ''
       const rightMissing = right === undefined || right === null || right === ''
 
@@ -56,7 +68,7 @@ export const getComparator = (sortBy?: string, vector = false) => {
 
       let compared: number
 
-      if (sort.field === '_text_match') {
+      if (sort.field === '_text_match' && !hybrid) {
         const leftScore = BigInt(left as number | string)
         const rightScore = BigInt(right as number | string)
 
@@ -79,7 +91,7 @@ export const getComparator = (sortBy?: string, vector = false) => {
   }
 }
 
-const getValue = (hit: Hit, field: string): unknown => {
+function getValue(hit: Hit, field: string): unknown {
   if (field === '_text_match') return hit.text_match_info?.score ?? hit.text_match ?? 0
   if (field === '_vector_distance') return hit.vector_distance
 

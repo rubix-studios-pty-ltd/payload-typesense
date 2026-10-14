@@ -1,5 +1,8 @@
 import type Typesense from 'typesense'
 
+import { buildParameters } from '../lib/search.js'
+import { type TypesenseConfig } from '../types.js'
+
 export async function vectorSearch(
   client: Typesense.Client,
   query: string,
@@ -8,6 +11,7 @@ export async function vectorSearch(
     page: number
     per_page: number
     sort_by?: string
+    vectorSearch?: TypesenseConfig['vectorSearch']
   }
 ) {
   const { collection, page, per_page } = options
@@ -18,13 +22,19 @@ export async function vectorSearch(
   return client
     .collections(collection)
     .documents()
-    .search({
-      num_typos: 0,
-      page: pageNum,
-      per_page: perPageNum,
-      q: query,
-      query_by: 'embedding',
-      search_cutoff_ms: 5000,
-      ...(options.sort_by ? { sort_by: options.sort_by } : {}),
-    })
+    .search(
+      buildParameters(
+        {
+          vectorSearch: { ...options.vectorSearch, enabled: true },
+        },
+        [],
+        {
+          page: pageNum,
+          per_page: perPageNum,
+          q: query,
+          search_mode: 'semantic',
+          ...(options.sort_by ? { sort_by: options.sort_by } : {}),
+        }
+      )
+    )
 }

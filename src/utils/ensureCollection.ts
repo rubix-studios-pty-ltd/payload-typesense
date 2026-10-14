@@ -3,13 +3,13 @@ import { type CollectionUpdateSchema } from 'typesense/lib/Typesense/Collection.
 
 import { type CollectionSchema, type Readiness, type TypesenseConfig } from '../types.js'
 
-export const ensureCollection = async (
+export async function ensureCollection(
   client: Typesense.Client,
   slug: string,
   schema: CollectionSchema,
   vector?: NonNullable<TypesenseConfig['vectorSearch']>,
   reconcile = false
-): Promise<Readiness> => {
+): Promise<Readiness> {
   let existing
 
   try {
@@ -25,8 +25,7 @@ export const ensureCollection = async (
     }
 
     try {
-      await client.collections().create(schema)
-      return { available: true, embedding: Boolean(vector?.enabled) }
+      existing = await client.collections().create(schema)
     } catch (error) {
       if (vector?.enabled) {
         try {
@@ -39,7 +38,7 @@ export const ensureCollection = async (
 
           return { available: true, embedding: false }
         } catch {
-          // Another request may have created the collection
+          // Another request may have created the collection.
         }
       }
 
@@ -98,24 +97,79 @@ export const ensureCollection = async (
     }
   }
 
-  const embedding = existing.fields.some((field) => field.name === 'embedding')
+  type ExistingField = (typeof existing.fields)[number]
 
-  if (!vector?.enabled || embedding) {
-    return { available: true, embedding }
+  function isIndexed(field: ExistingField | undefined): boolean {
+    return field?.type === 'float[]' && (field.num_dim ?? 0) > 0 && field.index !== false
   }
 
-  const field = schema.fields.find((field) => field.name === 'embedding')
-  if (!field) return { available: true, embedding: false }
+  const current = existing.fields.find((field) => field.name === 'embedding')
+
+  if (!vector?.enabled) {
+    return { available: true, embedding: isIndexed(current) }
+  }
+
+  const desired = schema.fields.find((field) => field.name === 'embedding')
+
+  if (!desired) {
+    return { available: true, embedding: false }
+  }
+
+  const expectedEmbedding = desired.embed
+  const expectedDimensions = desired.num_dim
+
+  function isReady(field: ExistingField | undefined): boolean {
+    if (!field || !isIndexed(field)) return false
+
+    if (expectedDimensions !== undefined && field.num_dim !== expectedDimensions) {
+      return false
+    }
+
+    if (!expectedEmbedding) return true
+
+    const actualEmbedding = field.embed
+
+    if (!actualEmbedding) return false
+
+    return (
+      actualEmbedding.model_config?.model_name === expectedEmbedding.model_config.model_name &&
+      actualEmbedding.from.length === expectedEmbedding.from.length &&
+      actualEmbedding.from.every((source, index) => source === expectedEmbedding.from[index])
+    )
+  }
+
+  if (isReady(current)) {
+    return { available: true, embedding: true }
+  }
+
+  const fields: NonNullable<CollectionUpdateSchema['fields']> = []
+
+  if (current) {
+    fields.push({ name: 'embedding', drop: true })
+  }
+
+  fields.push(desired)
 
   try {
-    await client.collections(slug).update({
-      fields: [field],
-    })
+    existing = await client.collections(slug).update({ fields })
 
-    return { available: true, embedding: true }
+    return {
+      available: true,
+      embedding: isReady(existing.fields.find((field) => field.name === 'embedding')),
+    }
   } catch (error) {
+    try {
+      existing = await client.collections(slug).retrieve()
+
+      if (isReady(existing.fields.find((field) => field.name === 'embedding'))) {
+        return { available: true, embedding: true }
+      }
+    } catch {
+      // Preserve the original alteration error for logging.
+    }
+
     console.warn(
-      `Could not add embedding field to collection ${slug}: ${
+      `Could not configure embedding field for collection ${slug}: ${
         error instanceof Error ? error.message : 'Unknown error'
       }`
     )

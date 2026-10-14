@@ -16,7 +16,7 @@ export const syncDoc = async (
   vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ): Promise<void> => {
   try {
-    const document = mapDoc(doc, slug, config)
+    const document = mapDoc(doc, slug, config, vector)
 
     if (!document) {
       await deleteDoc(client, slug, String(doc.id))

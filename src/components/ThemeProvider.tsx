@@ -27,3 +27,10 @@ export function useTheme(): ThemeContextValue {
 
   return context
 }
+
+export function useComponentTheme(theme?: string | ThemeConfig): ThemeContextValue {
+  const context = use(ThemeContext)
+  return useThemeConfig(
+    typeof theme === 'string' ? { theme } : (theme ?? context?.config ?? { theme: 'modern' })
+  )
+}

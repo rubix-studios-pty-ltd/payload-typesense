@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useSearch } from '../hooks/useSearch.js'
@@ -13,7 +13,8 @@ import {
   RenderedResult,
   RenderedResultError,
 } from './render/index.js'
-import { useThemeConfig } from './themes/hooks.js'
+import { SearchStyles } from './SearchThemeStyles.js'
+import { useComponentTheme } from './ThemeProvider.js'
 
 export function HeadlessSearchInput<T = Record<string, unknown>>(
   props: HeadlessSearchInputProps<T>
@@ -27,8 +28,11 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     errorClassName = '',
     inputClassName = '',
     inputWrapperClassName = '',
+    loadingClassName = '',
     minQueryLength = 2,
     noResultsClassName = '',
+    onError,
+    onLoading,
     onResultClick,
     onResults,
     onSearch,
@@ -49,24 +53,28 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     resultsListClassName = '',
     showLoading = true,
     showResultCount = true,
-    theme = 'modern',
+    theme,
     vector = false,
+    searchMode,
+    numTypos,
   } = props
+  const scope = useId()
+  const themeConfig = useComponentTheme(theme)
 
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
+  const rootRef = useRef<HTMLDivElement>(null)
 
-  const themeConfig = useThemeConfig({
-    theme: typeof theme === 'string' ? theme : theme.theme || 'modern',
-    ...(typeof theme === 'object' ? theme : {}),
-  })
+  const resultsId = `${scope}-results`
+
+  const classes = themeConfig.classes
 
   const debouncedQuery = useDebounce(query, debounceMs)
 
-  const { error, isLoading, results, search } = useSearch<T>({
+  const { error, isLoading, results, search, reset } = useSearch<T>({
     baseUrl,
     collections,
     minQueryLength,
@@ -74,127 +82,99 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     onSearch,
     perPage,
     vector,
+    searchMode,
+    numTypos,
   })
 
   useEffect(() => {
-    void search(debouncedQuery)
-  }, [debouncedQuery, search])
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-
-    setQuery(value)
-    setIsOpen(enableSuggestions && value.length >= minQueryLength)
-  }
-
-  const handleInputFocus = () => {
-    if (enableSuggestions && query.length >= minQueryLength) {
-      setIsOpen(true)
+    if (query === debouncedQuery) {
+      void search(debouncedQuery)
     }
-  }
+  }, [query, debouncedQuery, search])
 
-  const handleInputBlur = (_e: React.FocusEvent) => {
-    setTimeout(() => {
-      if (!resultsRef.current?.contains(document.activeElement)) {
+  useEffect(() => {
+    if (error) {
+      onError?.(error)
+    }
+  }, [error, onError])
+
+  useEffect(() => {
+    onLoading?.(isLoading)
+  }, [isLoading, onLoading])
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) {
         setIsOpen(false)
       }
-    }, 150)
-  }
+    }
 
-  const handleResultClick = (result: SearchResult<T>) => {
+    document.addEventListener('pointerdown', outside)
+
+    return () => document.removeEventListener('pointerdown', outside)
+  }, [isOpen])
+
+  const clickResult = (result: SearchResult<T>) => {
     onResultClick?.(result)
     setIsOpen(false)
     setQuery('')
+    reset()
   }
 
-  const handleResultHover = (result: SearchResult<T>) => {
-    onResultHover?.(result)
+  const keyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      setIsOpen(false)
+      inputRef.current?.focus()
+      return
+    }
+
+    handleKeyboard(event, { inputRef, isOpen, results, resultsRef })
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    handleKeyboard(e, {
-      inputRef,
-      isOpen,
-      results,
-      resultsRef,
-    })
+  const inputProps = {
+    'aria-label': 'Search input',
+    'aria-controls': isOpen ? resultsId : undefined,
+    'aria-busy': isLoading,
+    className: `${classes.input} ${inputClassName}`,
+    ref: inputRef,
+    value: query,
+    placeholder,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+      reset()
+      setQuery(event.target.value)
+      setIsOpen(enableSuggestions && event.target.value.trim().length >= minQueryLength)
+    },
+    onFocus: () => {
+      if (enableSuggestions && query.trim().length >= minQueryLength) {
+        setIsOpen(true)
+      }
+    },
+    onBlur: (_event: React.FocusEvent<HTMLInputElement>) => {},
+    onKeyDown: keyDown,
   }
 
   return (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Closes suggestions when focus leaves the search component.
     <div
-      className={className}
-      style={{
-        margin: '0 auto',
-        maxWidth: '600px',
-        position: 'relative',
-        width: '100%',
+      className={`${classes.container} ${className}`}
+      data-search-theme={scope}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsOpen(false)
       }}
+      ref={rootRef}
     >
-      <div
-        className={inputWrapperClassName}
-        style={{
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SearchStyles scope={scope} themeConfig={themeConfig} />
+
+      <div className={`${classes.inputContainer} ${inputWrapperClassName}`}>
         {renderInput ? (
-          renderInput({
-            className: inputClassName,
-            onBlur: handleInputBlur,
-            onChange: handleInputChange,
-            onFocus: handleInputFocus,
-            onKeyDown: handleKeyDown,
-            placeholder,
-            ref: inputRef,
-            value: query,
-          })
+          renderInput(inputProps)
         ) : (
-          <input
-            aria-label="Search input"
-            autoComplete="off"
-            className={inputClassName}
-            onBlur={(e) => {
-              e.target.style.borderColor = themeConfig.theme.colors.inputBorder
-              e.target.style.boxShadow = 'none'
-              handleInputBlur(e)
-            }}
-            onChange={handleInputChange}
-            onFocus={(e) => {
-              e.target.style.borderColor = themeConfig.theme.colors.inputBorderFocus
-              e.target.style.boxShadow =
-                themeConfig.config.enableShadows !== false
-                  ? `0 0 0 3px ${themeConfig.theme.colors.inputBorderFocus}20`
-                  : 'none'
-              handleInputFocus()
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            ref={inputRef}
-            style={{
-              backgroundColor: themeConfig.theme.colors.inputBackground,
-              border: `2px solid ${themeConfig.theme.colors.inputBorder}`,
-              borderRadius:
-                themeConfig.config.enableRoundedCorners !== false
-                  ? themeConfig.theme.spacing.inputBorderRadius
-                  : '0',
-              boxShadow: 'none',
-              color: themeConfig.theme.colors.inputText,
-              fontFamily: themeConfig.theme.typography.fontFamily,
-              fontSize: themeConfig.theme.spacing.inputFontSize,
-              fontWeight: themeConfig.theme.typography.fontWeightNormal,
-              lineHeight: themeConfig.theme.typography.lineHeightNormal,
-              outline: 'none',
-              padding: themeConfig.theme.spacing.inputPadding,
-              transition:
-                themeConfig.config.enableAnimations !== false
-                  ? `all ${themeConfig.theme.animations.transitionNormal} ${themeConfig.theme.animations.easeInOut}`
-                  : 'none',
-              width: '100%',
-            }}
-            title="Search input"
-            type="text"
-            value={query}
-          />
+          <input {...inputProps} autoComplete="off" type="search" />
         )}
 
         {isLoading &&
@@ -203,81 +183,24 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
             renderLoading()
           ) : (
             <div
-              style={{
-                position: 'absolute',
-                right: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-              }}
+              aria-label="Searching"
+              className={`${classes.loadingIndicator} ${loadingClassName}`}
+              role="status"
             >
-              <style>
-                {`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-        `}
-              </style>
-
-              <div
-                data-testid="loading-spinner"
-                style={{
-                  animation: 'spin 1s linear infinite',
-                  border: `2px solid ${themeConfig.theme.colors.inputBorder}`,
-                  borderRadius: '50%',
-                  borderTop: `2px solid ${themeConfig.theme.colors.inputBorderFocus}`,
-                  height: '16px',
-                  width: '16px',
-                }}
-              />
+              <div aria-hidden="true" className={classes.loadingSpinner} />
             </div>
           ))}
       </div>
 
       {enableSuggestions && isOpen && (results || error) && (
-        // biome-ignore lint/a11y/noStaticElementInteractions: Handle keyboard navigation
+        // biome-ignore lint/a11y/noStaticElementInteractions: Handles keyboard navigation between focusable search results.
         <div
-          className={resultsContainerClassName}
-          onKeyDown={(event) => {
-            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-              handleKeyDown(event)
-            }
-          }}
+          className={`${classes.resultsContainer} ${resultsContainerClassName}`}
+          id={resultsId}
+          onKeyDown={keyDown}
           ref={resultsRef}
-          style={{
-            backgroundColor: themeConfig.theme.colors.resultsBackground,
-            border: `1px solid ${themeConfig.theme.colors.resultsBorder}`,
-            borderRadius:
-              themeConfig.config.enableRoundedCorners !== false
-                ? themeConfig.theme.spacing.resultsBorderRadius
-                : '0',
-            boxShadow:
-              themeConfig.config.enableShadows !== false
-                ? themeConfig.theme.shadows.shadowLg
-                : 'none',
-            boxSizing: 'border-box',
-            display: 'flex',
-            left: '0',
-            marginTop: '10px',
-            maxHeight: themeConfig.theme.spacing.resultsMaxHeight,
-            overflow: 'hidden',
-            padding: '4px',
-            position: 'absolute',
-            right: '0',
-            top: '100%',
-            zIndex: 1000,
-            ...(themeConfig.config.enableAnimations !== false && {
-              animation: `slideDown ${themeConfig.theme.animations.animationNormal} ${themeConfig.theme.animations.easeOut}`,
-            }),
-          }}
         >
-          <div
-            className={`relative ${resultsClassName}`}
-            style={{
-              minHeight: 0,
-              overflowY: 'auto',
-            }}
-          >
+          <div className={`${classes.results} ${resultsClassName}`}>
             {error &&
               (renderError ? (
                 renderError(error)
@@ -302,28 +225,30 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                     />
                   ))}
 
-                {results.hits.length > 0 ? (
-                  <div className={resultsListClassName}>
-                    {results.hits.map((result, index) =>
-                      renderResult ? (
-                        renderResult(result, index, {
-                          onClick: handleResultClick,
-                          onHover: handleResultHover,
-                        })
-                      ) : (
-                        <RenderedResult
-                          index={index}
-                          key={result.document?.id || result.id || index}
-                          onResultClick={handleResultClick}
-                          onResultHover={() => handleResultHover(result)}
-                          renderDate={renderDate}
-                          result={result}
-                          resultItemClassName={resultItemClassName}
-                          resultsContainerClassName={resultsContainerClassName}
-                          themeConfig={themeConfig}
-                        />
-                      )
-                    )}
+                {results.hits.length ? (
+                  <div className={`${classes.resultsList} ${resultsListClassName}`}>
+                    {results.hits.map((result, index) => (
+                      <React.Fragment
+                        key={`${result.collection ?? ''}:${result.document?.id ?? result.id ?? index}`}
+                      >
+                        {renderResult ? (
+                          renderResult(result, index, {
+                            onClick: clickResult,
+                            onHover: onResultHover,
+                          })
+                        ) : (
+                          <RenderedResult<T>
+                            index={index}
+                            onResultClick={clickResult}
+                            onResultHover={onResultHover}
+                            renderDate={renderDate}
+                            result={result}
+                            resultItemClassName={resultItemClassName}
+                            themeConfig={themeConfig}
+                          />
+                        )}
+                      </React.Fragment>
+                    ))}
                   </div>
                 ) : renderNoResults ? (
                   renderNoResults(query)

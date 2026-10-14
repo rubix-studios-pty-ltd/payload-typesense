@@ -1,6 +1,8 @@
 import { type PayloadHandler, type PayloadRequest } from 'payload'
 import type Typesense from 'typesense'
 
+import { buildParameters, getCollectionName, getSearchMode } from '../../lib/search.js'
+import { getErrors, validateParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
 
 export const createAdvancedSearch = (
@@ -20,9 +22,12 @@ export const createAdvancedSearch = (
       return Response.json({ error: 'Invalid request URL' }, { status: 400 })
     }
 
-    const parts = url.pathname.split('/')
-    const searchIndex = parts.indexOf('search')
-    const collection = searchIndex >= 0 ? parts[searchIndex + 1] : undefined
+    let collection: string | undefined
+    try {
+      collection = getCollectionName(url)
+    } catch {
+      return Response.json({ error: 'Invalid collection name' }, { status: 400 })
+    }
     const settings = collection ? config.collections?.[collection] : undefined
 
     if (!collection || !settings?.enabled) {
@@ -85,11 +90,58 @@ export const createAdvancedSearch = (
       return Response.json({ error: 'Invalid query_by parameter' }, { status: 400 })
     }
 
+    const validation = validateParams({
+      ...params,
+      q: typeof params.q === 'string' ? params.q.trim() : params.q,
+    })
+
+    if (!validation.success || !validation.data) {
+      return Response.json(
+        {
+          error: 'Invalid search parameters',
+          details: getErrors(validation.errors ?? []),
+        },
+        { status: 400 }
+      )
+    }
+
+    try {
+      getSearchMode(config, validation.data)
+
+      if (params.vector_query !== undefined && !config.vectorSearch?.enabled) {
+        throw new Error('Vector search requires vectorSearch.enabled')
+      }
+    } catch (error) {
+      return Response.json({ error: (error as Error).message }, { status: 400 })
+    }
+
+    const requestedFields =
+      typeof params.query_by === 'string' ? params.query_by.split(',') : params.query_by
+    const fields =
+      Array.isArray(requestedFields) && requestedFields.length
+        ? requestedFields.map((field) => String(field).trim()).filter(Boolean)
+        : settings.searchFields?.length
+          ? settings.searchFields
+          : ['title', 'content', 'description']
+    const { search_mode: _mode, vector: _vector, ...overrides } = params
+
+    if (getSearchMode(config, validation.data) !== 'keyword') {
+      delete overrides.query_by
+    }
+
+    const searchParams = {
+      ...buildParameters(config, fields, validation.data),
+      ...overrides,
+      q: validation.data.q,
+      page: validation.data.page,
+      per_page: validation.data.per_page,
+    }
+
     try {
       const results = await client
         .collections(collection)
         .documents()
-        .search(params as { q?: string; query_by?: string | string[] })
+        .search(searchParams as { q: string; query_by: string | string[] })
 
       return Response.json(results)
     } catch {

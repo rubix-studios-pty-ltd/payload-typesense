@@ -2,25 +2,31 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { type SearchResponse } from '../types.js'
+import { type SearchMode, type SearchResponse } from '../types.js'
 
-type UseSearchOptions<T> = {
+export type UseSearchOptions<T> = {
   baseUrl: string
   collections?: string | string[]
+  enabled?: boolean
   minQueryLength: number
   onResults?: (results: SearchResponse<T>) => void
   onSearch?: (query: string, results: SearchResponse<T>) => void
   perPage: number
+  searchMode?: SearchMode
+  numTypos?: 0 | 1 | 2
   vector?: boolean
 }
 
 export function useSearch<T = Record<string, unknown>>({
   baseUrl,
   collections,
+  enabled = true,
   minQueryLength,
   onResults,
   onSearch,
   perPage,
+  searchMode,
+  numTypos,
   vector = false,
 }: UseSearchOptions<T>) {
   const [results, setResults] = useState<null | SearchResponse<T>>(null)
@@ -37,7 +43,6 @@ export function useSearch<T = Record<string, unknown>>({
       : collections?.length === 1
         ? collections[0]
         : undefined
-
   const collectionList =
     Array.isArray(collections) && collections.length > 1 ? collections.join(',') : undefined
 
@@ -46,71 +51,97 @@ export function useSearch<T = Record<string, unknown>>({
     onSearchRef.current = onSearch
   }, [onResults, onSearch])
 
-  useEffect(() => {
-    return () => {
-      requestRef.current?.abort()
-      requestRef.current = null
-    }
+  const reset = useCallback(() => {
+    requestRef.current?.abort()
+    requestRef.current = null
+    setResults(null)
+    setIsLoading(false)
+    setError(null)
   }, [])
 
+  useEffect(() => {
+    if (!enabled) reset()
+  }, [enabled, reset])
+
+  useEffect(
+    () => () => {
+      requestRef.current?.abort()
+      requestRef.current = null
+    },
+    []
+  )
+
   const search = useCallback(
-    async (searchQuery: string) => {
+    async (searchQuery: string, page = 1) => {
       requestRef.current?.abort()
       requestRef.current = null
 
-      if (searchQuery.length < minQueryLength) {
-        setResults(null)
-        setIsLoading(false)
-        setError(null)
+      const query = searchQuery.trim()
+
+      if (!enabled || query.length < minQueryLength) {
+        reset()
         return
       }
 
       const controller = new AbortController()
       requestRef.current = controller
-
       setIsLoading(true)
       setError(null)
 
       try {
         const params = new URLSearchParams({
           per_page: String(perPage),
-          q: searchQuery,
+          page: String(page),
+          q: query,
         })
 
-        if (vector) {
+        if (searchMode) {
+          params.set('search_mode', searchMode)
+        } else if (vector) {
           params.set('vector', 'true')
+        }
+
+        if (numTypos !== undefined) {
+          params.set('num_typos', String(numTypos))
         }
 
         if (collectionList) {
           params.set('collections', collectionList)
         }
 
-        let url = baseUrl
-
-        while (url.endsWith('/')) {
-          url = url.slice(0, -1)
-        }
-
+        const url = baseUrl.replace(/\/+$/, '')
         const path = collection ? `/api/search/${encodeURIComponent(collection)}` : '/api/search'
-
-        const response = await fetch(`${url}${path}?${params.toString()}`, {
-          signal: controller.signal,
-        })
+        const response = await fetch(`${url}${path}?${params}`, { signal: controller.signal })
 
         if (!response.ok) {
-          throw new Error(`Search failed: ${response.status} ${response.statusText}`)
+          let message = `Search failed (${response.status})`
+
+          try {
+            const body = (await response.json()) as { error?: unknown; details?: unknown }
+
+            if (typeof body.error === 'string') {
+              message = body.error
+            }
+
+            if (typeof body.details === 'string') {
+              message += ` (${body.details})`
+            }
+          } catch {
+            /* Keep the HTTP status when the response is not JSON. */
+          }
+
+          throw new Error(message)
         }
 
         const data = (await response.json()) as SearchResponse<T>
 
-        if (requestRef.current !== controller) {
+        if (requestRef.current !== controller || controller.signal.aborted) {
           return
         }
 
         setResults(data)
-
         onResultsRef.current?.(data)
-        onSearchRef.current?.(searchQuery, data)
+        onSearchRef.current?.(query, data)
       } catch (err) {
         if (controller.signal.aborted || requestRef.current !== controller) {
           return
@@ -125,13 +156,19 @@ export function useSearch<T = Record<string, unknown>>({
         }
       }
     },
-    [baseUrl, collection, collectionList, minQueryLength, perPage, vector]
+    [
+      baseUrl,
+      collection,
+      collectionList,
+      enabled,
+      minQueryLength,
+      perPage,
+      searchMode,
+      numTypos,
+      vector,
+      reset,
+    ]
   )
 
-  return {
-    error,
-    isLoading,
-    results,
-    search,
-  }
+  return { error, isLoading, results, search, reset }
 }

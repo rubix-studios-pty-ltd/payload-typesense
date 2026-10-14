@@ -2,149 +2,100 @@ import { type PayloadHandler, type PayloadRequest } from 'payload'
 import type Typesense from 'typesense'
 
 import { searchCache } from '../../lib/cache.js'
-import { getValidationErrors, validateSearchParams } from '../../lib/validation.js'
+import { buildParameters, getCollectionName, getSearchMode } from '../../lib/search.js'
+import { getErrors, validateParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
 import { getCollections } from '../../utils/getCollections.js'
-import { vectorSearch } from '../../utils/vectorSearch.js'
 
 export const createSearch = (client: Typesense.Client, config: TypesenseConfig): PayloadHandler => {
   return async (request: PayloadRequest): Promise<Response> => {
-    if (!request.url) {
-      return Response.json({ error: 'Request URL missing' }, { status: 400 })
-    }
+    if (!request.url) return Response.json({ error: 'Request URL missing' }, { status: 400 })
 
     let url: URL
+    let collection: string | undefined
 
     try {
       url = new URL(request.url)
+      collection = getCollectionName(url)
     } catch {
       return Response.json({ error: 'Invalid request URL' }, { status: 400 })
     }
 
+    const value = (key: string) => url.searchParams.get(key)
+    const number = (key: string) => (url.searchParams.has(key) ? Number(value(key)) : undefined)
+    const boolean = (key: string) => {
+      if (!url.searchParams.has(key)) {
+        return undefined
+      }
+
+      return value(key) === 'true' ? true : value(key) === 'false' ? false : value(key)
+    }
+
+    const validation = validateParams({
+      q: value('q')?.trim() ?? '',
+      page: number('page'),
+      per_page: number('per_page'),
+      sort_by: value('sort_by') ?? undefined,
+      num_typos: number('num_typos'),
+      min_len_1typo: number('min_len_1typo'),
+      min_len_2typo: number('min_len_2typo'),
+      typo_threshold: number('typo_tokens_threshold'),
+      numerical: boolean('numerical'),
+      alpha_numerical: boolean('alpha_numerical'),
+      search_mode: value('search_mode') ?? undefined,
+      vector: boolean('vector'),
+    })
+
+    if (!validation.success || !validation.data) {
+      return Response.json(
+        {
+          error: 'Invalid search parameters',
+          details: getErrors(validation.errors ?? []),
+        },
+        { status: 400 }
+      )
+    }
+
+    const params = validation.data
+
     try {
-      const parts = url.pathname.split('/')
-      const searchIndex = parts.indexOf('search')
-      const collection = searchIndex >= 0 ? parts[searchIndex + 1] || '' : ''
-      const settings = collection ? config.collections?.[collection] : undefined
+      getSearchMode(config, params)
+    } catch (error) {
+      return Response.json({ error: (error as Error).message }, { status: 400 })
+    }
 
-      const q = url.searchParams.get('q')?.trim() || ''
-      const page = Number(url.searchParams.get('page') ?? 1)
-      const per_page = Number(url.searchParams.get('per_page') ?? 10)
-
-      const collectionsParam = url.searchParams.get('collections')
-      const collections = collectionsParam
-        ? collectionsParam
-            .split(',')
-            .map((name) => name.trim())
-            .filter(Boolean)
-        : undefined
-
-      const vector =
-        url.searchParams.get('vector') === 'true' && config.vectorSearch?.enabled === true
-
-      const sort_by = url.searchParams.has('sort_by')
-        ? url.searchParams.get('sort_by') || ''
-        : undefined
-
-      if (!Number.isInteger(page) || page < 1) {
-        return Response.json({ error: 'Invalid page parameter' }, { status: 400 })
-      }
-
-      if (!Number.isInteger(per_page) || per_page < 1 || per_page > 250) {
-        return Response.json({ error: 'Invalid per_page parameter' }, { status: 400 })
-      }
-
-      const validation = validateSearchParams({ page, per_page, q, sort_by })
-
-      if (!validation.success) {
-        return Response.json(
-          {
-            details: getValidationErrors(validation.errors || []),
-            error: 'Invalid search parameters',
-          },
-          { status: 400 }
-        )
-      }
-
-      if (!q) {
-        return Response.json(
-          {
-            details: 'Use /api/search?q=keyword',
-            error: 'Query parameter "q" is required',
-          },
-          { status: 400 }
-        )
-      }
-
+    try {
       if (!collection) {
-        return getCollections(client, config, q, {
-          collections,
-          filters: {},
-          page,
-          per_page,
-          sort_by,
-          vector,
-        })
+        const collections = value('collections')
+          ?.split(',')
+          .map((name) => name.trim())
+          .filter(Boolean)
+
+        return getCollections(client, config, params.q, { ...params, collections, filters: {} })
       }
 
+      const settings = config.collections?.[collection]
       if (!settings?.enabled) {
         return Response.json({ error: 'Collection not enabled for search' }, { status: 400 })
       }
 
-      if (vector) {
-        try {
-          const results = await vectorSearch(client, q, {
-            collection,
-            page,
-            per_page,
-            sort_by,
-          })
-
-          return Response.json(results)
-        } catch (error) {
-          return Response.json(
-            {
-              details: error instanceof Error ? error.message : 'Unknown vector search error',
-              error: 'Vector search failed',
-            },
-            { status: 500 }
-          )
-        }
-      }
-
       const fields = settings.searchFields?.length
-        ? settings.searchFields.join(',')
-        : 'title,content'
+        ? settings.searchFields
+        : ['title', 'content', 'description']
+      const searchParams = buildParameters(config, fields, params)
+      const cached = searchCache.get(params.q, collection, searchParams)
 
-      const searchParams = {
-        highlight_full_fields: fields,
-        num_typos: 0,
-        page,
-        per_page,
-        q,
-        query_by: fields,
-        snippet_threshold: 30,
-        typo_tokens_threshold: 1,
-        ...(sort_by ? { sort_by } : {}),
-      }
-
-      const cacheKey = { fields, page, per_page, sort_by, vector }
-      const cached = searchCache.get(q, collection, cacheKey)
-
-      if (cached) {
-        return Response.json(cached)
-      }
+      if (cached) return Response.json(cached)
 
       const results = await client.collections(collection).documents().search(searchParams)
-
-      searchCache.set(q, results, collection, cacheKey)
+      searchCache.set(params.q, results, collection, searchParams)
 
       return Response.json(results)
     } catch (error) {
       return Response.json(
         {
-          details: error instanceof Error ? error.message : 'Unknown error',
           error: 'Search handler failed',
+          details: error instanceof Error ? error.message : 'Unknown error',
         },
         { status: 500 }
       )

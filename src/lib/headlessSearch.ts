@@ -48,6 +48,9 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
    */
   renderInput?: (props: {
     className: string
+    'aria-label': string
+    'aria-controls'?: string
+    'aria-busy'?: boolean
     onBlur: (event: FocusEvent<HTMLInputElement>) => void
     onChange: (event: ChangeEvent<HTMLInputElement>) => void
     onFocus: () => void
@@ -115,7 +118,7 @@ export interface HeadlessSearchInputProps<T = Record<string, unknown>>
   theme?: string | ThemeConfig
 
   /**
-   * Enable vector search instead of text search
+   * Legacy semantic-only switch. searchMode takes precedence when supplied.
    */
   vector?: boolean
 }

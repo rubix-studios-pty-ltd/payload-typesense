@@ -35,8 +35,8 @@
   "sideEffects": false,
   "exports": {
     ".": {
-      "import": "./dist/index.js",
       "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
   },
@@ -48,10 +48,11 @@
   "scripts": {
     "build": "pnpm build:types && pnpm build:swc",
     "build:swc": "swc ./src -d ./dist --config-file .swcrc --strip-leading-paths",
-    "build:types": "tsc -p tsconfig.json",
+    "build:types": "tsc --build tsconfig.json --force",
     "clean": "rimraf -g {dist,*.tsbuildinfo} && pnpm exec biome check --write && pnpm biome migrate --write",
     "update": "pnpm self-update && pnpm update --latest && pnpm install && pnpm prune && pnpm dedupe && pnpm run clean",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "prepack": "pnpm build"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
