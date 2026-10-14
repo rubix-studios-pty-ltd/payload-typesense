@@ -18,6 +18,7 @@ export { default as HeadlessSearchDialog } from './HeadlessSearchDialog.js'
 export { default as HeadlessSearchInput } from './HeadlessSearchInput.js'
 export { ClockIcon, CollectionIcon, ErrorIcon, NoResultsIcon, SearchIcon } from './icons/index.js'
 export {
+  Highlight,
   RenderedHeader,
   RenderedNoResults,
   RenderedResult,

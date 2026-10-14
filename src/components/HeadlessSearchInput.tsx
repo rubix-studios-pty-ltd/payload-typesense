@@ -1,6 +1,16 @@
 'use client'
 
-import React, { useEffect, useId, useRef, useState } from 'react'
+import React, {
+  type ChangeEvent,
+  type FocusEvent,
+  Fragment,
+  type KeyboardEvent,
+  type ReactElement,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react'
 
 import { useDebounce } from '../hooks/useDebounce.js'
 import { useSearch } from '../hooks/useSearch.js'
@@ -18,7 +28,7 @@ import { useComponentTheme } from './ThemeProvider.js'
 
 export function HeadlessSearchInput<T = Record<string, unknown>>(
   props: SearchInputProps<T>
-): React.ReactElement {
+): ReactElement {
   const {
     baseUrl,
     className = '',
@@ -125,7 +135,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     reset()
   }
 
-  const keyDown = (event: React.KeyboardEvent) => {
+  const keyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {
       event.preventDefault()
       setIsOpen(false)
@@ -144,7 +154,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
     ref: inputRef,
     value: query,
     placeholder,
-    onChange: (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange: (event: ChangeEvent<HTMLInputElement>) => {
       reset()
       setQuery(event.target.value)
       setIsOpen(enableSuggestions && event.target.value.trim().length >= minQueryLength)
@@ -154,12 +164,12 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
         setIsOpen(true)
       }
     },
-    onBlur: (_event: React.FocusEvent<HTMLInputElement>) => {},
+    onBlur: (_event: FocusEvent<HTMLInputElement>) => {},
     onKeyDown: keyDown,
   }
 
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions: Closes suggestions when focus leaves the search component.
+    // biome-ignore lint/a11y/noStaticElementInteractions: Closes when lost focus.
     <div
       className={`${classes.container} ${className}`}
       data-search-theme={scope}
@@ -193,7 +203,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
       </div>
 
       {enableSuggestions && isOpen && (results || error) && (
-        // biome-ignore lint/a11y/noStaticElementInteractions: Handles keyboard navigation between focusable search results.
+        // biome-ignore lint/a11y/noStaticElementInteractions: Handles keyboard navigation.
         <div
           className={`${classes.resultsContainer} ${resultsContainerClassName}`}
           id={resultsId}
@@ -228,7 +238,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                 {results.hits.length ? (
                   <div className={`${classes.resultsList} ${resultsListClassName}`}>
                     {results.hits.map((result, index) => (
-                      <React.Fragment
+                      <Fragment
                         key={`${result.collection ?? ''}:${result.document?.id ?? result.id ?? index}`}
                       >
                         {renderResult ? (
@@ -247,7 +257,7 @@ export function HeadlessSearchInput<T = Record<string, unknown>>(
                             themeConfig={themeConfig}
                           />
                         )}
-                      </React.Fragment>
+                      </Fragment>
                     ))}
                   </div>
                 ) : renderNoResults ? (

@@ -3,7 +3,6 @@
 import React, {
   type ChangeEvent,
   type FocusEvent,
-  Fragment,
   type KeyboardEvent,
   type MouseEvent,
   type ReactElement,
@@ -20,12 +19,7 @@ import { type SearchDialogProps } from '../lib/search-dialog.js'
 import { type SearchPaginationProps } from '../lib/search-pagination.js'
 import { type SearchResult } from '../types.js'
 import { handleKeyboard } from '../utils/keyboard.js'
-import {
-  RenderedHeader,
-  RenderedNoResults,
-  RenderedResult,
-  RenderedResultError,
-} from './render/index.js'
+import { RenderedContent, RenderedDialog } from './render/index.js'
 import { SearchStyles } from './SearchThemeStyles.js'
 import { useComponentTheme } from './ThemeProvider.js'
 
@@ -46,59 +40,23 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     onError,
     onLoading,
     onResultClick,
-    onResultHover,
     theme,
     open: controlledOpen,
     defaultOpen = false,
     onOpenChange,
     initialQuery = '',
-    title = 'Search',
-    dialogLabel,
     triggerLabel = 'Search',
-    closeLabel = 'Close',
-    previousPageLabel = 'Previous',
-    nextPageLabel = 'Next',
     closeOnResultClick = true,
-    closeOnBackdropClick = true,
     clearOnClose = false,
-    showPagination = true,
     onPageChange,
     renderTrigger,
-    renderDialogHeader,
-    renderDialogContent,
-    renderPagination,
-    renderEmpty,
-    renderInput,
-    renderResult,
-    renderError,
-    renderLoading,
-    renderNoResults,
-    renderResultsHeader,
-    renderDate = true,
-    showLoading = true,
-    showResultCount = true,
     placeholder = 'Search...',
     className = '',
     triggerClassName = '',
-    dialogClassName = '',
-    dialogHeaderClassName = '',
-    dialogContentClassName = '',
-    closeButtonClassName = '',
-    paginationClassName = '',
-    paginationButtonClassName = '',
     inputClassName = '',
-    inputWrapperClassName = '',
-    loadingClassName = '',
-    errorClassName = '',
-    noResultsClassName = '',
-    resultsClassName = '',
-    resultsContainerClassName = '',
-    resultsHeaderClassName = '',
-    resultsListClassName = '',
-    resultItemClassName = '',
     triggerProps,
-    dialogProps,
   } = props
+
   const scope = useId()
   const themeConfig = useComponentTheme(theme)
 
@@ -115,7 +73,7 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
   const isOpen = controlledOpen ?? internalOpen
   const wasOpenRef = useRef(isOpen)
 
-  const dialogId = dialogProps?.id ?? `${scope}-dialog`
+  const dialogId = props.dialogProps?.id ?? `${scope}-dialog`
   const resultsId = `${scope}-results`
 
   const classes = themeConfig.classes
@@ -285,213 +243,44 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
     onPageChange: changePage,
   }
 
-  const content = (
-    <>
-      <div className={`${classes.inputContainer} ${inputWrapperClassName}`}>
-        {renderInput ? (
-          renderInput(inputProps)
-        ) : (
-          <input {...inputProps} autoComplete="off" type="search" />
-        )}
-      </div>
-
-      {showLoading &&
-        isLoading &&
-        (renderLoading ? (
-          renderLoading()
-        ) : (
-          <div className={`${classes.loading} ${loadingClassName}`} role="status">
-            <div aria-hidden="true" className={classes.loadingSpinner} />
-            Searching...
-          </div>
-        ))}
-
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: Handles keyboard navigation between focusable search results. */}
-      <div
-        aria-busy={isLoading}
-        className={`${classes.dialogResults} ${resultsContainerClassName}`}
-        id={resultsId}
-        onKeyDown={(event) => {
-          if (event.key === 'ArrowDown' || event.key === 'ArrowUp')
-            handleKeyboard(event, { inputRef, isOpen, results, resultsRef })
-        }}
-        ref={resultsRef}
-      >
-        <div className={`${classes.results} ${resultsClassName}`}>
-          {error &&
-            (renderError ? (
-              renderError(error)
-            ) : (
-              <RenderedResultError
-                error={error}
-                errorClassName={errorClassName}
-                themeConfig={themeConfig}
-              />
-            ))}
-
-          {!error && !isLoading && results && (
-            <>
-              {showResultCount &&
-                (renderResultsHeader ? (
-                  renderResultsHeader(results.found)
-                ) : (
-                  <RenderedHeader
-                    found={results.found}
-                    resultsHeaderClassName={resultsHeaderClassName}
-                    themeConfig={themeConfig}
-                  />
-                ))}
-
-              {results.hits.length > 0 ? (
-                <div className={`${classes.resultsList} ${resultsListClassName}`}>
-                  {results.hits.map((result, index) => (
-                    <Fragment
-                      key={`${result.collection ?? ''}:${result.document?.id ?? result.id ?? index}`}
-                    >
-                      {renderResult ? (
-                        renderResult(result, index, {
-                          onClick: clickResult,
-                          onHover: onResultHover,
-                        })
-                      ) : (
-                        <RenderedResult<T>
-                          index={index}
-                          onResultClick={clickResult}
-                          onResultHover={onResultHover}
-                          renderDate={renderDate}
-                          result={result}
-                          resultItemClassName={resultItemClassName}
-                          themeConfig={themeConfig}
-                        />
-                      )}
-                    </Fragment>
-                  ))}
-                </div>
-              ) : renderNoResults ? (
-                renderNoResults(query)
-              ) : (
-                <RenderedNoResults
-                  noResultsClassName={noResultsClassName}
-                  query={query}
-                  themeConfig={themeConfig}
-                />
-              )}
-            </>
-          )}
-
-          {!results && !error && !isLoading && renderEmpty?.()}
-        </div>
-      </div>
-
-      {showPagination &&
-        results &&
-        totalPages > 1 &&
-        (renderPagination ? (
-          renderPagination(pagination)
-        ) : (
-          <nav
-            aria-label="Search result pages"
-            className={`${classes.pagination} ${paginationClassName}`}
-          >
-            <button
-              className={`${classes.paginationButton} ${paginationButtonClassName}`}
-              disabled={isLoading || !pagination.hasPreviousPage}
-              onClick={() => changePage(page - 1)}
-              type="button"
-            >
-              {previousPageLabel}
-            </button>
-
-            <span className={classes.paginationStatus} role="status">
-              Page {page} of {totalPages}
-            </span>
-
-            <button
-              className={`${classes.paginationButton} ${paginationButtonClassName}`}
-              disabled={isLoading || !pagination.hasNextPage}
-              onClick={() => changePage(page + 1)}
-              type="button"
-            >
-              {nextPageLabel}
-            </button>
-          </nav>
-        ))}
-    </>
-  )
-
   return (
     <div className={`${classes.dialogRoot} ${className}`} data-search-theme={scope}>
       <SearchStyles scope={scope} themeConfig={themeConfig} />
 
       {renderTrigger ? renderTrigger(buttonProps) : <button {...buttonProps} />}
 
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: Backdrop clicks dismiss the dialog; keyboard dismissal uses Escape through onCancel. */}
-      <dialog
-        {...dialogProps}
-        aria-label={
-          dialogProps?.['aria-label'] ??
-          dialogLabel ??
-          (typeof title === 'string' ? title : 'Search')
-        }
-        className={`${classes.dialog} ${dialogClassName} ${dialogProps?.className ?? ''}`}
-        id={dialogId}
-        onCancel={(event) => {
-          event.preventDefault()
-          close()
-        }}
-        onClick={(event) => {
-          if (!closeOnBackdropClick || event.target !== event.currentTarget) {
-            return
-          }
-
-          const rect = event.currentTarget.getBoundingClientRect()
-
-          if (
-            event.clientX < rect.left ||
-            event.clientX > rect.right ||
-            event.clientY < rect.top ||
-            event.clientY > rect.bottom
-          ) {
-            close()
-          }
-        }}
-        onClose={() => {
-          if (isOpen && !dialogRef.current?.open) {
-            close()
-          }
-        }}
-        ref={dialogRef}
+      <RenderedDialog<T>
+        {...props}
+        close={close}
+        dialogId={dialogId}
+        dialogRef={dialogRef}
+        error={error}
+        isLoading={isLoading}
+        isOpen={isOpen}
+        page={page}
+        query={query}
+        results={results}
+        themeConfig={themeConfig}
       >
-        {renderDialogHeader ? (
-          renderDialogHeader({ title, close })
-        ) : (
-          <div className={`${classes.dialogHeader} ${dialogHeaderClassName}`}>
-            <h2 className={classes.dialogTitle}>{title}</h2>
-
-            <button
-              className={`${classes.closeButton} ${closeButtonClassName}`}
-              onClick={close}
-              type="button"
-            >
-              {closeLabel}
-            </button>
-          </div>
-        )}
-
-        <div className={`${classes.dialogContent} ${dialogContentClassName}`}>
-          {renderDialogContent
-            ? renderDialogContent({
-                children: content,
-                close,
-                query,
-                page,
-                results,
-                isLoading,
-                error,
-              })
-            : content}
-        </div>
-      </dialog>
+        <RenderedContent<T>
+          {...props}
+          changePage={changePage}
+          clickResult={clickResult}
+          error={error}
+          inputProps={inputProps}
+          inputRef={inputRef}
+          isLoading={isLoading}
+          isOpen={isOpen}
+          page={page}
+          pagination={pagination}
+          query={query}
+          results={results}
+          resultsId={resultsId}
+          resultsRef={resultsRef}
+          themeConfig={themeConfig}
+          totalPages={totalPages}
+        />
+      </RenderedDialog>
     </div>
   )
 }
