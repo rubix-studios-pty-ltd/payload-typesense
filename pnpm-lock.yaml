@@ -167,8 +167,8 @@ importers:
   .:
     dependencies:
       typesense:
-        specifier: ^3.1.1
-        version: 3.1.1(@babel/runtime@7.29.10)(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+        specifier: ^3.2.0
+        version: 3.2.0(@babel/runtime@7.29.10)(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
       zod:
         specifier: ^4.6.7
         version: 4.6.7
@@ -2571,8 +2571,8 @@ packages:
     engines: {node: '>=16.20.0'}
     hasBin: true
 
-  typesense@3.1.1:
-    resolution: {integrity: sha512-MbipLTJCebw/AakwFdo06P3/u1gQ0pWCiRjcL0I1bdLqHvtDr8bjP7N18Tfo/PTGIsj2aVr0QGkdv7lOjRBNNw==}
+  typesense@3.2.0:
+    resolution: {integrity: sha512-CeqjNyblDxXR+9okyxMFPzctYXD9W9a0o7LMj9JN6BhzUySFH1gioua8HecKmtQVgCrqv+bBgjCo83p6gj2rjg==}
     peerDependencies:
       '@babel/runtime': ^7.23.2
 
@@ -4927,7 +4927,7 @@ snapshots:
       '@typescript/typescript-win32-arm64': 7.0.2
       '@typescript/typescript-win32-x64': 7.0.2
 
-  typesense@3.1.1(@babel/runtime@7.29.10)(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
+  typesense@3.2.0(@babel/runtime@7.29.10)(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
       '@babel/runtime': 7.29.10
       axios: 1.20.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
