@@ -109,7 +109,13 @@ export function useSearch<T = Record<string, unknown>>({
           params.set('collections', collectionList)
         }
 
-        const url = baseUrl.replace(/\/+$/, '')
+        let end = baseUrl.length
+
+        while (end > 0 && baseUrl[end - 1] === '/') {
+          end--
+        }
+
+        const url = baseUrl.slice(0, end)
         const path = collection ? `/api/search/${encodeURIComponent(collection)}` : '/api/search'
         const response = await fetch(`${url}${path}?${params}`, { signal: controller.signal })
 
