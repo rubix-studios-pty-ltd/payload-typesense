@@ -18,7 +18,8 @@
       "!payload/payload-types.ts",
       "!**/*.svg",
       "!**/*.png",
-      "!**/*.ico"
+      "!**/*.ico",
+      "!CHANGELOG.md"
     ]
   },
   "formatter": {
