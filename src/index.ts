@@ -4,6 +4,7 @@ import { createSearchEndpoints } from './endpoints/search.js'
 import { createClient } from './lib/client.js'
 import { deleteDoc, syncDoc } from './lib/hooks.js'
 import { initializeTypesense } from './lib/initialization.js'
+import { getErrors, validateConfig } from './lib/validation.js'
 import { type TypesenseConfig } from './types.js'
 
 export * from './components/index.js'
@@ -13,6 +14,11 @@ export const typesenseSearch =
   (pluginConfig: TypesenseConfig) =>
   (incomingConfig: Config): Config => {
     if (pluginConfig.disabled) return incomingConfig
+
+    const validate = validateConfig(pluginConfig)
+    if (!validate.success) {
+      throw new Error(`Invalid configuration\n${getErrors(validate.errors ?? [])}`)
+    }
 
     const client = createClient(pluginConfig.typesense)
 

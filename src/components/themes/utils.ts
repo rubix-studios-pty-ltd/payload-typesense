@@ -1,380 +1,451 @@
+import { toKebab } from '../utils/index.js'
+import { parts, unitless } from './constant.js'
 import { defaultTheme, themes } from './themes.js'
-import { type Theme, type ThemeClasses, type ThemeConfig } from './types.js'
+import { type Theme, type ThemeClasses, type ThemeConfig, type ThemePart } from './types.js'
+
+type Declarations = Record<string, number | string | undefined>
+type Styles = Record<string, number | string | undefined | Declarations>
+
+const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)'
+
+export function getSystemTheme(): 'dark' | 'light' {
+  return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light'
+}
+
+export function getServerTheme(): 'dark' | 'light' {
+  return 'light'
+}
+
+export function systemTheme(callback: () => void): () => void {
+  const media = window.matchMedia(SYSTEM_THEME_QUERY)
+
+  media.addEventListener('change', callback)
+
+  return () => media.removeEventListener('change', callback)
+}
 
 export function getTheme(name: string): Theme {
   return Object.hasOwn(themes, name) ? (themes[name] ?? defaultTheme) : defaultTheme
 }
 
-export function mergeThemeConfig(config: ThemeConfig): Theme {
+export function mergeConfig(config: ThemeConfig): Theme {
   const base = typeof config.theme === 'string' ? getTheme(config.theme) : config.theme
-
   return {
     ...base,
-    animations: {
-      ...base.animations,
-      ...config.animations,
-    },
-    colors: {
-      ...base.colors,
-      ...config.colors,
-    },
-    shadows: {
-      ...base.shadows,
-      ...config.shadows,
-    },
-    spacing: {
-      ...base.spacing,
-      ...config.spacing,
-    },
-    typography: {
-      ...base.typography,
-      ...config.typography,
-    },
+    animations: { ...defaultTheme.animations, ...base.animations, ...config.animations },
+    colors: { ...defaultTheme.colors, ...base.colors, ...config.colors },
+    shadows: { ...defaultTheme.shadows, ...base.shadows, ...config.shadows },
+    spacing: { ...defaultTheme.spacing, ...base.spacing, ...config.spacing },
+    typography: { ...defaultTheme.typography, ...base.typography, ...config.typography },
   }
 }
 
-export function css(
-  styles: Record<string, number | Record<string, number | string> | string>
-): string {
-  const toKebab = (key: string) => key.replace(/([A-Z])/g, '-$1').toLowerCase()
-
-  const serialize = (styles: Record<string, number | string>) =>
-    Object.entries(styles)
-      .map(([key, value]) => `${toKebab(key)}: ${value}`)
-      .join('; ')
-
+function serialize(styles: Declarations): string {
   return Object.entries(styles)
+    .filter(([, value]) => value !== undefined)
     .map(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        return `${toKebab(key)} { ${serialize(value)} }`
-      }
+      const needsUnit =
+        typeof value === 'number' && value !== 0 && !unitless.has(key) && !key.startsWith('--')
 
-      return `${toKebab(key)}: ${value}`
+      return `${toKebab(key)}:${needsUnit ? `${value}px` : value}`
     })
-    .join('; ')
+    .join(';')
 }
 
-export function generateThemeClasses(
+export function css(styles: Styles): string {
+  return Object.entries(styles)
+    .map(([key, value]) =>
+      typeof value === 'object' ? `${key}{${serialize(value)}}` : serialize({ [key]: value })
+    )
+    .filter(Boolean)
+    .join(';')
+}
+
+export function generateClasses(_theme: Theme, _config: Partial<ThemeConfig> = {}): ThemeClasses {
+  return Object.fromEntries(
+    parts.map((part) => [part, `typesense-search-${part}`])
+  ) as unknown as ThemeClasses
+}
+
+export function generateThemeStyles(
   theme: Theme,
-  config: Partial<ThemeConfig> = {}
-): ThemeClasses {
-  const enableAnimations = config.enableAnimations !== false
-  const enableShadows = config.enableShadows !== false
-  const enableRoundedCorners = config.enableRoundedCorners !== false
+  config: Partial<ThemeConfig>,
+  scope: string
+): string {
+  if (config.unstyled) return ''
+  const color = theme.colors
+  const spacing = theme.spacing
+  const typography = theme.typography
 
-  const containerStyles = css({
-    margin: '0 auto',
-    maxWidth: '600px',
-    position: 'relative',
-    width: '100%',
-  })
+  const rounded = config.enableRoundedCorners !== false
+  const animated = config.enableAnimations !== false
+  const shadows = config.enableShadows !== false
 
-  const inputContainerStyles = css({
-    position: 'relative',
-    width: '100%',
-  })
+  const transition = animated
+    ? `all ${theme.animations.transitionFast} ${theme.animations.easeInOut}`
+    : 'none'
 
-  const resultsContainerStyles = css({
-    backgroundColor: theme.colors.resultsBackground,
-    border: `1px solid ${theme.colors.resultsBorder}`,
-    borderRadius: enableRoundedCorners ? theme.spacing.resultsBorderRadius : '0',
-    boxShadow: enableShadows ? theme.shadows.shadowLg : 'none',
-    left: '0',
-    marginBottom: '2px',
-    marginTop: '2px',
-    maxHeight: theme.spacing.resultsMaxHeight,
-    overflowY: 'auto',
-    position: 'absolute',
-    right: '0',
-    top: '100%',
-    zIndex: '1000',
-    ...(enableAnimations && {
-      animation: 'slideDown 0.2s ease-out',
-    }),
-  })
+  const focus = {
+    outline: 'none',
+    borderColor: color.inputBorderFocus,
+    boxShadow: shadows ? `${theme.shadows.focusShadow} ${theme.shadows.focusShadowColor}` : 'none',
+    ...config.styles?.inputFocus,
+  }
 
-  const inputStyles = css({
-    '::placeholder': {
-      color: theme.colors.inputPlaceholder,
+  const button = {
+    backgroundColor: color.triggerBackground ?? color.inputBackground,
+    color: color.triggerText ?? color.inputText,
+    border: `1px solid ${color.triggerBorder ?? color.inputBorder}`,
+    borderRadius: rounded ? spacing.triggerBorderRadius : '0',
+    cursor: 'pointer',
+    fontSize: typography.fontSizeSm,
+    padding: spacing.triggerPadding,
+    transition,
+  }
+
+  const styles: Partial<Record<ThemePart, Styles>> = {
+    container: {
+      margin: spacing.containerMargin,
+      maxWidth: spacing.containerMaxWidth,
+      position: 'relative',
+      width: '100%',
     },
-    ':disabled': {
-      backgroundColor: theme.colors.inputBackground,
-      cursor: 'not-allowed',
-      opacity: '0.6',
+    inputContainer: { position: 'relative', width: '100%' },
+    input: {
+      backgroundColor: color.inputBackground,
+      border: `${spacing.inputBorderWidth} solid ${color.inputBorder}`,
+      borderRadius: rounded ? spacing.inputBorderRadius : '0',
+      color: color.inputText,
+      boxSizing: 'border-box',
+      fontSize: spacing.inputFontSize,
+      fontWeight: typography.fontWeightNormal,
+      lineHeight: typography.lineHeightNormal,
+      padding: spacing.inputPadding,
+      width: '100%',
+      outline: 'none',
+      transition,
+      ':focus': focus,
+      '::placeholder': { color: color.inputPlaceholder },
+      ':disabled': { opacity: 0.6, cursor: 'not-allowed' },
     },
-    ':focus': {
-      borderColor: theme.colors.inputBorderFocus,
-      boxShadow: enableShadows
-        ? `${theme.shadows.focusShadow} ${theme.shadows.focusShadowColor}`
+    inputFocus: focus,
+    inputDisabled: { opacity: 0.6, cursor: 'not-allowed' },
+    resultsContainer: {
+      backgroundColor: color.resultsBackground,
+      border: `${spacing.resultsBorderWidth} solid ${color.resultsBorder}`,
+      borderRadius: rounded ? spacing.resultsBorderRadius : '0',
+      boxShadow: shadows ? (config.colors?.resultsShadow ?? theme.shadows.shadowLg) : 'none',
+      boxSizing: 'border-box',
+      display: 'flex',
+      marginTop: spacing.resultsOffset,
+      maxHeight: spacing.resultsMaxHeight,
+      overflow: 'hidden',
+      padding: spacing.resultsPadding,
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: '100%',
+      zIndex: spacing.resultsZIndex,
+      animation: animated
+        ? `typesenseSearchSlideDown ${theme.animations.animationNormal} ${theme.animations.easeOut}`
         : 'none',
     },
-    backgroundColor: theme.colors.inputBackground,
-    border: `2px solid ${theme.colors.inputBorder}`,
-    borderRadius: enableRoundedCorners ? theme.spacing.inputBorderRadius : '0',
-    boxShadow: 'none',
-    color: theme.colors.inputText,
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.spacing.inputFontSize,
-    fontWeight: theme.typography.fontWeightNormal,
-    lineHeight: theme.typography.lineHeightNormal,
-    outline: 'none',
-    padding: theme.spacing.inputPadding,
-    transition: enableAnimations
-      ? `all ${theme.animations.transitionNormal} ${theme.animations.easeInOut}`
-      : 'none',
-    width: '100%',
-  })
-
-  const resultsStyles = css({
-    backgroundColor: theme.colors.resultsBackground,
-    border: `1px solid ${theme.colors.resultsBorder}`,
-    borderRadius: enableRoundedCorners ? theme.spacing.resultsBorderRadius : '0',
-    boxShadow: enableShadows ? theme.shadows.shadowLg : 'none',
-    left: '0',
-    maxHeight: theme.spacing.resultsMaxHeight,
-    overflowY: 'auto',
-    position: 'absolute',
-    right: '0',
-    top: '100%',
-    zIndex: '1000',
-  })
-
-  const resultsHeaderStyles = css({
-    alignItems: 'center',
-    backgroundColor: theme.colors.headerBackground,
-    borderBottom: `1px solid ${theme.colors.headerBorder}`,
-    color: theme.colors.headerText,
-    display: 'flex',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.spacing.headerFontSize,
-    fontWeight: theme.typography.fontWeightMedium,
-    justifyContent: 'space-between',
-    padding: theme.spacing.headerPadding,
-  })
-
-  const resultsListStyles = css({
-    padding: '2px',
-  })
-
-  const resultItemStyles = css({
-    ':focus': {
-      backgroundColor: theme.colors.resultBackgroundFocus,
-      boxShadow: enableShadows ? `inset 0 0 0 2px ${theme.colors.inputBorderFocus}` : 'none',
+    results: {
+      flex: 1,
+      minHeight: 0,
+      minWidth: 0,
+      overflowY: 'auto',
+      position: 'relative',
+      width: '100%',
     },
-    ':hover': {
-      backgroundColor: theme.colors.resultBackgroundHover,
-      transform: enableAnimations ? 'translateX(2px)' : 'none',
+    resultsHeader: {
+      alignItems: 'center',
+      backgroundColor: color.headerBackground,
+      borderBottom: `1px solid ${color.headerBorder}`,
+      color: color.headerText,
+      display: 'flex',
+      fontSize: spacing.headerFontSize,
+      fontWeight: typography.fontWeightMedium,
+      gap: spacing.headerGap,
+      padding: spacing.headerPadding,
     },
-    ':last-child': {
-      borderBottom: 'none',
+    resultsList: { padding: spacing.resultsListPadding },
+    resultItem: {
+      backgroundColor: color.resultBackground,
+      borderBottom: `1px solid ${color.resultBorder}`,
+      borderRadius: rounded ? spacing.itemBorderRadius : '0',
+      color: color.titleText,
+      cursor: 'pointer',
+      margin: spacing.itemMargin,
+      padding: spacing.itemPadding,
+      outline: 'none',
+      transition,
+      ':hover': { backgroundColor: color.resultBackgroundHover, ...config.styles?.resultItemHover },
+      ':focus': { backgroundColor: color.resultBackgroundFocus, ...config.styles?.resultItemFocus },
+      ':focus-visible': focus,
+      ':last-child': { borderBottom: 'none' },
     },
-    backgroundColor: theme.colors.resultBackground,
-    borderBottom: `1px solid ${theme.colors.resultBorder}`,
-    cursor: 'pointer',
-    outline: 'none',
-    padding: theme.spacing.itemPadding,
-    transition: enableAnimations
-      ? `all ${theme.animations.transitionFast} ${theme.animations.easeInOut}`
-      : 'none',
-  })
-
-  const resultTitleStyles = css({
-    color: theme.colors.titleText,
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeLg,
-    fontWeight: theme.typography.fontWeightSemibold,
-    lineHeight: theme.typography.lineHeightTight,
-    marginBottom: '8px',
-  })
-
-  const resultDescriptionStyles = css({
-    color: theme.colors.descriptionText,
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeSm,
-    lineHeight: theme.typography.lineHeightNormal,
-    marginBottom: '8px',
-  })
-
-  const resultHighlightStyles = css({
-    backgroundColor: theme.colors.highlightBackground,
-    borderRadius: enableRoundedCorners ? '6px' : '0',
-    color: theme.colors.descriptionText,
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeSm,
-    lineHeight: theme.typography.lineHeightNormal,
-    marginBottom: '8px',
-    mark: {
-      backgroundColor: theme.colors.highlightBackground,
-      borderRadius: enableRoundedCorners ? '3px' : '0',
-      color: theme.colors.highlightText,
-      fontWeight: theme.typography.fontWeightMedium,
-      padding: '2px 4px',
+    resultItemHover: { backgroundColor: color.resultBackgroundHover },
+    resultItemFocus: { backgroundColor: color.resultBackgroundFocus },
+    resultItemActive: { backgroundColor: color.resultBackgroundFocus },
+    resultLayout: {
+      display: 'flex',
+      alignItems: 'flex-start',
+      gap: spacing.resultGap,
+      overflow: 'hidden',
     },
-    padding: '8px 12px',
-  })
-
-  const resultMetaStyles = css({
-    alignItems: 'center',
-    color: theme.colors.metaText,
-    display: 'flex',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeXs,
-    justifyContent: 'space-between',
-    marginTop: '8px',
-  })
-
-  const collectionBadgeStyles = css({
-    backgroundColor: theme.colors.collectionBadge,
-    borderRadius: enableRoundedCorners ? '12px' : '0',
-    color: theme.colors.collectionBadgeText,
-    display: 'inline-block',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeXs,
-    fontWeight: theme.typography.fontWeightSemibold,
-    letterSpacing: '0.5px',
-    padding: '4px 8px',
-    textTransform: 'uppercase',
-  })
-
-  const scoreBadgeStyles = css({
-    backgroundColor: theme.colors.scoreBadge,
-    borderRadius: enableRoundedCorners ? '4px' : '0',
-    color: theme.colors.scoreBadgeText,
-    display: 'inline-block',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeXs,
-    fontWeight: theme.typography.fontWeightMedium,
-    padding: '2px 6px',
-  })
-
-  const loadingStyles = css({
-    alignItems: 'center',
-    color: theme.colors.loadingText,
-    display: 'flex',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeSm,
-    gap: '12px',
-    justifyContent: 'center',
-    padding: '24px',
-  })
-
-  const loadingSpinnerStyles = css({
-    animation: enableAnimations ? 'spin 1s linear infinite' : 'none',
-    border: `2px solid ${theme.colors.inputBorder}`,
-    borderRadius: '50%',
-    borderTop: `2px solid ${theme.colors.inputBorderFocus}`,
-    height: '20px',
-    width: '20px',
-  })
-
-  const errorStyles = css({
-    alignItems: 'center',
-    backgroundColor: theme.colors.errorBackground,
-    borderBottom: `1px solid ${theme.colors.resultBorder}`,
-    color: theme.colors.errorText,
-    display: 'flex',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeSm,
-    gap: '8px',
-    padding: '16px',
-  })
-
-  const noResultsStyles = css({
-    color: theme.colors.noResultsText,
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeSm,
-    padding: '40px 20px',
-    textAlign: 'center',
-  })
-
-  const facetContainerStyles = css({
-    backgroundColor: theme.colors.headerBackground,
-    borderBottom: `1px solid ${theme.colors.headerBorder}`,
-    padding: '16px',
-  })
-
-  const facetItemStyles = css({
-    ':hover': {
-      backgroundColor: theme.colors.facetActiveBackground,
-      borderColor: theme.colors.facetActiveBackground,
-      color: theme.colors.facetActiveText,
+    resultIcon: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      flexShrink: 0,
+      width: spacing.resultIconSize,
+      height: spacing.resultIconSize,
+      borderRadius: rounded ? spacing.inputBorderRadius : '0',
+      backgroundColor: color.collectionBadge,
+      color: color.collectionBadgeText,
+      fontSize: typography.fontSizeBase,
+      fontWeight: typography.fontWeightMedium,
     },
-    backgroundColor: theme.colors.facetBackground,
-    border: `1px solid ${theme.colors.facetBorder}`,
-    borderRadius: enableRoundedCorners ? '16px' : '0',
-    color: theme.colors.facetText,
-    cursor: 'pointer',
-    display: 'inline-block',
-    fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSizeXs,
-    fontWeight: theme.typography.fontWeightMedium,
-    margin: '4px',
-    padding: '6px 12px',
-    transition: enableAnimations
-      ? `all ${theme.animations.transitionFast} ${theme.animations.easeInOut}`
-      : 'none',
-  })
-
-  const facetItemActiveStyles = css({
-    backgroundColor: theme.colors.facetActiveBackground,
-    borderColor: theme.colors.facetActiveBackground,
-    color: theme.colors.facetActiveText,
-  })
-
-  const hiddenStyles = css({
-    display: 'none',
-  })
-
-  const visibleStyles = css({
-    display: 'block',
-  })
-
-  const focusableStyles = css({
-    ':focus': {
-      boxShadow: enableShadows ? `0 0 0 2px ${theme.colors.inputBorderFocus}` : 'none',
+    resultBody: { flex: 1, minWidth: 0 },
+    resultTitle: {
+      color: color.titleText,
+      fontSize: typography.fontSizeBase,
+      fontWeight: typography.fontWeightSemibold,
+      lineHeight: typography.lineHeightTight,
+      margin: spacing.resultTitleMargin,
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
-    outline: 'none',
-  })
-
-  return {
-    container: containerStyles,
-    inputContainer: inputContainerStyles,
-    resultsContainer: resultsContainerStyles,
-
-    input: inputStyles,
-    inputDisabled: '',
-    inputFocus: '',
-
-    results: resultsStyles,
-    resultsHeader: resultsHeaderStyles,
-    resultsList: resultsListStyles,
-
-    resultItem: resultItemStyles,
-    resultItemActive: '',
-    resultItemFocus: '',
-    resultItemHover: '',
-
-    resultDescription: resultDescriptionStyles,
-    resultHighlight: resultHighlightStyles,
-    resultMeta: resultMetaStyles,
-    resultTitle: resultTitleStyles,
-
-    collectionBadge: collectionBadgeStyles,
-    scoreBadge: scoreBadgeStyles,
-
-    error: errorStyles,
-    loading: loadingStyles,
-    loadingSpinner: loadingSpinnerStyles,
-    noResults: noResultsStyles,
-
-    facetContainer: facetContainerStyles,
-    facetItem: facetItemStyles,
-    facetItemActive: facetItemActiveStyles,
-
-    focusable: focusableStyles,
-    hidden: hiddenStyles,
-    visible: visibleStyles,
+    resultDescription: {
+      color: color.descriptionText,
+      display: '-webkit-box',
+      fontSize: typography.fontSizeSm,
+      fontWeight: typography.fontWeightNormal,
+      lineHeight: typography.lineHeightNormal,
+      margin: spacing.resultDescriptionMargin,
+      overflow: 'hidden',
+      WebkitBoxOrient: 'vertical',
+      WebkitLineClamp: spacing.descriptionLineClamp,
+      mark: { backgroundColor: color.highlightBackground, color: color.highlightText },
+    },
+    resultHighlight: { backgroundColor: color.highlightBackground, color: color.highlightText },
+    resultMeta: {
+      alignItems: 'center',
+      display: 'flex',
+      color: color.metaText,
+      fontSize: spacing.metaFontSize,
+      gap: spacing.resultGap,
+      padding: spacing.metaPadding,
+    },
+    resultMetaItem: { display: 'inline-flex', alignItems: 'center', gap: spacing.headerGap },
+    collectionBadge: {
+      display: 'inline-block',
+      backgroundColor: color.collectionBadge,
+      color: color.collectionBadgeText,
+      padding: spacing.itemPadding,
+      borderRadius: rounded ? spacing.itemBorderRadius : '0',
+    },
+    scoreBadge: {
+      display: 'inline-block',
+      backgroundColor: color.scoreBadge,
+      color: color.scoreBadgeText,
+      fontSize: typography.fontSizeXs,
+    },
+    loading: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing.loadingGap,
+      padding: spacing.loadingPadding,
+      color: color.loadingText,
+      fontSize: typography.fontSizeSm,
+    },
+    loadingIndicator: {
+      position: 'absolute',
+      right: spacing.resultGap,
+      top: '50%',
+      transform: 'translateY(-50%)',
+      pointerEvents: 'none',
+    },
+    loadingSpinner: {
+      width: spacing.loadingSpinnerSize,
+      height: spacing.loadingSpinnerSize,
+      border: `2px solid ${color.inputBorder}`,
+      borderTopColor: color.inputBorderFocus,
+      borderRadius: '50%',
+      animation: animated ? 'typesenseSearchSpin 1s linear infinite' : 'none',
+    },
+    error: {
+      alignItems: 'center',
+      display: 'flex',
+      backgroundColor: color.errorBackground,
+      color: color.errorText,
+      fontSize: typography.fontSizeSm,
+      padding: spacing.errorPadding,
+      gap: spacing.errorGap,
+    },
+    noResults: {
+      color: color.noResultsText,
+      fontSize: typography.fontSizeSm,
+      padding: spacing.noResultsPadding,
+      textAlign: 'center',
+    },
+    noResultsTitle: {
+      color: color.titleText,
+      fontSize: typography.fontSizeSm,
+      fontWeight: typography.fontWeightMedium,
+      margin: 0,
+    },
+    noResultsDescription: {
+      color: color.descriptionText,
+      fontSize: typography.fontSizeSm,
+      margin: 0,
+    },
+    facetContainer: {
+      backgroundColor: color.headerBackground,
+      borderBottom: `1px solid ${color.headerBorder}`,
+      padding: spacing.headerPadding,
+    },
+    facetItem: {
+      ...button,
+      backgroundColor: color.facetBackground,
+      color: color.facetText,
+      borderColor: color.facetBorder,
+      ':hover': { backgroundColor: color.facetActiveBackground, color: color.facetActiveText },
+    },
+    facetItemActive: { backgroundColor: color.facetActiveBackground, color: color.facetActiveText },
+    focusable: { ':focus-visible': focus },
+    hidden: { display: 'none' },
+    visible: { display: 'block' },
+    trigger: {
+      ...button,
+      ':focus-visible': focus,
+      ':disabled': { opacity: 0.6, cursor: 'not-allowed' },
+    },
+    dialog: {
+      position: 'fixed',
+      inset: 0,
+      margin: 'auto',
+      height: 'fit-content',
+      minHeight: 0,
+      backgroundColor: color.dialogBackground ?? color.resultsBackground,
+      color: color.inputText,
+      border: `${spacing.resultsBorderWidth} solid ${color.resultsBorder}`,
+      borderRadius: rounded ? spacing.dialogBorderRadius : '0',
+      boxShadow: shadows ? theme.shadows.shadowXl : 'none',
+      boxSizing: 'border-box',
+      width: spacing.dialogWidth,
+      maxWidth: 'calc(100vw - 2rem)',
+      maxHeight: spacing.dialogMaxHeight,
+      padding: spacing.dialogPadding,
+      overflowY: 'auto',
+      '::backdrop': {
+        backgroundColor: color.dialogBackdrop ?? 'rgba(0,0,0,0.45)',
+        ...config.styles?.dialogBackdrop,
+      },
+    },
+    dialogBackdrop: { backgroundColor: color.dialogBackdrop },
+    dialogHeader: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: spacing.dialogGap,
+      padding: spacing.dialogHeaderPadding,
+    },
+    dialogTitle: {
+      color: color.titleText,
+      fontSize: typography.fontSizeLg,
+      fontWeight: typography.fontWeightSemibold,
+      margin: 0,
+    },
+    closeButton: {
+      appearance: 'none',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      alignSelf: 'center',
+      flex: '0 0 auto',
+      boxSizing: 'border-box',
+      position: 'static',
+      margin: 0,
+      width: 'auto',
+      height: 'auto',
+      minWidth: 0,
+      minHeight: 0,
+      backgroundColor: 'transparent',
+      color: color.inputText,
+      border: `1px solid ${color.resultsBorder}`,
+      borderRadius: rounded ? (spacing.closeButtonBorderRadius ?? '0.375rem') : '0',
+      padding: spacing.closeButtonPadding ?? '0.25rem 0.5rem',
+      cursor: 'pointer',
+      fontSize: typography.fontSizeSm,
+      fontWeight: typography.fontWeightMedium,
+      lineHeight: typography.lineHeightTight,
+      whiteSpace: 'nowrap',
+      textTransform: 'none',
+      transition,
+      ':hover': { backgroundColor: color.resultBackgroundHover },
+      ':focus-visible': focus,
+    },
+    dialogContent: {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: spacing.dialogGap,
+      minHeight: 0,
+    },
+    dialogResults: { maxHeight: spacing.resultsMaxHeight, overflowY: 'auto', minHeight: 0 },
+    pagination: {
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing.paginationPadding,
+      gap: spacing.paginationGap,
+      borderTop: `1px solid ${color.headerBorder}`,
+    },
+    paginationButton: {
+      ...button,
+      backgroundColor: color.paginationBackground ?? color.inputBackground,
+      color: color.paginationText ?? color.inputText,
+      borderColor: color.paginationBorder ?? color.inputBorder,
+      padding: spacing.paginationButtonPadding,
+      borderRadius: rounded ? spacing.paginationBorderRadius : '0',
+      ':focus-visible': focus,
+      ':disabled': { opacity: 0.5, cursor: 'not-allowed' },
+    },
+    paginationStatus: { color: color.metaText, fontSize: typography.fontSizeSm },
   }
+
+  const classes = generateClasses(theme, config)
+  const root = `:where([data-search-theme="${scope}"])`
+
+  const rules = parts
+    .map((part) => {
+      const selector = `${root} .${classes[part]},${root}.${classes[part]}`
+      const style = { ...styles[part], ...config.styles?.[part] }
+      const plain: Declarations = {}
+      const nested: string[] = []
+      for (const [key, value] of Object.entries(style)) {
+        if (typeof value === 'object' && value !== null) {
+          const suffix = key.startsWith(':') ? key : ` ${key}`
+          nested.push(
+            `${selector
+              .split(',')
+              .map((s) => `${s}${suffix}`)
+              .join(',')}{${serialize(value as Declarations)}}`
+          )
+        } else {
+          plain[key] = value
+        }
+      }
+      return `${selector}{${serialize(plain)}}${nested.join('')}`
+    })
+    .join('\n')
+  return `${rules}\n@keyframes typesenseSearchSpin{to{transform:rotate(360deg)}}
+@keyframes typesenseSearchSlideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){${root} *,${root}{animation:none!important;transition:none!important}}`
 }
 
 export function applyTheme(
@@ -383,17 +454,13 @@ export function applyTheme(
   variant?: string,
   config: Partial<ThemeConfig> = {}
 ): string {
-  const classes = generateThemeClasses(theme, config)
-  const base = classes[element as keyof ThemeClasses] ?? ''
+  const classes = generateClasses(theme, config)
+  const base = classes[element as ThemePart] ?? ''
 
-  if (!variant) {
-    return base
-  }
-
-  const variantKey =
-    `${element}${variant.charAt(0).toUpperCase()}${variant.slice(1)}` as keyof ThemeClasses
-
-  return [base, classes[variantKey]].filter(Boolean).join('; ')
+  const key = variant
+    ? (`${element}${variant.charAt(0).toUpperCase()}${variant.slice(1)}` as ThemePart)
+    : undefined
+  return [base, key ? classes[key] : ''].filter(Boolean).join(' ')
 }
 
 export function isDarkTheme(theme: Theme): boolean {
@@ -403,41 +470,30 @@ export function isDarkTheme(theme: Theme): boolean {
     theme.colors.inputBackground.includes('#0f')
   )
 }
-
 export function isLightTheme(theme: Theme): boolean {
   return !isDarkTheme(theme)
 }
 
 export function getThemeVariables(theme: Theme): Record<string, string> {
-  return {
-    '--search-collection-badge': theme.colors.collectionBadge,
-    '--search-collection-badge-text': theme.colors.collectionBadgeText,
-    '--search-description-text': theme.colors.descriptionText,
-    '--search-error-bg': theme.colors.errorBackground,
-    '--search-error-text': theme.colors.errorText,
-    '--search-facet-active-bg': theme.colors.facetActiveBackground,
-    '--search-facet-active-text': theme.colors.facetActiveText,
-    '--search-facet-bg': theme.colors.facetBackground,
-    '--search-facet-border': theme.colors.facetBorder,
-    '--search-facet-text': theme.colors.facetText,
-    '--search-header-bg': theme.colors.headerBackground,
-    '--search-header-text': theme.colors.headerText,
-    '--search-highlight-bg': theme.colors.highlightBackground,
-    '--search-highlight-text': theme.colors.highlightText,
+  const variables: Record<string, string> = {}
+  for (const [key, value] of Object.entries(theme.colors)) {
+    if (value !== undefined) variables[`--search-${toKebab(key)}`] = value
+  }
+
+  for (const [key, value] of Object.entries(theme.spacing)) {
+    if (value !== undefined) variables[`--search-${toKebab(key)}`] = String(value)
+  }
+
+  Object.assign(variables, {
     '--search-input-bg': theme.colors.inputBackground,
-    '--search-input-border': theme.colors.inputBorder,
-    '--search-input-border-focus': theme.colors.inputBorderFocus,
-    '--search-input-placeholder': theme.colors.inputPlaceholder,
-    '--search-input-text': theme.colors.inputText,
-    '--search-loading-text': theme.colors.loadingText,
-    '--search-meta-text': theme.colors.metaText,
-    '--search-no-results-text': theme.colors.noResultsText,
+    '--search-results-bg': theme.colors.resultsBackground,
+    '--search-header-bg': theme.colors.headerBackground,
     '--search-result-bg': theme.colors.resultBackground,
     '--search-result-bg-hover': theme.colors.resultBackgroundHover,
-    '--search-results-bg': theme.colors.resultsBackground,
-    '--search-results-border': theme.colors.resultsBorder,
-    '--search-score-badge': theme.colors.scoreBadge,
-    '--search-score-badge-text': theme.colors.scoreBadgeText,
-    '--search-title-text': theme.colors.titleText,
-  }
+    '--search-error-bg': theme.colors.errorBackground,
+    '--search-highlight-bg': theme.colors.highlightBackground,
+    '--search-facet-bg': theme.colors.facetBackground,
+    '--search-facet-active-bg': theme.colors.facetActiveBackground,
+  })
+  return variables
 }

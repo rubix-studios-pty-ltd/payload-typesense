@@ -21,25 +21,79 @@ const baseTheme = {
     shadowXl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
   },
   spacing: {
-    headerFontSize: '0.875rem',
-    headerPadding: '0.75rem 1rem',
+    // Container
+    containerMaxWidth: '600px',
+    containerMargin: '0 auto',
+
+    // Input
+    inputBorderWidth: '2px',
     inputBorderRadius: '0.5rem',
     inputFontSize: '1rem',
     inputPadding: '0.5rem 0.75rem',
+
+    // Results container
+    resultsBorderWidth: '1px',
+    resultsBorderRadius: '0.5rem',
+    resultsMaxHeight: '24rem',
+    resultsOffset: '10px',
+    resultsPadding: '4px',
+    resultsZIndex: 1000,
+
+    // Results header
+    headerFontSize: '0.875rem',
+    headerPadding: '0.75rem 1rem',
+    headerGap: '8px',
+
+    // Results list
+    resultsListPadding: '2px',
     itemBorderRadius: '0',
     itemMargin: '0',
     itemPadding: '0.5rem',
+    resultGap: '12px',
+    resultIconSize: '32px',
+    resultTitleMargin: '0 0 8px',
+    resultDescriptionMargin: '4px 0 0',
+    descriptionLineClamp: 2,
+
+    // Result metadata
     metaFontSize: '0.75rem',
     metaPadding: '0.5rem 0',
-    resultsBorderRadius: '0.5rem',
-    resultsMaxHeight: '24rem',
-    resultsPadding: '0',
+
+    // Loading
+    loadingPadding: '24px',
+    loadingGap: '12px',
+    loadingSpinnerSize: '16px',
+
+    // Error
+    errorPadding: '16px',
+    errorGap: '8px',
+
+    // No results
+    noResultsPadding: '40px 20px',
+
+    // Dialog trigger button
+    triggerPadding: '0.5rem 0.75rem',
+    triggerBorderRadius: '0.5rem',
+
+    // Dialog
+    dialogWidth: '550px',
+    dialogMaxHeight: '80vh',
+    dialogPadding: '1rem',
+    dialogBorderRadius: '0.75rem',
+    dialogHeaderPadding: '0 0 1rem',
+    dialogGap: '0.75rem',
+
+    // Dialog close button
+    closeButtonPadding: '0.25rem 0.5rem',
+    closeButtonBorderRadius: '0.375rem',
+
+    // Pagination
+    paginationPadding: '0.75rem',
+    paginationGap: '0.5rem',
+    paginationButtonPadding: '0.375rem 0.75rem',
+    paginationBorderRadius: '0.375rem',
   },
   typography: {
-    fontFamily:
-      'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    fontFamilyMono:
-      'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
     fontSize2xl: '1.5rem',
     fontSizeBase: '1rem',
     fontSizeLg: '1.125rem',
@@ -59,6 +113,7 @@ const baseTheme = {
 export const modernTheme: Theme = {
   name: 'modern',
   colors: {
+    dialogBackdrop: 'rgba(0, 0, 0, 0.45)',
     // Input
     inputBackground: '#ffffff',
     inputBorder: '#d1d5db',
@@ -114,6 +169,7 @@ export const modernTheme: Theme = {
 export const darkTheme: Theme = {
   name: 'dark',
   colors: {
+    dialogBackdrop: 'rgba(0, 0, 0, 0.65)',
     // Input
     inputBackground: '#1f2937',
     inputBorder: '#374151',

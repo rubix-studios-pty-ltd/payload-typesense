@@ -1,6 +1,6 @@
 import type Typesense from 'typesense'
 
-export const testConnection = async (client: Typesense.Client): Promise<boolean> => {
+export async function testConnection(client: Typesense.Client): Promise<boolean> {
   try {
     const health = await client.health.retrieve()
     return health.ok === true

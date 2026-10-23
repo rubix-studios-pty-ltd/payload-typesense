@@ -1,10 +1,14 @@
+import { type CSSProperties } from 'react'
+
 export interface ThemeColors {
   // Interactive
   collectionBadge: string
   collectionBadgeText: string
-
-  // Text
   descriptionText: string
+
+  // Dialog
+  dialogBackdrop?: string
+  dialogBackground?: string
 
   // States
   errorBackground: string
@@ -21,8 +25,11 @@ export interface ThemeColors {
   headerBackground: string
   headerBorder: string
   headerText: string
+
+  // Highlight
   highlightBackground: string
   highlightText: string
+
   // Input
   inputBackground: string
   inputBorder: string
@@ -32,6 +39,10 @@ export interface ThemeColors {
   loadingText: string
   metaText: string
   noResultsText: string
+
+  paginationBackground?: string
+  paginationBorder?: string
+  paginationText?: string
 
   // Result items
   resultBackground: string
@@ -45,33 +56,73 @@ export interface ThemeColors {
   resultsShadow: string
   scoreBadge: string
   scoreBadgeText: string
+
+  // Text
   titleText: string
+
+  // Dialog button
+  triggerBackground?: string
+  triggerBorder?: string
+  triggerText?: string
 }
 
 export interface ThemeSpacing {
+  // Dialog close
+  closeButtonBorderRadius?: string
+  closeButtonPadding?: string
+  containerMargin?: string
+  containerMaxWidth?: string
+  descriptionLineClamp?: number
+
+  dialogBorderRadius?: string
+  dialogGap?: string
+  dialogHeaderPadding?: string
+  dialogMaxHeight?: string
+  dialogPadding?: string
+  dialogWidth?: string
+
+  errorGap?: string
+  errorPadding?: string
   headerFontSize: string
+  headerGap?: string
   headerPadding: string
 
   inputBorderRadius: string
+  inputBorderWidth?: string
   inputFontSize: string
   inputPadding: string
 
   itemBorderRadius: string
   itemMargin: string
   itemPadding: string
+  loadingGap?: string
+  loadingPadding?: string
+  loadingSpinnerSize?: string
 
   metaFontSize: string
   metaPadding: string
+  noResultsPadding?: string
+  paginationBorderRadius?: string
+  paginationButtonPadding?: string
+  paginationGap?: string
+  paginationPadding?: string
+  resultDescriptionMargin?: string
+  resultGap?: string
+  resultIconSize?: string
 
   resultsBorderRadius: string
+  resultsBorderWidth?: string
+  resultsListPadding?: string
   resultsMaxHeight: string
+  resultsOffset?: string
   resultsPadding: string
+  resultsZIndex?: number
+  resultTitleMargin?: string
+  triggerBorderRadius?: string
+  triggerPadding?: string
 }
 
 export interface ThemeTypography {
-  fontFamily: string
-  fontFamilyMono: string
-
   fontSize2xl: string
   fontSizeBase: string
   fontSizeLg: string
@@ -134,15 +185,29 @@ export interface ThemeConfig {
   responsive?: boolean
   shadows?: Partial<ThemeShadows>
   spacing?: Partial<ThemeSpacing>
+
+  styles?: Partial<Record<ThemePart, CSSProperties>>
   theme: string | Theme
   typography?: Partial<ThemeTypography>
+
+  unstyled?: boolean
 }
 
 export interface ThemeClasses {
+  closeButton: string
+
   // Badges
   collectionBadge: string
+
   // Containers
   container: string
+  dialog: string
+  dialogBackdrop: string
+  dialogContent: string
+  dialogHeader: string
+  dialogResults: string
+  dialogRoot: string
+  dialogTitle: string
 
   // States
   error: string
@@ -162,27 +227,40 @@ export interface ThemeClasses {
   inputDisabled: string
   inputFocus: string
   loading: string
+  loadingIndicator: string
   loadingSpinner: string
   noResults: string
+  noResultsDescription: string
+  noResultsTitle: string
+  pagination: string
+  paginationButton: string
+  paginationStatus: string
+  resultBody: string
 
   // Content
   resultDescription: string
   resultHighlight: string
+  resultIcon: string
 
   // Result items
   resultItem: string
   resultItemActive: string
   resultItemFocus: string
   resultItemHover: string
+  resultLayout: string
   resultMeta: string
+  resultMetaItem: string
   results: string
   resultsContainer: string
   resultsHeader: string
   resultsList: string
   resultTitle: string
   scoreBadge: string
+  trigger: string
   visible: string
 }
+
+export type ThemePart = keyof ThemeClasses
 
 export interface ThemeContextValue {
   applyTheme: (element: string, variant?: string) => string

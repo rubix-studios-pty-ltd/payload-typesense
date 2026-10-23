@@ -1,9 +1,12 @@
 /** Plugin */
 
+export type SearchMode = 'keyword' | 'semantic' | 'hybrid'
+export type Protocol = 'http' | 'https'
+
 export type TypesenseNode = {
   host: string
   port: number | string
-  protocol: 'http' | 'https'
+  protocol: Protocol
 }
 
 export type TypesenseCollectionConfig = {
@@ -16,29 +19,39 @@ export type TypesenseCollectionConfig = {
   syncLimit?: number
 }
 
+export type TypoTolerance = {
+  numTypos?: 0 | 1 | 2
+  minLengthOneTypo?: number
+  minLengthTwoTypos?: number
+  typoTokensThreshold?: number
+  numericalTokens?: boolean
+  alphaNumericalTokens?: boolean
+}
+
 export type TypesenseConfig = {
   collections?: Record<string, TypesenseCollectionConfig>
-
   disabled?: boolean
-
   settings?: {
     autoSync?: boolean
     batchSize?: number
     categorized?: boolean
     searchEndpoint?: string
+    searchMode?: SearchMode
+    typoTolerance?: TypoTolerance
   }
-
   typesense: {
     apiKey: string
     connectionTimeoutSeconds?: number
     nodes: TypesenseNode[]
   }
-
   vectorSearch?: {
     embeddingModel?: string
     embedFrom?: string[]
     enabled?: boolean
     modelConfig?: Record<string, unknown>
+    alpha?: number
+    k?: number
+    distanceThreshold?: number
   }
 }
 
@@ -61,6 +74,8 @@ export interface TypesenseSearchConfig<T = Record<string, any>> {
       ttl?: number
     }
     categorized?: boolean
+    searchMode?: SearchMode
+    typoTolerance?: TypoTolerance
   }
   typesense: {
     apiKey: string
@@ -99,11 +114,6 @@ export interface RichText {
 
 /** Schema */
 
-export type Readiness = {
-  available: boolean
-  embedding: boolean
-}
-
 export type FieldType =
   | 'auto'
   | 'bool'
@@ -123,6 +133,11 @@ export type FieldType =
   | 'string'
   | 'string*'
   | 'string[]'
+
+export type Readiness = {
+  available: boolean
+  embedding: boolean
+}
 
 export interface CollectionFieldSchema {
   embed?: {
@@ -163,6 +178,9 @@ export type CollectionSchema = {
 
 export type Hit = {
   document: object
+  hybrid_search_info?: {
+    rank_fusion_score: number
+  }
   text_match?: number
   text_match_info?: { score: string }
   vector_distance?: number
@@ -175,16 +193,22 @@ export type Sort = {
 }
 
 export interface SearchParams {
+  alpha_numerical?: boolean
   facets?: string[]
   filters?: Record<string, any>
   highlight_fields?: string[]
+  min_len_1typo?: number
+  min_len_2typo?: number
   num_typos?: number
+  numerical?: boolean
   page?: number
   per_page?: number
   q: string
+  search_mode?: SearchMode
   snippet_threshold?: number
   sort_by?: string
-  typo_tokens_threshold?: number
+  typo_threshold?: number
+  vector?: boolean
 }
 
 export interface SearchResult<T = any> {
@@ -205,6 +229,9 @@ export interface SearchResult<T = any> {
     snippet: string
     value: string
   }>
+  hybrid_search_info?: {
+    rank_fusion_score: number
+  }
   icon?: string
   id: string
   text_match?: number
@@ -217,6 +244,7 @@ export interface SearchResult<T = any> {
   }
   title?: string
   updatedAt?: string
+  vector_distance?: number
 }
 
 export interface SearchResponse<T = any> {
@@ -281,6 +309,7 @@ export interface BaseSearchInputProps<T = any> {
   maxResults?: number
   minQueryLength?: number
   noResultsClassName?: string
+  numTypos?: 0 | 1 | 2
   onError?: (error: string) => void
   onLoading?: (loading: boolean) => void
   onResultClick?: (result: SearchResult<T>) => void
@@ -290,6 +319,7 @@ export interface BaseSearchInputProps<T = any> {
   renderDate?: boolean
   resultsHeaderClassName?: string
   resultsListClassName?: string
+  searchMode?: SearchMode
 }
 
 /** Cache */
