@@ -96,6 +96,11 @@ export function generateClasses(_theme: Theme, _config: Partial<ThemeConfig> = {
 
 export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope: string): string {
   if (config.unstyled) return ''
+
+  const classes = generateClasses(theme, config)
+
+  const root = `:where([data-search-theme="${scope}"])`
+
   const color = theme.colors
   const spacing = theme.spacing
   const typography = theme.typography
@@ -133,7 +138,10 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       position: 'relative',
       width: '100%',
     },
-    inputContainer: { position: 'relative', width: '100%' },
+    inputContainer: {
+      position: 'relative',
+      width: '100%',
+    },
     input: {
       backgroundColor: color.inputBackground,
       border: `${spacing.inputBorderWidth} solid ${color.inputBorder}`,
@@ -148,11 +156,19 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       outline: 'none',
       transition,
       ':focus': focus,
-      '::placeholder': { color: color.inputPlaceholder },
-      ':disabled': { opacity: 0.6, cursor: 'not-allowed' },
+      '::placeholder': {
+        color: color.inputPlaceholder,
+      },
+      ':disabled': {
+        opacity: 0.6,
+        cursor: 'not-allowed',
+      },
     },
     inputFocus: focus,
-    inputDisabled: { opacity: 0.6, cursor: 'not-allowed' },
+    inputDisabled: {
+      opacity: 0.6,
+      cursor: 'not-allowed',
+    },
     resultsContainer: {
       backgroundColor: color.resultsBackground,
       border: `${spacing.resultsBorderWidth} solid ${color.resultsBorder}`,
@@ -192,7 +208,9 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       gap: spacing.headerGap,
       padding: spacing.headerPadding,
     },
-    resultsList: { padding: spacing.resultsListPadding },
+    resultsList: {
+      padding: spacing.resultsListPadding,
+    },
     resultItem: {
       backgroundColor: color.resultBackground,
       borderBottom: `1px solid ${color.resultBorder}`,
@@ -203,14 +221,28 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       padding: spacing.itemPadding,
       outline: 'none',
       transition,
-      ':hover': { backgroundColor: color.resultBackgroundHover, ...config.styles?.resultItemHover },
-      ':focus': { backgroundColor: color.resultBackgroundFocus, ...config.styles?.resultItemFocus },
+      ':hover': {
+        backgroundColor: color.resultBackgroundHover,
+        ...config.styles?.resultItemHover,
+      },
+      ':focus': {
+        backgroundColor: color.resultBackgroundFocus,
+        ...config.styles?.resultItemFocus,
+      },
       ':focus-visible': focus,
-      ':last-child': { borderBottom: 'none' },
+      ':last-child': {
+        borderBottom: 'none',
+      },
     },
-    resultItemHover: { backgroundColor: color.resultBackgroundHover },
-    resultItemFocus: { backgroundColor: color.resultBackgroundFocus },
-    resultItemActive: { backgroundColor: color.resultBackgroundFocus },
+    resultItemHover: {
+      backgroundColor: color.resultBackgroundHover,
+    },
+    resultItemFocus: {
+      backgroundColor: color.resultBackgroundFocus,
+    },
+    resultItemActive: {
+      backgroundColor: color.resultBackgroundFocus,
+    },
     resultLayout: {
       display: 'flex',
       alignItems: 'flex-start',
@@ -251,9 +283,15 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       overflow: 'hidden',
       WebkitBoxOrient: 'vertical',
       WebkitLineClamp: spacing.descriptionLineClamp,
-      mark: { backgroundColor: color.highlightBackground, color: color.highlightText },
+      mark: {
+        backgroundColor: color.highlightBackground,
+        color: color.highlightText,
+      },
     },
-    resultHighlight: { backgroundColor: color.highlightBackground, color: color.highlightText },
+    resultHighlight: {
+      backgroundColor: color.highlightBackground,
+      color: color.highlightText,
+    },
     resultMeta: {
       alignItems: 'center',
       display: 'flex',
@@ -262,7 +300,11 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       gap: spacing.resultGap,
       padding: spacing.metaPadding,
     },
-    resultMetaItem: { display: 'inline-flex', alignItems: 'center', gap: spacing.headerGap },
+    resultMetaItem: {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: spacing.headerGap,
+    },
     collectionBadge: {
       display: 'inline-block',
       backgroundColor: color.collectionBadge,
@@ -336,16 +378,31 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       backgroundColor: color.facetBackground,
       color: color.facetText,
       borderColor: color.facetBorder,
-      ':hover': { backgroundColor: color.facetActiveBackground, color: color.facetActiveText },
+      ':hover': {
+        backgroundColor: color.facetActiveBackground,
+        color: color.facetActiveText,
+      },
     },
-    facetItemActive: { backgroundColor: color.facetActiveBackground, color: color.facetActiveText },
-    focusable: { ':focus-visible': focus },
-    hidden: { display: 'none' },
-    visible: { display: 'block' },
+    facetItemActive: {
+      backgroundColor: color.facetActiveBackground,
+      color: color.facetActiveText,
+    },
+    focusable: {
+      ':focus-visible': focus,
+    },
+    hidden: {
+      display: 'none',
+    },
+    visible: {
+      display: 'block',
+    },
     trigger: {
       ...button,
       ':focus-visible': focus,
-      ':disabled': { opacity: 0.6, cursor: 'not-allowed' },
+      ':disabled': {
+        opacity: 0.6,
+        cursor: 'not-allowed',
+      },
     },
     dialog: {
       position: 'fixed',
@@ -369,7 +426,9 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
         ...config.styles?.dialogBackdrop,
       },
     },
-    dialogBackdrop: { backgroundColor: color.dialogBackdrop },
+    dialogBackdrop: {
+      backgroundColor: color.dialogBackdrop,
+    },
     dialogHeader: {
       display: 'flex',
       alignItems: 'center',
@@ -409,7 +468,9 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       whiteSpace: 'nowrap',
       textTransform: 'none',
       transition,
-      ':hover': { backgroundColor: color.resultBackgroundHover },
+      ':hover': {
+        backgroundColor: color.resultBackgroundHover,
+      },
       ':focus-visible': focus,
     },
     dialogContent: {
@@ -418,7 +479,11 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       gap: spacing.dialogGap,
       minHeight: 0,
     },
-    dialogResults: { maxHeight: spacing.resultsMaxHeight, overflowY: 'auto', minHeight: 0 },
+    dialogResults: {
+      maxHeight: spacing.resultsMaxHeight,
+      overflowY: 'auto',
+      minHeight: 0,
+    },
     pagination: {
       display: 'flex',
       flexWrap: 'wrap',
@@ -436,13 +501,16 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
       padding: spacing.paginationButtonPadding,
       borderRadius: rounded ? spacing.paginationBorderRadius : '0',
       ':focus-visible': focus,
-      ':disabled': { opacity: 0.5, cursor: 'not-allowed' },
+      ':disabled': {
+        opacity: 0.5,
+        cursor: 'not-allowed',
+      },
     },
-    paginationStatus: { color: color.metaText, fontSize: typography.fontSizeSm },
+    paginationStatus: {
+      color: color.metaText,
+      fontSize: typography.fontSizeSm,
+    },
   }
-
-  const classes = generateClasses(theme, config)
-  const root = `:where([data-search-theme="${scope}"])`
 
   const rules = parts
     .map((part) => {
@@ -469,9 +537,14 @@ export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope
     })
     .join('\n')
 
-  return `${rules}\n@keyframes typesenseSearchSpin{to{transform:rotate(360deg)}}
-@keyframes typesenseSearchSlideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){${root} *,${root}{animation:none!important;transition:none!important}}`
+  const keyframes = `
+    @keyframes typesenseSearchSpin{to{transform:rotate(360deg)}}
+    @keyframes typesenseSearchSlideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`
+
+  const reducedMotion = `
+    @media(prefers-reduced-motion:reduce){${root} *,${root}{animation:none!important;transition:none!important}}`
+
+  return `${rules}\n${keyframes}\n${reducedMotion}`
 }
 
 export function applyTheme(
