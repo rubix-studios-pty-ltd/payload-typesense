@@ -5,14 +5,14 @@ import { createContext, type ReactNode, use } from 'react'
 import { useThemeConfig } from './themes/hooks.js'
 import { type ThemeConfig, type ThemeContextValue } from './themes/types.js'
 
-interface ThemeProviderProps {
+interface ProviderProps {
   children: ReactNode
   config: ThemeConfig
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
-export function ThemeProvider({ children, config }: ThemeProviderProps) {
+export function ThemeProvider({ children, config }: ProviderProps) {
   const value = useThemeConfig(config)
 
   return <ThemeContext value={value}>{children}</ThemeContext>
