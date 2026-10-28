@@ -1,6 +1,6 @@
 import { type Config } from 'payload'
 
-import { createSearchEndpoints } from './endpoints/search.js'
+import { createEndpoints } from './endpoints/search.js'
 import { createClient } from './lib/client.js'
 import { deleteDoc, syncDoc } from './lib/hooks.js'
 import { initializeTypesense } from './lib/initialization.js'
@@ -57,10 +57,7 @@ export const typesenseSearch =
     return {
       ...incomingConfig,
       collections,
-      endpoints: [
-        ...(incomingConfig.endpoints || []),
-        ...createSearchEndpoints(client, pluginConfig),
-      ],
+      endpoints: [...(incomingConfig.endpoints || []), ...createEndpoints(client, pluginConfig)],
       onInit: async (payload) => {
         if (existing) {
           await existing(payload)

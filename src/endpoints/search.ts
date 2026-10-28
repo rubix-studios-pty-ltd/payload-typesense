@@ -8,10 +8,7 @@ import { createSearch } from './handler/createSearch.js'
 import { createSuggest } from './handler/createSuggest.js'
 import { createDetailedHealthCheck, createHealthCheck } from './health.js'
 
-export const createSearchEndpoints = (
-  client: Typesense.Client,
-  config: TypesenseConfig
-): Endpoint[] => {
+export const createEndpoints = (client: Typesense.Client, config: TypesenseConfig): Endpoint[] => {
   const search = createSearch(client, config)
 
   return [
