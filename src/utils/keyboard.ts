@@ -27,14 +27,14 @@ export function handleKeyboard(
 
   if (!items.length) return
 
-  const activeElement = document.activeElement
-  const currentIndex = activeElement instanceof HTMLElement ? items.indexOf(activeElement) : -1
+  const active = document.activeElement
+  const current = active instanceof HTMLElement ? items.indexOf(active) : -1
 
   switch (event.key) {
     case 'ArrowDown': {
       event.preventDefault()
 
-      const nextIndex = currentIndex < items.length - 1 ? currentIndex + 1 : 0
+      const nextIndex = current < items.length - 1 ? current + 1 : 0
       items[nextIndex]?.focus()
       break
     }
@@ -42,16 +42,16 @@ export function handleKeyboard(
     case 'ArrowUp': {
       event.preventDefault()
 
-      const previousIndex = currentIndex > 0 ? currentIndex - 1 : items.length - 1
+      const previousIndex = current > 0 ? current - 1 : items.length - 1
       items[previousIndex]?.focus()
       break
     }
 
     case 'Enter': {
-      if (currentIndex < 0) return
+      if (current < 0) return
 
       event.preventDefault()
-      items[currentIndex]?.click()
+      items[current]?.click()
       break
     }
   }
