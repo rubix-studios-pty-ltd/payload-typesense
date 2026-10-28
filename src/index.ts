@@ -23,7 +23,6 @@ export const typesenseSearch =
     const client = createClient(pluginConfig.typesense)
 
     const sync = pluginConfig.settings?.autoSync !== false
-    const existingOnInit = incomingConfig.onInit
 
     const collections = incomingConfig.collections?.map((collection) => {
       const config = pluginConfig.collections?.[collection.slug]
@@ -52,6 +51,8 @@ export const typesenseSearch =
         },
       }
     })
+
+    const existingOnInit = incomingConfig.onInit
 
     return {
       ...incomingConfig,
