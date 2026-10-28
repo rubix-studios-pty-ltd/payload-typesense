@@ -69,8 +69,8 @@ export function HeadlessSearchDialog<T = Record<string, unknown>>(
   const triggerRef = useRef<HTMLButtonElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const openerRef = useRef<HTMLElement | null>(null)
 
+  const openerRef = useRef<HTMLElement | null>(null)
   const isOpen = controlledOpen ?? internalOpen
   const wasOpenRef = useRef(isOpen)
 

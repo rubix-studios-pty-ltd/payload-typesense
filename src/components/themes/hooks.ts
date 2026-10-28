@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
-import { type Theme, type ThemeConfig, type ThemeContextValue } from './types.js'
+import { type Theme, type ThemeConfig, type ThemeContextValue, type ThemeVariant } from './types.js'
 import {
   applyTheme,
   generateClasses,
@@ -111,7 +111,7 @@ export function useThemeTypography(config: ThemeConfig): Theme['typography'] {
   }, [config])
 }
 
-export function useSystemTheme(): 'dark' | 'light' {
+export function useSystemTheme(): ThemeVariant {
   return useSyncExternalStore(systemTheme, getSystemTheme, getServerTheme)
 }
 

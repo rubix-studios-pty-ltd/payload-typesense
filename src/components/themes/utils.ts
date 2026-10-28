@@ -1,18 +1,24 @@
 import { toKebab } from '../utils/index.js'
 import { parts, unitless } from './constant.js'
 import { defaultTheme, themes } from './themes.js'
-import { type Theme, type ThemeClasses, type ThemeConfig, type ThemePart } from './types.js'
+import {
+  type Theme,
+  type ThemeClasses,
+  type ThemeConfig,
+  type ThemePart,
+  type ThemeVariant,
+} from './types.js'
 
 type Declarations = Record<string, number | string | undefined>
 type Styles = Record<string, number | string | undefined | Declarations>
 
 const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)'
 
-export function getSystemTheme(): 'dark' | 'light' {
+export function getSystemTheme(): ThemeVariant {
   return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light'
 }
 
-export function getServerTheme(): 'dark' | 'light' {
+export function getServerTheme(): ThemeVariant {
   return 'light'
 }
 
@@ -30,13 +36,34 @@ export function getTheme(name: string): Theme {
 
 export function mergeConfig(config: ThemeConfig): Theme {
   const base = typeof config.theme === 'string' ? getTheme(config.theme) : config.theme
+
   return {
     ...base,
-    animations: { ...defaultTheme.animations, ...base.animations, ...config.animations },
-    colors: { ...defaultTheme.colors, ...base.colors, ...config.colors },
-    shadows: { ...defaultTheme.shadows, ...base.shadows, ...config.shadows },
-    spacing: { ...defaultTheme.spacing, ...base.spacing, ...config.spacing },
-    typography: { ...defaultTheme.typography, ...base.typography, ...config.typography },
+    animations: {
+      ...defaultTheme.animations,
+      ...base.animations,
+      ...config.animations,
+    },
+    colors: {
+      ...defaultTheme.colors,
+      ...base.colors,
+      ...config.colors,
+    },
+    shadows: {
+      ...defaultTheme.shadows,
+      ...base.shadows,
+      ...config.shadows,
+    },
+    spacing: {
+      ...defaultTheme.spacing,
+      ...base.spacing,
+      ...config.spacing,
+    },
+    typography: {
+      ...defaultTheme.typography,
+      ...base.typography,
+      ...config.typography,
+    },
   }
 }
 
@@ -67,11 +94,7 @@ export function generateClasses(_theme: Theme, _config: Partial<ThemeConfig> = {
   ) as unknown as ThemeClasses
 }
 
-export function generateThemeStyles(
-  theme: Theme,
-  config: Partial<ThemeConfig>,
-  scope: string
-): string {
+export function generateStyles(theme: Theme, config: Partial<ThemeConfig>, scope: string): string {
   if (config.unstyled) return ''
   const color = theme.colors
   const spacing = theme.spacing
@@ -427,6 +450,7 @@ export function generateThemeStyles(
       const style = { ...styles[part], ...config.styles?.[part] }
       const plain: Declarations = {}
       const nested: string[] = []
+
       for (const [key, value] of Object.entries(style)) {
         if (typeof value === 'object' && value !== null) {
           const suffix = key.startsWith(':') ? key : ` ${key}`
@@ -440,9 +464,11 @@ export function generateThemeStyles(
           plain[key] = value
         }
       }
+
       return `${selector}{${serialize(plain)}}${nested.join('')}`
     })
     .join('\n')
+
   return `${rules}\n@keyframes typesenseSearchSpin{to{transform:rotate(360deg)}}
 @keyframes typesenseSearchSlideDown{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){${root} *,${root}{animation:none!important;transition:none!important}}`
@@ -460,6 +486,7 @@ export function applyTheme(
   const key = variant
     ? (`${element}${variant.charAt(0).toUpperCase()}${variant.slice(1)}` as ThemePart)
     : undefined
+
   return [base, key ? classes[key] : ''].filter(Boolean).join(' ')
 }
 
@@ -470,12 +497,14 @@ export function isDarkTheme(theme: Theme): boolean {
     theme.colors.inputBackground.includes('#0f')
   )
 }
+
 export function isLightTheme(theme: Theme): boolean {
   return !isDarkTheme(theme)
 }
 
 export function getThemeVariables(theme: Theme): Record<string, string> {
   const variables: Record<string, string> = {}
+
   for (const [key, value] of Object.entries(theme.colors)) {
     if (value !== undefined) variables[`--search-${toKebab(key)}`] = value
   }
@@ -495,5 +524,6 @@ export function getThemeVariables(theme: Theme): Record<string, string> {
     '--search-facet-bg': theme.colors.facetBackground,
     '--search-facet-active-bg': theme.colors.facetActiveBackground,
   })
+
   return variables
 }

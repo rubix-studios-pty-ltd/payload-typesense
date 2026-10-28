@@ -1,13 +1,15 @@
 import { type ThemeContextValue } from '../themes/types.js'
-import { generateThemeStyles } from '../themes/utils.js'
+import { generateStyles } from '../themes/utils.js'
 
-export function SearchStyles({
-  themeConfig,
-  scope,
-}: {
+type Props = {
   themeConfig: ThemeContextValue
   scope: string
-}) {
+}
+
+export function SearchStyles({ themeConfig, scope }: Props) {
   if (themeConfig.config.unstyled) return null
-  return <style>{generateThemeStyles(themeConfig.theme, themeConfig.config, scope)}</style>
+
+  const themeStyles = generateStyles(themeConfig.theme, themeConfig.config, scope)
+
+  return <style>{themeStyles}</style>
 }

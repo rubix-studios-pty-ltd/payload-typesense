@@ -1,5 +1,7 @@
 import { type CSSProperties } from 'react'
 
+export type ThemeVariant = 'dark' | 'light'
+
 export interface ThemeColors {
   // Interactive
   collectionBadge: string
