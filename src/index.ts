@@ -52,7 +52,7 @@ export const typesenseSearch =
       }
     })
 
-    const existingOnInit = incomingConfig.onInit
+    const existing = incomingConfig.onInit
 
     return {
       ...incomingConfig,
@@ -62,8 +62,8 @@ export const typesenseSearch =
         ...createSearchEndpoints(client, pluginConfig),
       ],
       onInit: async (payload) => {
-        if (existingOnInit) {
-          await existingOnInit(payload)
+        if (existing) {
+          await existing(payload)
         }
 
         await initializeTypesense(payload, client, pluginConfig)
