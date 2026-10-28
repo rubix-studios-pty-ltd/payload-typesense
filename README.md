@@ -74,7 +74,7 @@ export function GlobalSearch() {
 Search all enabled collections by default, or use the `collections` prop to restrict results.
 
 ```tsx
-;<HeadlessSearchInput
+<HeadlessSearchInput
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
   placeholder="Search posts and products..."
