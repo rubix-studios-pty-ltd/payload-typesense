@@ -90,6 +90,14 @@ export interface TypesenseSearchConfig<T = Record<string, any>> {
   }
 }
 
+export type VectorOptions = {
+  collection: string
+  page: number
+  per_page: number
+  sort_by?: string
+  vectorSearch?: TypesenseConfig['vectorSearch']
+}
+
 /** Document */
 
 export interface BaseDocument {
