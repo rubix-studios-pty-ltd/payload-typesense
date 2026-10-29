@@ -55,10 +55,10 @@
     "prepack": "pnpm build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.3",
+    "@biomejs/biome": "2.6.4",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^11.0.1",
-    "@swc/cli": "^0.8.1",
+    "@swc/cli": "^0.8.2",
     "@swc/core": "^1.16.20",
     "@types/react": "19.3.0",
     "conventional-changelog-conventionalcommits": "^10.4.1",
@@ -91,5 +91,5 @@
     "typesense": "^3.2.0",
     "zod": "^4.6.7"
   },
-  "packageManager": "pnpm@12.15.0"
+  "packageManager": "pnpm@12.16.1"
 }
