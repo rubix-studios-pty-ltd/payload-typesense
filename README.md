@@ -74,7 +74,7 @@ export function GlobalSearch() {
 Search all enabled collections by default, or use the `collections` prop to restrict results.
 
 ```tsx
-<HeadlessSearchInput
+;<HeadlessSearchInput
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
   placeholder="Search posts and products..."
@@ -95,15 +95,15 @@ The included React component provides modern and dark themes, responsive styling
 
 Search endpoints are registered under Payload's `/api` path by default.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/search` | Search across collections |
-| GET | `/api/search/{collection}` | Search a collection |
-| POST | `/api/search/{collection}` | Advanced search |
-| GET | `/api/search/{collection}/suggest` | Search suggestions |
-| GET | `/api/search/collections` | Available collections |
-| GET | `/api/search/health` | Health status |
-| GET | `/api/search/health/detailed` | Detailed health information |
+| Method | Endpoint                           | Purpose                     |
+| ------ | ---------------------------------- | --------------------------- |
+| GET    | `/api/search`                      | Search across collections   |
+| GET    | `/api/search/{collection}`         | Search a collection         |
+| POST   | `/api/search/{collection}`         | Advanced search             |
+| GET    | `/api/search/{collection}/suggest` | Search suggestions          |
+| GET    | `/api/search/collections`          | Available collections       |
+| GET    | `/api/search/health`               | Health status               |
+| GET    | `/api/search/health/detailed`      | Detailed health information |
 
 Requests support pagination and the relevant Typesense search parameters. Vector search is available through the `vector=true` query parameter when enabled.
 

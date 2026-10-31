@@ -2,59 +2,44 @@
 
 import { useCallback, useMemo, useSyncExternalStore } from 'react'
 
-import { type Theme, type ThemeConfig, type ThemeContextValue } from './types.js'
+import { type Theme, type ThemeConfig, type ThemeContextValue, type ThemeVariant } from './types.js'
 import {
   applyTheme,
-  generateThemeClasses,
+  generateClasses,
+  getServerTheme,
+  getSystemTheme,
   getThemeVariables,
   isDarkTheme,
   isLightTheme,
-  mergeThemeConfig,
+  mergeConfig,
+  systemTheme,
 } from './utils.js'
 
-const SYSTEM_THEME_QUERY = '(prefers-color-scheme: dark)'
-
-function getSystemTheme(): 'dark' | 'light' {
-  return window.matchMedia(SYSTEM_THEME_QUERY).matches ? 'dark' : 'light'
-}
-
-function getServerTheme(): 'dark' | 'light' {
-  return 'light'
-}
-
-function subscribeSystemTheme(callback: () => void): () => void {
-  const media = window.matchMedia(SYSTEM_THEME_QUERY)
-
-  media.addEventListener('change', callback)
-
-  return () => media.removeEventListener('change', callback)
-}
-
 export function useThemeConfig(config: ThemeConfig): ThemeContextValue {
-  const theme = useMemo(() => mergeThemeConfig(config), [config])
-  const classes = useMemo(() => generateThemeClasses(theme, config), [theme, config])
+  const theme = useMemo(() => mergeConfig(config), [config])
+  const classes = useMemo(() => generateClasses(theme, config), [theme, config])
 
-  const applyThemeToElement = useCallback(
-    (element: string, variant?: string) => applyTheme(theme, element, variant),
-    [theme]
+  const element = useCallback(
+    (element: string, variant?: string) => applyTheme(theme, element, variant, config),
+    [theme, config]
   )
 
   return useMemo(
     () => ({
-      applyTheme: applyThemeToElement,
+      applyTheme: element,
       classes,
       config,
       isDark: isDarkTheme(theme),
       isLight: isLightTheme(theme),
       theme,
     }),
-    [theme, config, classes, applyThemeToElement]
+    [theme, config, classes, element]
   )
 }
 
 export function useThemeStyles(config: ThemeConfig): Record<string, string> {
   return useMemo(() => {
-    const theme = mergeThemeConfig(config)
+    const theme = mergeConfig(config)
 
     return getThemeVariables(theme)
   }, [config])
@@ -94,17 +79,17 @@ export function useThemeToggle(
   return isDark ? darkConfig : lightConfig
 }
 
-export function useThemeClasses(config: ThemeConfig): ReturnType<typeof generateThemeClasses> {
+export function useThemeClasses(config: ThemeConfig): ReturnType<typeof generateClasses> {
   return useMemo(() => {
-    const theme = mergeThemeConfig(config)
+    const theme = mergeConfig(config)
 
-    return generateThemeClasses(theme, config)
+    return generateClasses(theme, config)
   }, [config])
 }
 
 export function useThemeColors(config: ThemeConfig): Theme['colors'] {
   return useMemo(() => {
-    const theme = mergeThemeConfig(config)
+    const theme = mergeConfig(config)
 
     return theme.colors
   }, [config])
@@ -112,7 +97,7 @@ export function useThemeColors(config: ThemeConfig): Theme['colors'] {
 
 export function useThemeSpacing(config: ThemeConfig): Theme['spacing'] {
   return useMemo(() => {
-    const theme = mergeThemeConfig(config)
+    const theme = mergeConfig(config)
 
     return theme.spacing
   }, [config])
@@ -120,14 +105,14 @@ export function useThemeSpacing(config: ThemeConfig): Theme['spacing'] {
 
 export function useThemeTypography(config: ThemeConfig): Theme['typography'] {
   return useMemo(() => {
-    const theme = mergeThemeConfig(config)
+    const theme = mergeConfig(config)
 
     return theme.typography
   }, [config])
 }
 
-export function useSystemTheme(): 'dark' | 'light' {
-  return useSyncExternalStore(subscribeSystemTheme, getSystemTheme, getServerTheme)
+export function useSystemTheme(): ThemeVariant {
+  return useSyncExternalStore(systemTheme, getSystemTheme, getServerTheme)
 }
 
 export function useAutoTheme(lightTheme: string, darkTheme: string): string {

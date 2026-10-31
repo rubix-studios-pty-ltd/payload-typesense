@@ -1,8 +1,4 @@
-type Props = {
-  color?: string
-}
-
-export const NoResultsIcon = ({ color = 'currentColor' }: Props) => (
+export const NoResultsIcon = ({ color = 'currentColor' }: { color?: string }) => (
   <svg
     aria-hidden="true"
     fill="none"
