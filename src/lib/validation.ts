@@ -6,7 +6,7 @@ export interface ValidationResult<T = unknown> {
   success: boolean
 }
 
-const TypesenseNodeSchema = z.object({
+const NodeSchema = z.object({
   host: z.string().min(1, 'Host is required'),
   port: z.union([
     z.number().int().min(1).max(65535),
@@ -20,7 +20,7 @@ const TypesenseNodeSchema = z.object({
   protocol: z.enum(['http', 'https']),
 })
 
-const CollectionConfigSchema = z.object({
+const CollectionSchema = z.object({
   displayName: z.string().optional(),
   enabled: z.boolean(),
   facetFields: z.array(z.string()).optional(),
@@ -30,36 +30,61 @@ const CollectionConfigSchema = z.object({
   syncLimit: z.number().int().positive().optional(),
 })
 
-const SettingsConfigSchema = z.object({
+const SettingsSchema = z.object({
   autoSync: z.boolean().optional(),
   batchSize: z.number().int().positive().optional(),
   categorized: z.boolean().optional(),
   searchEndpoint: z.string().optional(),
+  searchMode: z.enum(['keyword', 'semantic', 'hybrid']).optional(),
+  typoTolerance: z
+    .object({
+      numTypos: z.union([z.literal(0), z.literal(1), z.literal(2)]).optional(),
+      minLengthOneTypo: z.number().int().positive().optional(),
+      minLengthTwoTypos: z.number().int().positive().optional(),
+      typoTokensThreshold: z.number().int().nonnegative().optional(),
+      numericalTokens: z.boolean().optional(),
+      alphaNumericalTokens: z.boolean().optional(),
+    })
+    .optional(),
 })
 
-const VectorSearchSchema = z.object({
+const VectorSchema = z.object({
   embeddingModel: z.string().optional(),
   embedFrom: z.array(z.string()).optional(),
   enabled: z.boolean().optional(),
   modelConfig: z.record(z.string(), z.unknown()).optional(),
+  alpha: z.number().min(0).max(1).optional(),
+  k: z.number().int().positive().optional(),
+  distanceThreshold: z.number().min(0).max(2).optional(),
 })
 
-export const TypesenseConfigSchema = z.object({
-  collections: z.record(z.string(), CollectionConfigSchema).optional(),
-  disabled: z.boolean().optional(),
-  settings: SettingsConfigSchema.optional(),
-  typesense: z.object({
-    apiKey: z.string().min(1, 'API key is required'),
-    connectionTimeoutSeconds: z.number().positive().optional(),
-    nodes: z.array(TypesenseNodeSchema).min(1, 'At least one Typesense node is required'),
-  }),
-  vectorSearch: VectorSearchSchema.optional(),
-})
+export const PluginSchema = z
+  .object({
+    collections: z.record(z.string(), CollectionSchema).optional(),
+    disabled: z.boolean().optional(),
+    settings: SettingsSchema.optional(),
+    typesense: z.object({
+      apiKey: z.string().min(1, 'API key is required'),
+      connectionTimeoutSeconds: z.number().positive().optional(),
+      nodes: z.array(NodeSchema).min(1, 'At least one Typesense node is required'),
+    }),
+    vectorSearch: VectorSchema.optional(),
+  })
+  .refine(
+    (config) =>
+      !config.settings?.searchMode ||
+      config.settings.searchMode === 'keyword' ||
+      config.vectorSearch?.enabled === true,
+    {
+      message: 'Semantic and hybrid search require vectorSearch.enabled',
+      path: ['settings', 'searchMode'],
+    }
+  )
 
-export type ValidatedTypesenseConfig = z.infer<typeof TypesenseConfigSchema>
+export type ValidatedConfig = z.infer<typeof PluginSchema>
 
-export function validateConfig(config: unknown): ValidationResult<ValidatedTypesenseConfig> {
-  const result = TypesenseConfigSchema.safeParse(config)
+export function validateConfig(config: unknown): ValidationResult<ValidatedConfig> {
+  const result = PluginSchema.safeParse(config)
 
   if (!result.success) {
     return {
@@ -71,29 +96,35 @@ export function validateConfig(config: unknown): ValidationResult<ValidatedTypes
   return { data: result.data, success: true }
 }
 
-export function getValidationErrors(errors: string[]): string {
+export function getErrors(errors: string[]): string {
   return errors.map((error, index) => `${index + 1}. ${error}`).join('\n')
 }
 
-export const SearchParamsSchema = z.object({
+export const SearchSchema = z.object({
   facets: z.array(z.string()).optional(),
   filters: z.record(z.string(), z.any()).optional(),
   highlight_fields: z.array(z.string()).optional(),
-  num_typos: z.number().int().min(0).max(4).optional().default(0),
+  num_typos: z.number().int().min(0).max(2).optional(),
+  min_len_1typo: z.number().int().positive().optional(),
+  min_len_2typo: z.number().int().positive().optional(),
   page: z.number().int().min(1).optional().default(1),
   per_page: z.number().int().min(1).max(250).optional().default(10),
   q: z.string().min(1, 'Query parameter "q" is required'),
   snippet_threshold: z.number().int().min(0).max(100).optional().default(30),
   sort_by: z.string().optional(),
-  typo_tokens_threshold: z.number().int().min(1).optional().default(1),
+  search_mode: z.enum(['keyword', 'semantic', 'hybrid']).optional(),
+  vector: z.boolean().optional(),
+  typo_threshold: z.number().int().min(0).optional(),
+  numerical: z.boolean().optional(),
+  alpha_numerical: z.boolean().optional(),
 })
 
-export type ValidatedSearchParams = z.infer<typeof SearchParamsSchema>
+export type ValidatedParams = z.infer<typeof SearchSchema>
 
-export type ValidateResult = ValidationResult<ValidatedSearchParams>
+export type ValidateResult = ValidationResult<ValidatedParams>
 
-export function validateSearchParams(params: unknown): ValidateResult {
-  const result = SearchParamsSchema.safeParse(params)
+export function validateParams(params: unknown): ValidateResult {
+  const result = SearchSchema.safeParse(params)
 
   if (!result.success) {
     return {

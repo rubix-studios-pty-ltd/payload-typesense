@@ -1,20 +1,23 @@
+import React from 'react'
+
 import { type SearchResult } from '../../types.js'
 import { ClockIcon, CollectionIcon } from '../icons/index.js'
-import { type ThemeContextValue } from '../themes/types.js'
+import { type ThemeContextValue } from '../themes/index.js'
+import { toText } from '../utils/index.js'
+import { Highlight } from './index.js'
 
-type Props = {
+type Props<T> = {
   index: number
-  onResultClick: (result: SearchResult) => void
-  onResultHover?: (result: SearchResult) => void
+  onResultClick: (result: SearchResult<T>) => void
+  onResultHover?: (result: SearchResult<T>) => void
   renderDate?: boolean
-  result: SearchResult
+  result: SearchResult<T>
   resultItemClassName?: string
   resultsContainerClassName?: string
   themeConfig: ThemeContextValue
 }
 
-export function RenderedResult({
-  index,
+export function RenderedResult<T = Record<string, unknown>>({
   onResultClick,
   onResultHover,
   renderDate = true,
@@ -22,144 +25,64 @@ export function RenderedResult({
   resultItemClassName = '',
   resultsContainerClassName = '',
   themeConfig,
-}: Props) {
+}: Props<T>) {
+  const classes = themeConfig.classes
+  const doc = result.document as Record<string, unknown>
+
+  const title = toText(doc.title) || toText(doc.name) || result.title || 'Untitled'
+  const snippet =
+    result.highlight?.title?.snippet ||
+    result.highlight?.content?.snippet ||
+    result.highlight?.description?.snippet ||
+    result.highlights?.[0]?.snippet
+  const description = snippet || toText(doc.description) || toText(doc.content) || result.content
+
+  const dateValue = doc.updatedAt ?? result.updatedAt
+  const date =
+    typeof dateValue === 'string' || typeof dateValue === 'number' ? new Date(dateValue) : null
+
   return (
-    <div
-      className={resultsContainerClassName}
-      style={{
-        backgroundColor: themeConfig.theme.colors.resultBackground,
-        borderBottom: `1px solid ${themeConfig.theme.colors.resultBorder}`,
-        cursor: 'pointer',
-        transition:
-          themeConfig.config.enableAnimations !== false
-            ? `all ${themeConfig.theme.animations.transitionFast} ${themeConfig.theme.animations.easeInOut}`
-            : 'none',
-      }}
-    >
+    <div className={resultsContainerClassName}>
       <div
-        className={`${themeConfig.classes.resultItem} ${resultItemClassName}`}
+        className={`${classes.resultItem} ${resultItemClassName}`}
         data-result-item
-        key={result.document?.id || result.id || index}
-        onBlur={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
-        }}
         onClick={() => onResultClick(result)}
-        onFocus={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundFocus
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
             onResultClick(result)
           }
         }}
-        onMouseEnter={(event) => {
-          event.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackgroundHover
-          onResultHover?.(result)
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = themeConfig.theme.colors.resultBackground
-        }}
+        onMouseEnter={() => onResultHover?.(result)}
         role="button"
         tabIndex={0}
       >
-        <div
-          style={{
-            alignItems: 'flex-start',
-            display: 'flex',
-            gap: '12px',
-            overflow: 'hidden',
-            padding: '6px',
-          }}
-        >
-          <div style={{ flexShrink: 0 }}>
-            <div
-              style={{
-                alignItems: 'center',
-                backgroundColor: themeConfig.theme.colors.collectionBadge,
-                borderRadius: themeConfig.theme.spacing.inputBorderRadius,
-                color: themeConfig.theme.colors.collectionBadgeText,
-                display: 'flex',
-                fontSize: themeConfig.theme.typography.fontSizeBase,
-                fontWeight: themeConfig.theme.typography.fontWeightMedium,
-                height: '32px',
-                justifyContent: 'center',
-                width: '32px',
-              }}
-            >
-              {result.collection?.charAt(0).toUpperCase() || '📄'}
-            </div>
+        <div className={classes.resultLayout}>
+          <div aria-hidden="true" className={classes.resultIcon}>
+            {result.collection?.charAt(0).toUpperCase() || '📄'}
           </div>
 
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                alignItems: 'center',
-                display: 'flex',
-                justifyContent: 'space-between',
-                marginBottom: '8px',
-              }}
-            >
-              <h3
-                style={{
-                  color: themeConfig.theme.colors.titleText,
-                  fontFamily: themeConfig.theme.typography.fontFamily,
-                  fontSize: themeConfig.theme.typography.fontSizeBase,
-                  fontWeight: themeConfig.theme.typography.fontWeightSemibold,
-                  lineHeight: themeConfig.theme.typography.lineHeightTight,
-                  margin: 0,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {result.document?.title || result.document?.name || result.title || 'Untitled'}
-              </h3>
-            </div>
+          <div className={classes.resultBody}>
+            <h3 className={classes.resultTitle}>{title}</h3>
 
-            {(result.highlight?.title?.snippet || result.highlight?.content?.snippet) && (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html:
-                    result.highlight?.title?.snippet || result.highlight?.content?.snippet || '',
-                }}
-                style={{
-                  color: themeConfig.theme.colors.descriptionText,
-                  display: '-webkit-box',
-                  fontSize: themeConfig.theme.typography.fontSizeSm,
-                  fontWeight: themeConfig.theme.typography.fontWeightNormal,
-                  lineHeight: themeConfig.theme.typography.lineHeightNormal,
-                  marginTop: '4px',
-                  overflow: 'hidden',
-                  WebkitBoxOrient: 'vertical',
-                  WebkitLineClamp: 2,
-                }}
-              />
+            {description && (
+              <div className={classes.resultDescription}>
+                {snippet ? Highlight(snippet, classes.resultHighlight) : description}
+              </div>
             )}
 
-            <div
-              style={{
-                alignItems: 'center',
-                color: themeConfig.theme.colors.metaText,
-                display: 'flex',
-                fontSize: themeConfig.theme.typography.fontSizeXs,
-                gap: '12px',
-                marginTop: '8px',
-              }}
-            >
+            <div className={classes.resultMeta}>
               {result.collection && (
-                <span style={{ alignItems: 'center', display: 'inline-flex' }}>
+                <span className={classes.resultMetaItem}>
                   <CollectionIcon />
-
-                  {result.collection}
+                  {result.displayName ?? result.collection}
                 </span>
               )}
 
-              {renderDate && (result.document?.updatedAt || result.updatedAt) && (
-                <span style={{ alignItems: 'center', display: 'inline-flex' }}>
+              {renderDate && date && !Number.isNaN(date.getTime()) && (
+                <span className={classes.resultMetaItem}>
                   <ClockIcon />
-
-                  {new Date(result.document?.updatedAt || result.updatedAt).toLocaleDateString()}
+                  {date.toLocaleDateString()}
                 </span>
               )}
             </div>

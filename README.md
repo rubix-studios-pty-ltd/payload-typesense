@@ -5,6 +5,8 @@ A Typesense search plugin for Payload CMS, maintained by [Rubix Studios](https:/
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 [![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml)
 
+![Search interface](https://github.com/user-attachments/assets/f97d0f07-0efb-4509-b144-837695bd677d)
+
 ## Installation
 
 ```sh
@@ -48,11 +50,15 @@ export default buildConfig({
 
 The plugin initialises enabled collections in Typesense and synchronises existing documents during startup. Subsequent document changes and deletions are handled through Payload collection hooks when automatic synchronisation is enabled.
 
-### React search component
+### React search components
 
-`HeadlessSearchInput` provides a configurable search interface with keyboard navigation, loading states, result callbacks, and custom rendering support.
+`HeadlessSearchInput` and `HeadlessSearchDialog` provide configurable search interfaces with keyboard navigation, loading states, result callbacks, and custom rendering support.
 
-```tsx
+Both components support the same configuration options. Use `HeadlessSearchInput` for an inline search interface or `HeadlessSearchDialog` for a dialog-based search experience.
+
+#### Search input
+
+```typescript
 'use client'
 
 import { HeadlessSearchInput } from '@rubixstudios/payload-typesense'
@@ -71,9 +77,32 @@ export function GlobalSearch() {
 }
 ```
 
-Search all enabled collections by default, or use the `collections` prop to restrict results.
+#### Search dialog
 
-```tsx
+```typescript
+'use client'
+
+import { HeadlessSearchDialog } from '@rubixstudios/payload-typesense'
+
+export function GlobalSearch() {
+  return (
+    <HeadlessSearchDialog
+      baseUrl="http://localhost:3000"
+      theme="modern"
+      placeholder="Search everything..."
+      onResultClick={(result) => {
+        console.log('Selected document:', result.document)
+      }}
+    />
+  )
+}
+```
+
+#### Collection filtering
+
+Both components search all enabled collections by default. Use the `collections` prop to restrict results to specific collections.
+
+```typescript
 <HeadlessSearchInput
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
@@ -81,7 +110,17 @@ Search all enabled collections by default, or use the `collections` prop to rest
 />
 ```
 
-Vector search can also be requested using the `vector` prop when embedding support is configured.
+The same configuration applies to `HeadlessSearchDialog`.
+
+```typescript
+<HeadlessSearchDialog
+  baseUrl="http://localhost:3000"
+  collections={['posts', 'products']}
+  placeholder="Search posts and products..."
+/>
+```
+
+Vector search can also be requested using the `vector` prop on either component when embedding support is configured.
 
 ## Features
 
@@ -95,15 +134,15 @@ The included React component provides modern and dark themes, responsive styling
 
 Search endpoints are registered under Payload's `/api` path by default.
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/api/search` | Search across collections |
-| GET | `/api/search/{collection}` | Search a collection |
-| POST | `/api/search/{collection}` | Advanced search |
-| GET | `/api/search/{collection}/suggest` | Search suggestions |
-| GET | `/api/search/collections` | Available collections |
-| GET | `/api/search/health` | Health status |
-| GET | `/api/search/health/detailed` | Detailed health information |
+| Method | Endpoint                           | Purpose                     |
+| ------ | ---------------------------------- | --------------------------- |
+| GET    | `/api/search`                      | Search across collections   |
+| GET    | `/api/search/{collection}`         | Search a collection         |
+| POST   | `/api/search/{collection}`         | Advanced search             |
+| GET    | `/api/search/{collection}/suggest` | Search suggestions          |
+| GET    | `/api/search/collections`          | Available collections       |
+| GET    | `/api/search/health`               | Health status               |
+| GET    | `/api/search/health/detailed`      | Detailed health information |
 
 Requests support pagination and the relevant Typesense search parameters. Vector search is available through the `vector=true` query parameter when enabled.
 
@@ -131,7 +170,7 @@ To request vector search from the React component, pass `vector={true}`.
 
 Two themes are included, `modern` (default) and `dark`. Both can be customised using theme configuration options for colours, spacing, typography, shadows, and animations.
 
-```tsx
+```typescript
 const customTheme = {
   theme: 'modern',
   colors: {

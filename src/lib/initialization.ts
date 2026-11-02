@@ -11,11 +11,11 @@ import { ensureCollection } from '../utils/ensureCollection.js'
 import { testConnection } from '../utils/testConnection.js'
 import { mapCollection, mapDoc } from './schema-mapper.js'
 
-export const initializeTypesense = async (
+export async function initializeTypesense(
   payload: Payload,
   client: Typesense.Client,
   options: TypesenseConfig
-): Promise<void> => {
+): Promise<void> {
   const connected = await testConnection(client)
   if (!connected) return
 
@@ -29,14 +29,14 @@ export const initializeTypesense = async (
   }
 }
 
-const initializeCollection = async (
+async function initializeCollection(
   payload: Payload,
   client: Typesense.Client,
   slug: string,
   config: TypesenseCollectionConfig,
   vector?: NonNullable<TypesenseConfig['vectorSearch']>,
   autoSync = true
-): Promise<void> => {
+): Promise<void> {
   if (!payload.collections[slug]) return
 
   const schema = mapCollection(slug, config, vector)
@@ -44,18 +44,20 @@ const initializeCollection = async (
 
   if (!available || !autoSync) return
 
-  await syncExistingDocuments(payload, client, slug, config)
+  await syncExisting(payload, client, slug, config, vector)
 }
 
-const syncExistingDocuments = async (
+async function syncExisting(
   payload: Payload,
   client: Typesense.Client,
   slug: string,
-  config: NonNullable<TypesenseConfig['collections']>[string]
-): Promise<void> => {
+  config: NonNullable<TypesenseConfig['collections']>[string],
+  vector?: NonNullable<TypesenseConfig['vectorSearch']>
+): Promise<void> {
   try {
     const limit = config.syncLimit ?? 1000
     const batchSize = 100
+
     let page = 1
     let hasMore = true
 
@@ -80,7 +82,7 @@ const syncExistingDocuments = async (
             const id = (doc as Record<string, unknown>).id
             return typeof id === 'string' || typeof id === 'number'
           })
-          .map((doc) => mapDoc(doc, slug, config))
+          .map((doc) => mapDoc(doc, slug, config, vector))
           .filter((doc): doc is Record<string, number | string> => doc !== null)
 
         if (!mapped.length) continue

@@ -1,15 +1,15 @@
 import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
-import { type TypesenseConfig } from '../types.js'
-import { getComparator } from './sortResults.js'
-import { vectorSearch } from './vectorSearch.js'
+import { buildParameters, getSearchMode } from '../lib/search.js'
+import { type SearchParams, type TypesenseConfig } from '../types.js'
+import { getCompare } from './sortResults.js'
 
 export const getCollections = async (
   client: Typesense.Client,
   config: TypesenseConfig,
   query: string,
-  options: {
+  options: Omit<SearchParams, 'q'> & {
     collections?: string[]
     filters: Record<string, unknown>
     page: number
@@ -29,12 +29,13 @@ export const getCollections = async (
     }
 
     const multiple = enabledCollections.length > 1
-    const vector = Boolean(options.vector && config.vectorSearch?.enabled)
-    let compare: ReturnType<typeof getComparator> | undefined
+    const mode = getSearchMode(config, options)
+
+    let compare: ReturnType<typeof getCompare> | undefined
 
     if (multiple) {
       try {
-        compare = getComparator(options.sort_by, vector)
+        compare = getCompare(options.sort_by, mode)
       } catch (error) {
         return Response.json(
           { error: error instanceof Error ? error.message : 'Invalid sort_by parameter' },
@@ -48,6 +49,14 @@ export const getCollections = async (
 
     const cacheKey = {
       ...options,
+      settings: config.settings,
+      vectorSearch: config.vectorSearch && {
+        enabled: config.vectorSearch.enabled,
+        alpha: config.vectorSearch.alpha,
+        k: config.vectorSearch.k,
+        distanceThreshold: config.vectorSearch.distanceThreshold,
+      },
+      fields: enabledCollections.map(([slug, collection]) => [slug, collection.searchFields]),
       collections: enabledCollections
         .map(([slug]) => slug)
         .sort()
@@ -65,33 +74,29 @@ export const getCollections = async (
       const icon = collection.icon || '📄'
 
       try {
-        const fields = collection.searchFields?.join(',') || 'title,content,description'
+        const fields = collection.searchFields?.length
+          ? collection.searchFields
+          : ['title', 'content', 'description']
+
         const search = (page: number) =>
-          vector
-            ? vectorSearch(client, query, {
-                collection: slug,
+          client
+            .collections(slug)
+            .documents()
+            .search(
+              buildParameters(config, fields, {
+                ...options,
                 page,
                 per_page: perPage,
-                sort_by: options.sort_by,
+                q: query,
+                search_mode: mode,
               })
-            : client
-                .collections(slug)
-                .documents()
-                .search({
-                  highlight_full_fields: fields,
-                  num_typos: 0,
-                  page,
-                  per_page: perPage,
-                  q: query,
-                  query_by: fields,
-                  snippet_threshold: 30,
-                  typo_tokens_threshold: 1,
-                  ...(options.sort_by ? { sort_by: options.sort_by } : {}),
-                })
+            )
 
         let page = multiple ? 1 : options.page
+
         const results = await search(page)
         const hits = [...(results.hits ?? [])]
+
         let cutoff = results.search_cutoff
         let time = results.search_time_ms
 
@@ -135,6 +140,13 @@ export const getCollections = async (
     })
 
     const results = await Promise.all(searches)
+
+    if (results.every((result) => 'error' in result)) {
+      return Response.json(
+        { error: 'All collection searches failed', collections: results },
+        { status: 500 }
+      )
+    }
 
     const hits = results.flatMap((result) => result.hits)
     const found = results.reduce((total, result) => total + result.found, 0)

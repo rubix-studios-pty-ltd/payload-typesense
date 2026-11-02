@@ -14,7 +14,12 @@ export const mapCollection = (
   config: TypesenseCollectionConfig,
   vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ): CollectionSchema => {
-  const searchFields = config.searchFields ?? defaultSearchFields
+  const searchFields = config.searchFields?.length ? config.searchFields : defaultSearchFields
+  const embedFields = vector?.enabled
+    ? vector.embedFrom?.length
+      ? vector.embedFrom
+      : searchFields
+    : []
   const facetFields = config.facetFields ?? []
   const sortFields = config.sortFields ?? []
 
@@ -37,7 +42,7 @@ export const mapCollection = (
     },
   ]
 
-  const configuredFields = new Set([...searchFields, ...facetFields, ...sortFields])
+  const configuredFields = new Set([...searchFields, ...facetFields, ...sortFields, ...embedFields])
   const existingFields = new Set(fields.map((field) => field.name))
 
   for (const field of configuredFields) {
@@ -52,7 +57,7 @@ export const mapCollection = (
   }
 
   if (vector?.enabled) {
-    const embedFromFields = vector.embedFrom ?? searchFields
+    const embedFromFields = embedFields
     const embeddingModel = vector.embeddingModel ?? 'ts/all-MiniLM-L12-v2'
 
     fields.push({
@@ -77,13 +82,20 @@ export const mapCollection = (
 export const mapDoc = (
   doc: BaseDocument,
   _slug: string,
-  config: TypesenseCollectionConfig
+  config: TypesenseCollectionConfig,
+  vector?: NonNullable<TypesenseConfig['vectorSearch']>
 ): Record<string, number | string> | null => {
   if (doc.id === null || doc.id === undefined || doc.id === '') {
     throw new Error("Document missing required 'id' field")
   }
 
-  const searchFields = config.searchFields ?? defaultSearchFields
+  const searchFields = config.searchFields?.length ? config.searchFields : defaultSearchFields
+  const embedFields = vector?.enabled
+    ? vector.embedFrom?.length
+      ? vector.embedFrom
+      : searchFields
+    : []
+  const searchableFields = new Set([...searchFields, ...embedFields])
   const facetFields = config.facetFields ?? []
   const sortFields = config.sortFields ?? []
 
@@ -97,12 +109,12 @@ export const mapDoc = (
     updatedAt: updatedAt.getTime(),
   }
 
-  const fields = new Set([...searchFields, ...facetFields, ...sortFields])
+  const fields = new Set([...searchFields, ...facetFields, ...sortFields, ...embedFields])
   let hasSearchableContent = false
 
   for (const field of fields) {
     if (field === 'slug' || field === 'createdAt' || field === 'updatedAt') {
-      if (field === 'slug' && searchFields.includes(field) && document.slug) {
+      if (field === 'slug' && searchableFields.has(field) && document.slug) {
         hasSearchableContent = true
       }
 
@@ -111,7 +123,7 @@ export const mapDoc = (
 
     const value = getFieldValue(doc, field)
 
-    if (searchFields.includes(field) && value.trim().length > 0) {
+    if (searchableFields.has(field) && value.trim().length > 0) {
       hasSearchableContent = true
     }
 
