@@ -5,7 +5,7 @@ A Typesense search plugin for Payload CMS, maintained by [Rubix Studios](https:/
 [![npm version](https://img.shields.io/npm/v/@rubixstudios/payload-typesense.svg)](https://www.npmjs.com/package/@rubixstudios/payload-typesense)
 [![Release](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml/badge.svg)](https://github.com/rubix-studios-pty-ltd/payload-typesense/actions/workflows/release.yml)
 
-<img width="1912" height="962" alt="image" src="https://github.com/user-attachments/assets/f97d0f07-0efb-4509-b144-837695bd677d" />
+![Search interface](https://github.com/user-attachments/assets/f97d0f07-0efb-4509-b144-837695bd677d)
 
 ## Installation
 
