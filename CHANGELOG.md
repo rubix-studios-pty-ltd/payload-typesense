@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+# [1.8.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.7.0...v1.8.0) (2026-11-02)
+
+
+### Bug Fixes
+
+* attach displayname and collection to results ([084b1bb](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/084b1bb6f4ba0f531f5316be25410703f0eb5377))
+* **biome:** Changelog build interruption. ([975b9d6](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/975b9d67f55127f78c5b1949b93caec11cf4f0d9))
+* **readme:** correct syntax error in HeadlessSearchInput example ([dc60335](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/dc603359a967fbc67becf97fb4774576ee566809))
+* remove deleted documents from typesense index ([3f01ea3](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/3f01ea305f75a973045c058ce22c8fc32676e31f))
+* **sec:** Node - CVE-2026-111497 ([5543cde](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/5543cde5c7859181e59585af9224d65f1ca35298))
+
+
+### Features
+
+* improve search ([9567a25](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9567a2586c74c04f915ef261060c8126b0a09642))
+* **render:** add XIcon and improve loading state handling ([4be3633](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/4be3633165911fd13122a3849879af967c3b6f12))
+* **types:** enhance theme colors and spacing interfaces ([9c49173](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/9c491739e2a4bac0ea8d9d156a25ab633b90d419))
+
 # [1.7.0](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.6.13...v1.7.0) (2026-10-11)
 
 
