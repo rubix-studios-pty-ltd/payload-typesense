@@ -2,6 +2,7 @@ import React, { type ReactNode, type RefObject } from 'react'
 
 import { type useSearch } from '../../hooks/useSearch.js'
 import { type SearchDialogProps } from '../../lib/search-dialog.js'
+import { XIcon } from '../icons/index.js'
 import { type ThemeContextValue } from '../themes/index.js'
 
 type Props<T> = Pick<
@@ -37,10 +38,6 @@ export function RenderedDialog<T = Record<string, unknown>>({
   title = 'Search',
   dialogClassName = '',
   closeOnBackdropClick = true,
-  renderDialogHeader,
-  dialogHeaderClassName = '',
-  closeButtonClassName = '',
-  closeLabel = 'X',
   dialogContentClassName = '',
   renderDialogContent,
   dialogId,
@@ -93,22 +90,6 @@ export function RenderedDialog<T = Record<string, unknown>>({
       }}
       ref={dialogRef}
     >
-      {renderDialogHeader ? (
-        renderDialogHeader({ title, close })
-      ) : (
-        <div className={`${classes.dialogHeader} ${dialogHeaderClassName}`}>
-          <h2 className={classes.dialogTitle}>{title}</h2>
-
-          <button
-            className={`${classes.closeButton} ${closeButtonClassName}`}
-            onClick={close}
-            type="button"
-          >
-            {closeLabel}
-          </button>
-        </div>
-      )}
-
       <div className={`${classes.dialogContent} ${dialogContentClassName}`}>
         {renderDialogContent
           ? renderDialogContent({

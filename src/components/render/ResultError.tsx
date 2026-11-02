@@ -13,6 +13,7 @@ export function RenderedResultError({ error, errorClassName = '', themeConfig }:
   return (
     <div className={`${themeConfig.classes.error} ${errorClassName}`} role="alert">
       <ErrorIcon />
+
       <div>{error}</div>
     </div>
   )

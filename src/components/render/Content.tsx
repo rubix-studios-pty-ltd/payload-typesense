@@ -1,4 +1,4 @@
-import React, { Fragment, type RefObject } from 'react'
+import React, { Fragment, type RefObject, useEffect, useRef } from 'react'
 
 import { type useSearch } from '../../hooks/useSearch.js'
 import { type SearchDialogProps } from '../../lib/search-dialog.js'
@@ -101,6 +101,23 @@ export function RenderedContent<T = Record<string, unknown>>({
   themeConfig,
 }: Props<T>) {
   const classes = themeConfig.classes
+  const last = useRef<{
+    query: string
+    page: number
+    results: NonNullable<Props<T>['results']>
+    totalPages: number
+  } | null>(null)
+
+  useEffect(() => {
+    if (!isLoading) {
+      last.current = !error && results ? { query, page, results, totalPages } : null
+    }
+  }, [error, isLoading, page, query, results, totalPages])
+
+  const cached = isLoading && last.current?.query === query ? last.current : null
+  const visible = isLoading ? cached?.results : results
+  const visiblePage = cached?.page ?? page
+  const pages = cached?.totalPages ?? totalPages
 
   return (
     <>
@@ -114,6 +131,7 @@ export function RenderedContent<T = Record<string, unknown>>({
 
       {showLoading &&
         isLoading &&
+        !visible &&
         (renderLoading ? (
           renderLoading()
         ) : (
@@ -129,12 +147,15 @@ export function RenderedContent<T = Record<string, unknown>>({
         className={`${classes.dialogResults} ${resultsContainerClassName}`}
         id={resultsId}
         onKeyDown={(event) => {
-          if (event.key === 'ArrowDown' || event.key === 'ArrowUp')
+          if (!isLoading && (event.key === 'ArrowDown' || event.key === 'ArrowUp'))
             handleKeyboard(event, { inputRef, isOpen, results, resultsRef })
         }}
         ref={resultsRef}
       >
-        <div className={`${classes.results} ${resultsClassName}`}>
+        <div
+          className={`${classes.results} ${resultsClassName}`}
+          style={isLoading && visible ? { opacity: 0.65, pointerEvents: 'none' } : undefined}
+        >
           {error &&
             (renderError ? (
               renderError(error)
@@ -146,22 +167,22 @@ export function RenderedContent<T = Record<string, unknown>>({
               />
             ))}
 
-          {!error && !isLoading && results && (
+          {!error && visible && (
             <>
               {showResultCount &&
                 (renderResultsHeader ? (
-                  renderResultsHeader(results.found)
+                  renderResultsHeader(visible.found)
                 ) : (
                   <RenderedHeader
-                    found={results.found}
+                    found={visible.found}
                     resultsHeaderClassName={resultsHeaderClassName}
                     themeConfig={themeConfig}
                   />
                 ))}
 
-              {results.hits.length > 0 ? (
+              {visible.hits.length > 0 ? (
                 <div className={`${classes.resultsList} ${resultsListClassName}`}>
-                  {results.hits.map((result, index) => (
+                  {visible.hits.map((result, index) => (
                     <Fragment
                       key={`${result.collection ?? ''}:${result.document?.id ?? result.id ?? index}`}
                     >
@@ -196,13 +217,13 @@ export function RenderedContent<T = Record<string, unknown>>({
             </>
           )}
 
-          {!results && !error && !isLoading && renderEmpty?.()}
+          {!visible && !error && !isLoading && renderEmpty?.()}
         </div>
       </div>
 
       {showPagination &&
-        results &&
-        totalPages > 1 &&
+        visible &&
+        pages > 1 &&
         (renderPagination ? (
           renderPagination(pagination)
         ) : (
@@ -220,7 +241,7 @@ export function RenderedContent<T = Record<string, unknown>>({
             </button>
 
             <span className={classes.paginationStatus} role="status">
-              Page {page} of {totalPages}
+              Page {visiblePage} of {pages}
             </span>
 
             <button

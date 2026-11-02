@@ -69,9 +69,6 @@ export interface ThemeColors {
 }
 
 export interface ThemeSpacing {
-  // Dialog close
-  closeButtonBorderRadius?: string
-  closeButtonPadding?: string
   containerMargin?: string
   containerMaxWidth?: string
   descriptionLineClamp?: number
@@ -196,8 +193,6 @@ export interface ThemeConfig {
 }
 
 export interface ThemeClasses {
-  closeButton: string
-
   // Badges
   collectionBadge: string
 

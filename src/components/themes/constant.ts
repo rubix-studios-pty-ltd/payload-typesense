@@ -64,7 +64,6 @@ export const parts = [
   'dialogTitle',
   'dialogContent',
   'dialogResults',
-  'closeButton',
   'trigger',
   'pagination',
   'paginationButton',

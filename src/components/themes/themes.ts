@@ -83,10 +83,6 @@ const baseTheme = {
     dialogHeaderPadding: '0 0 1rem',
     dialogGap: '0.75rem',
 
-    // Dialog close button
-    closeButtonPadding: '0.25rem 0.5rem',
-    closeButtonBorderRadius: '0.375rem',
-
     // Pagination
     paginationPadding: '0.75rem',
     paginationGap: '0.5rem',

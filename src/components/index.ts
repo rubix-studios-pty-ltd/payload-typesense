@@ -14,7 +14,14 @@ export type {
   TypesenseSearchConfig,
   TypoTolerance,
 } from '../types.js'
-export { ClockIcon, CollectionIcon, ErrorIcon, NoResultsIcon, SearchIcon } from './icons/index.js'
+export {
+  ClockIcon,
+  CollectionIcon,
+  ErrorIcon,
+  NoResultsIcon,
+  SearchIcon,
+  XIcon,
+} from './icons/index.js'
 export {
   Highlight,
   RenderedContent,
