@@ -58,7 +58,7 @@ Both components support the same configuration options. Use `HeadlessSearchInput
 
 #### Search input
 
-```tsx
+```typescript
 'use client'
 
 import { HeadlessSearchInput } from '@rubixstudios/payload-typesense'
@@ -79,7 +79,7 @@ export function GlobalSearch() {
 
 #### Search dialog
 
-```tsx
+```typescript
 'use client'
 
 import { HeadlessSearchDialog } from '@rubixstudios/payload-typesense'
@@ -102,8 +102,8 @@ export function GlobalSearch() {
 
 Both components search all enabled collections by default. Use the `collections` prop to restrict results to specific collections.
 
-```tsx
-;<HeadlessSearchInput
+```typescript
+<HeadlessSearchInput
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
   placeholder="Search posts and products..."
@@ -112,8 +112,8 @@ Both components search all enabled collections by default. Use the `collections`
 
 The same configuration applies to `HeadlessSearchDialog`.
 
-```tsx
-;<HeadlessSearchDialog
+```typescript
+<HeadlessSearchDialog
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
   placeholder="Search posts and products..."
@@ -170,7 +170,7 @@ To request vector search from the React component, pass `vector={true}`.
 
 Two themes are included, `modern` (default) and `dark`. Both can be customised using theme configuration options for colours, spacing, typography, shadows, and animations.
 
-```tsx
+```typescript
 const customTheme = {
   theme: 'modern',
   colors: {
