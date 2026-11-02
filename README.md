@@ -50,9 +50,13 @@ export default buildConfig({
 
 The plugin initialises enabled collections in Typesense and synchronises existing documents during startup. Subsequent document changes and deletions are handled through Payload collection hooks when automatic synchronisation is enabled.
 
-### React search component
+### React search components
 
-`HeadlessSearchInput` provides a configurable search interface with keyboard navigation, loading states, result callbacks, and custom rendering support.
+`HeadlessSearchInput` and `HeadlessSearchDialog` provide configurable search interfaces with keyboard navigation, loading states, result callbacks, and custom rendering support.
+
+Both components support the same configuration options. Use `HeadlessSearchInput` for an inline search interface or `HeadlessSearchDialog` for a dialog-based search experience.
+
+#### Search input
 
 ```tsx
 'use client'
@@ -73,17 +77,50 @@ export function GlobalSearch() {
 }
 ```
 
-Search all enabled collections by default, or use the `collections` prop to restrict results.
+#### Search dialog
 
 ```tsx
-<HeadlessSearchInput
+'use client'
+
+import { HeadlessSearchDialog } from '@rubixstudios/payload-typesense'
+
+export function GlobalSearch() {
+  return (
+    <HeadlessSearchDialog
+      baseUrl="http://localhost:3000"
+      theme="modern"
+      placeholder="Search everything..."
+      onResultClick={(result) => {
+        console.log('Selected document:', result.document)
+      }}
+    />
+  )
+}
+```
+
+#### Collection filtering
+
+Both components search all enabled collections by default. Use the `collections` prop to restrict results to specific collections.
+
+```tsx
+;<HeadlessSearchInput
   baseUrl="http://localhost:3000"
   collections={['posts', 'products']}
   placeholder="Search posts and products..."
 />
 ```
 
-Vector search can also be requested using the `vector` prop when embedding support is configured.
+The same configuration applies to `HeadlessSearchDialog`.
+
+```tsx
+;<HeadlessSearchDialog
+  baseUrl="http://localhost:3000"
+  collections={['posts', 'products']}
+  placeholder="Search posts and products..."
+/>
+```
+
+Vector search can also be requested using the `vector` prop on either component when embedding support is configured.
 
 ## Features
 
