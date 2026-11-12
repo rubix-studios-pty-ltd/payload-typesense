@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.3](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.8.2...v1.8.3) (2026-11-12)
+
+
+### Bug Fixes
+
+* **sec:** node image update upstream ([b379a4e](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/b379a4ec883b37c47dbcceaab76a54eba1db9ed4))
+* **security:** node release version ([ddddd42](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ddddd426bddafbe8a9de5cff048f4f86d4fbe9ba))
+
 ## [1.8.2](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.8.1...v1.8.2) (2026-11-11)
 
 
