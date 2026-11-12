@@ -30,9 +30,10 @@ jobs:
 
       - uses: actions/setup-node@v7.1.0
         with:
-          node-version: 24
-          registry-url: https://registry.npmjs.org/
+          node-version: 24.22.3
+          check-latest: true
           cache: pnpm
+          registry-url: https://registry.npmjs.org/
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
