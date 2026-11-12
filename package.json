@@ -55,7 +55,7 @@
     "prepack": "pnpm build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.7",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^11.0.1",
     "@swc/cli": "^0.8.2",
