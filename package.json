@@ -55,7 +55,7 @@
     "prepack": "pnpm build"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.7",
+    "@biomejs/biome": "^2.6.8",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^11.0.1",
     "@swc/cli": "^0.8.2",
@@ -64,11 +64,11 @@
     "conventional-changelog-conventionalcommits": "^10.4.1",
     "payload": "^3.93.0",
     "rimraf": "^6.1.4",
-    "semantic-release": "^25.0.9",
+    "semantic-release": "^26.0.1",
     "typescript": "^7.0.2"
   },
   "peerDependencies": {
-    "payload": "^3.93.0"
+    "payload": "^3.93.0 || ^4.0.0-beta.9"
   },
   "engines": {
     "node": ">=24.22.3 <25 || >=26.13.1",
@@ -91,5 +91,5 @@
     "typesense": "^3.2.0",
     "zod": "^4.6.7"
   },
-  "packageManager": "pnpm@12.18.0"
+  "packageManager": "pnpm@12.21.0"
 }
