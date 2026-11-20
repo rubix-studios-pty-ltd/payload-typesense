@@ -204,8 +204,8 @@ importers:
         specifier: ^10.4.1
         version: 10.4.1
       payload:
-        specifier: ^3.94.0
-        version: 3.94.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^3.94.1
+        version: 3.94.1(graphql@16.14.2)(supports-color@7.2.0)(typescript@7.0.2)
       rimraf:
         specifier: ^6.1.4
         version: 6.1.4
@@ -661,8 +661,8 @@ packages:
   '@octokit/types@18.0.0':
     resolution: {integrity: sha512-l6bAF43PNxkJp6g+W4PjoUSSkxHomXw2nOum5CTftJz1NlV3vu93NImgOYtLf6CbBUb5j+fiuzW0PPQ5JTSvZA==}
 
-  '@payloadcms/translations@3.94.0':
-    resolution: {integrity: sha512-HHuttYhuZym4OwF0qluYZ+7hLWLxC+d0oNMZgNtgVfpCgccyZ97SFi/KorPghw8mD+Vh2nvVD+oraRIA/6uBMw==}
+  '@payloadcms/translations@3.94.1':
+    resolution: {integrity: sha512-N+OSuBLxj/9Sg9kkInz42Ckq+ZjEkiMmV63BFIl/CXFqPE0UrIhh9HxvN+UeZm5VMARwdU6r/a08cXxmUid4jw==}
 
   '@pinojs/redact@0.4.0':
     resolution: {integrity: sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg==}
@@ -1331,10 +1331,6 @@ packages:
   deep-extend@0.6.0:
     resolution: {integrity: sha512-LOHxIOaPYdHlJRtCQfDIVZtfw/ufM8+rVj649RIHzcm/vGwQRXFt6OPqIFWsm2XEMrNIEtWR64sY1LEKD2vAOA==}
     engines: {node: '>=4.0.0'}
-
-  deepmerge@4.3.1:
-    resolution: {integrity: sha512-3sUqbMEc77XqpdNO7FRyRog+eW3ph+GYCbj+rK+uYyRMuwsVy0rMiVtPn+QJlKFvWP/1PYpapqYn0Me2knFn+A==}
-    engines: {node: '>=0.10.0'}
 
   delayed-stream@1.0.0:
     resolution: {integrity: sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==}
@@ -2110,8 +2106,8 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  payload@3.94.0:
-    resolution: {integrity: sha512-1cHOX5V8lfVmtfZugGSd1nU2NR4tAetSrqBHeMKWQ4+5p7AGQ8dj8/oQBKeN6FeAmfjoRRmP7jyOiQF75MTiZQ==}
+  payload@3.94.1:
+    resolution: {integrity: sha512-jNawMVpWlThNnMZ1EaCK4gDz3MHKZCXO21iMt8fPuf7KaqlNPNHK/cPkFx4W35yZXrpT2NqomLPPZC85Eo7YTA==}
     engines: {node: ^22.23.5 || ^24.22.3 || >=26.13.1}
     hasBin: true
     peerDependencies:
@@ -3010,7 +3006,7 @@ snapshots:
     dependencies:
       '@octokit/openapi-types': 29.0.1
 
-  '@payloadcms/translations@3.94.0':
+  '@payloadcms/translations@3.94.1':
     dependencies:
       date-fns: 4.1.0
 
@@ -3696,8 +3692,6 @@ snapshots:
 
   deep-extend@0.6.0: {}
 
-  deepmerge@4.3.1: {}
-
   delayed-stream@1.0.0: {}
 
   dir-glob@3.0.1:
@@ -4382,10 +4376,10 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  payload@3.94.0(graphql@16.14.2)(supports-color@7.2.0)(typescript@7.0.2):
+  payload@3.94.1(graphql@16.14.2)(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       '@next/env': 15.5.29
-      '@payloadcms/translations': 3.94.0
+      '@payloadcms/translations': 3.94.1
       '@types/busboy': 1.5.4
       ajv: 8.18.0
       bson-objectid: 2.0.4
@@ -4394,7 +4388,6 @@ snapshots:
       console-table-printer: 2.12.1
       croner: 10.0.1
       dataloader: 2.2.3
-      deepmerge: 4.3.1
       file-type: 21.3.4(supports-color@7.2.0)
       get-tsconfig: 4.8.1
       graphql: 16.14.2
