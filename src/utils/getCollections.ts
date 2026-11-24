@@ -1,8 +1,9 @@
 import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
-import { buildParameters, getSearchMode } from '../lib/search.js'
+import { buildParameters } from '../lib/search.js'
 import { type SearchParams, type TypesenseConfig } from '../types.js'
+import { getMode } from '../utils/getMode.js'
 import { getCompare } from './sortResults.js'
 
 export const getCollections = async (
@@ -29,7 +30,7 @@ export const getCollections = async (
     }
 
     const multiple = enabledCollections.length > 1
-    const mode = getSearchMode(config, options)
+    const mode = getMode(config, options)
 
     let compare: ReturnType<typeof getCompare> | undefined
 

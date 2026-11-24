@@ -1,25 +1,14 @@
 import { type SearchParams, type TypesenseConfig } from '../types.js'
+import { getMode } from '../utils/getMode.js'
 
 type SearchConfiguration = Pick<TypesenseConfig, 'settings' | 'vectorSearch'>
-
-export function getSearchMode(config: SearchConfiguration, params: Partial<SearchParams> = {}) {
-  const mode =
-    params.search_mode ??
-    (params.vector === true ? 'semantic' : (config.settings?.searchMode ?? 'keyword'))
-
-  if (mode !== 'keyword' && !config.vectorSearch?.enabled) {
-    throw new Error('Semantic and hybrid search require vectorSearch.enabled')
-  }
-
-  return mode
-}
 
 export function buildParameters(
   config: SearchConfiguration,
   fields: string[],
   params: SearchParams
 ) {
-  const mode = getSearchMode(config, params)
+  const mode = getMode(config, params)
   const tolerance = config.settings?.typoTolerance
   const vector = config.vectorSearch
   const keywordFields = fields.filter((field) => field !== 'embedding')
@@ -34,6 +23,7 @@ export function buildParameters(
   const vectorOptions = [`k:${vector?.k ?? 200}`]
 
   if (mode === 'hybrid') vectorOptions.push(`alpha:${vector?.alpha ?? 0.3}`)
+
   if (vector?.distanceThreshold !== undefined) {
     vectorOptions.push(`distance_threshold:${vector.distanceThreshold}`)
   }
@@ -62,11 +52,4 @@ export function buildParameters(
     }),
     ...(mode === 'hybrid' && { drop_tokens_threshold: 0 }),
   }
-}
-
-export function getCollectionName(url: URL): string | undefined {
-  const parts = url.pathname.split('/')
-  const index = parts.indexOf('search')
-  const name = index >= 0 ? parts[index + 1] : undefined
-  return name ? decodeURIComponent(name) : undefined
 }

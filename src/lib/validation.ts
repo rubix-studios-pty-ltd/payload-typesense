@@ -142,3 +142,30 @@ function formatErrors(error: z.ZodError): string[] {
     return `${path}${issue.message}`
   })
 }
+
+const FieldList = z
+  .union([z.string().transform((value) => value.split(',')), z.array(z.string())])
+  .transform((fields) => fields.map((field) => field.trim()))
+  .pipe(z.array(z.string().min(1)).max(32))
+
+const FilterValue = z.union([
+  z
+    .string()
+    .min(1)
+    .max(1024)
+    .refine((value) => !/[`\\\p{Cc}]/u.test(value)),
+  z.number().finite(),
+])
+
+export const AdvancedSchema = SearchSchema.extend({
+  q: z.string().trim().min(1),
+  query_by: FieldList.optional(),
+  facet_by: FieldList.optional(),
+  facets: FieldList.optional(),
+  highlight_fields: FieldList.optional(),
+  filters: z
+    .record(z.string(), z.union([FilterValue, z.array(FilterValue).min(1).max(32)]))
+    .optional(),
+}).strict()
+
+export type AdvancedParams = z.infer<typeof AdvancedSchema>

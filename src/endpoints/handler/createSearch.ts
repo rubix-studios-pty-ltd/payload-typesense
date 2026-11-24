@@ -2,10 +2,12 @@ import { type PayloadHandler, type PayloadRequest } from 'payload'
 import type Typesense from 'typesense'
 
 import { searchCache } from '../../lib/cache.js'
-import { buildParameters, getCollectionName, getSearchMode } from '../../lib/search.js'
+import { buildParameters } from '../../lib/search.js'
 import { getErrors, validateParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
+import { getCollection } from '../../utils/getCollection.js'
 import { getCollections } from '../../utils/getCollections.js'
+import { getMode } from '../../utils/getMode.js'
 
 export const createSearch = (client: Typesense.Client, config: TypesenseConfig): PayloadHandler => {
   return async (request: PayloadRequest): Promise<Response> => {
@@ -16,7 +18,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
 
     try {
       url = new URL(request.url)
-      collection = getCollectionName(url)
+      collection = getCollection(url)
     } catch {
       return Response.json({ error: 'Invalid request URL' }, { status: 400 })
     }
@@ -59,7 +61,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
     const params = validation.data
 
     try {
-      getSearchMode(config, params)
+      getMode(config, params)
     } catch (error) {
       return Response.json({ error: (error as Error).message }, { status: 400 })
     }
@@ -86,7 +88,6 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
       const cached = searchCache.get(params.q, collection, searchParams)
 
       const search = () => client.collections(collection).documents().search(searchParams)
-
       const results = cached ? (cached as Awaited<ReturnType<typeof search>>) : await search()
 
       const response = {
