@@ -2,13 +2,15 @@ import { type Config } from 'payload'
 
 import { createEndpoints } from './endpoints/search.js'
 import { createClient } from './lib/client.js'
-import { deleteDoc, syncDoc } from './lib/hooks.js'
 import { initializeTypesense } from './lib/initialization.js'
 import { getErrors, validateConfig } from './lib/validation.js'
 import { type TypesenseConfig } from './types.js'
 
 export * from './components/index.js'
 export type { TypesenseConfig } from './types.js'
+
+import { afterChange } from './lib/after-change.js'
+import { deleteDoc } from './lib/hooks.js'
 
 export const typesenseSearch =
   (pluginConfig: TypesenseConfig) =>
@@ -37,8 +39,7 @@ export const typesenseSearch =
           ...collection.hooks,
           afterChange: [
             ...(collection.hooks?.afterChange || []),
-            async ({ doc }) =>
-              syncDoc(client, collection.slug, doc, config, pluginConfig.vectorSearch),
+            afterChange(client, collection.slug, config, pluginConfig.vectorSearch),
           ],
           afterDelete: [
             ...(collection.hooks?.afterDelete || []),

@@ -102,10 +102,10 @@ export type VectorOptions = {
 
 export interface BaseDocument {
   _status?: 'draft' | 'published'
-  createdAt: Date | string
+  createdAt?: Date | string
   id: number | string
   slug?: string
-  updatedAt: Date | string
+  updatedAt?: Date | string
   [key: string]: unknown
 }
 

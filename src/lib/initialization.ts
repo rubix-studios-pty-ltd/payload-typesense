@@ -65,6 +65,8 @@ async function syncExisting(
       const { docs, hasNextPage } = await payload.find({
         collection: slug,
         depth: 0,
+        overrideAccess: false,
+        draft: false,
         limit,
         page,
       })
