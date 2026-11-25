@@ -65,9 +65,7 @@ export const PluginSchema = z
     collections: z.record(z.string(), CollectionSchema).optional(),
     disabled: z.boolean().optional(),
     healthAccess: z
-      .custom<NonNullable<TypesenseConfig['healthAccess']>>(
-        (value) => typeof value === 'function'
-      )
+      .custom<NonNullable<TypesenseConfig['healthAccess']>>((value) => typeof value === 'function')
       .optional(),
     settings: SettingsSchema.optional(),
     typesense: z.object({

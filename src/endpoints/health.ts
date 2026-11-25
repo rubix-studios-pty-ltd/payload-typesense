@@ -82,7 +82,7 @@ export const createDetailedHealthCheck = (
 
       const error = isHealthy
         ? undefined
-        : buildError(health, collections.length > 0) ?? 'Enabled collections unavailable'
+        : (buildError(health, collections.length > 0) ?? 'Enabled collections unavailable')
 
       return Response.json(
         {
