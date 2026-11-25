@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.8.6](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.8.5...v1.8.6) (2026-11-25)
+
+### Bug Fixes
+
+* bound search pagination to prevent resource exhaustion ([24bf857](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/24bf8573408a9fa7d38df5ede97ded5374ccaec8))
+* initialisation and change premissions ([ac68be2](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/ac68be23bd5eedb6dcc1cbe2b44b81eef3ea7a4b))
+* invalidate search cache on document changes and deletions ([37661a7](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/37661a70a9dd9e24ae6a32cfff81b0d18ea93ea5))
+* linter ([38faa52](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/38faa52bb4bd0b5efb75d7355e871a2b39207822))
+* prevent draft from being indexed in Typesense ([66d8e6e](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/66d8e6e59e972149ef8fd4d37300282902a65799))
+* restrict advanced search parameters to validated fields ([3e3ce66](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/3e3ce66847f37473c7ee638d0a5bfd85f2aa3dcf))
+* restrict health diagnostics and prevent upstream error disclosure ([95b6dae](https://github.com/rubix-studios-pty-ltd/payload-typesense/commit/95b6dae4b2e5e11199be098a89d7bcb26486e901))
+
 ## [1.8.5](https://github.com/rubix-studios-pty-ltd/payload-typesense/compare/v1.8.4...v1.8.5) (2026-11-24)
 
 ### Bug Fixes
