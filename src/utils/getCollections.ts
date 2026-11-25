@@ -6,6 +6,9 @@ import { type SearchParams, type TypesenseConfig } from '../types.js'
 import { getMode } from '../utils/getMode.js'
 import { getCompare } from './sortResults.js'
 
+const MAX_RESULT_WINDOW = 1000
+const MAX_PAGE_SIZE = 250
+
 export const getCollections = async (
   client: Typesense.Client,
   config: TypesenseConfig,
@@ -45,8 +48,29 @@ export const getCollections = async (
       }
     }
 
-    const limit = multiple ? options.page * options.per_page : options.per_page
-    const perPage = Math.min(limit, 250)
+    const { page, per_page } = options
+
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isSafeInteger(per_page) ||
+      per_page < 1 ||
+      per_page > MAX_PAGE_SIZE
+    ) {
+      return Response.json({ error: 'Invalid pagination parameters' }, { status: 400 })
+    }
+
+    const window = page * per_page
+
+    if (window > MAX_RESULT_WINDOW) {
+      return Response.json(
+        { error: `Search result window cannot exceed ${MAX_RESULT_WINDOW}` },
+        { status: 400 }
+      )
+    }
+
+    const limit = multiple ? window : per_page
+    const perPage = Math.min(limit, MAX_PAGE_SIZE)
 
     const cacheKey = {
       ...options,
@@ -102,7 +126,12 @@ export const getCollections = async (
         let cutoff = results.search_cutoff
         let time = results.search_time_ms
 
-        while (multiple && hits.length < Math.min(limit, results.found) && !cutoff) {
+        while (
+          multiple &&
+          page < Math.ceil(limit / perPage) &&
+          hits.length < Math.min(limit, results.found) &&
+          !cutoff
+        ) {
           const next = await search(++page)
           const batch = next.hits ?? []
 
