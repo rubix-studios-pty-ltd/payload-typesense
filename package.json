@@ -60,7 +60,7 @@
     "@semantic-release/git": "^11.0.1",
     "@swc/cli": "^0.8.2",
     "@swc/core": "^1.16.22",
-    "@types/react": "19.3.1",
+    "@types/react": "19.3.2",
     "conventional-changelog-conventionalcommits": "^10.4.1",
     "payload": "^3.94.2",
     "rimraf": "^6.1.4",
@@ -88,7 +88,7 @@
     }
   },
   "dependencies": {
-    "typesense": "^3.2.0",
+    "typesense": "^3.3.0",
     "zod": "^4.6.7"
   },
   "packageManager": "pnpm@12.23.0"
