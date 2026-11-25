@@ -1,3 +1,4 @@
+import { type Payload } from 'payload'
 import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
@@ -20,7 +21,8 @@ export const getCollections = async (
     per_page: number
     sort_by?: string
     vector?: boolean
-  }
+  },
+  logger?: Payload['logger']
 ) => {
   try {
     const enabledCollections = Object.entries(config.collections ?? {}).filter(
@@ -157,10 +159,12 @@ export const getCollections = async (
           search_time_ms: time,
         }
       } catch (error) {
+        logger?.error({ err: error, msg: `Typesense search failed for ${slug}` })
+
         return {
           collection: slug,
           displayName,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Collection search failed',
           found: 0,
           hits: [],
           icon,
@@ -213,12 +217,8 @@ export const getCollections = async (
 
     return Response.json(response)
   } catch (error) {
-    return Response.json(
-      {
-        details: error instanceof Error ? error.message : 'Unknown error',
-        error: 'Universal search failed',
-      },
-      { status: 500 }
-    )
+    logger?.error({ err: error, msg: 'Typesense universal search failed' })
+
+    return Response.json({ error: 'Universal search failed' }, { status: 500 })
   }
 }

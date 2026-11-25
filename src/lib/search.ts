@@ -35,7 +35,7 @@ export function buildParameters(
     per_page: params.per_page ?? 10,
     num_typos: params.num_typos ?? tolerance?.numTypos ?? 2,
     min_len_1typo: params.min_len_1typo ?? tolerance?.minLengthOneTypo ?? 4,
-    min_len_2typo: params.min_len_2typo ?? tolerance?.minLengthTwoTypos ?? 7,
+    min_len_2typo: params.min_len_2typo ?? tolerance?.minLengthTwoTypo ?? 7,
     typo_tokens_threshold: params.typo_threshold ?? tolerance?.typoTokensThreshold ?? 1,
     enable_typos_for_numerical_tokens: params.numerical ?? tolerance?.numericalTokens ?? true,
     enable_typos_for_alpha_numerical_tokens:

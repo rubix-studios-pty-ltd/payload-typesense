@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { type TypesenseConfig } from '../types.js'
+
 export interface ValidationResult<T = unknown> {
   data?: T
   errors?: string[]
@@ -40,7 +42,7 @@ const SettingsSchema = z.object({
     .object({
       numTypos: z.union([z.literal(0), z.literal(1), z.literal(2)]).optional(),
       minLengthOneTypo: z.number().int().positive().optional(),
-      minLengthTwoTypos: z.number().int().positive().optional(),
+      minLengthTwoTypo: z.number().int().positive().optional(),
       typoTokensThreshold: z.number().int().nonnegative().optional(),
       numericalTokens: z.boolean().optional(),
       alphaNumericalTokens: z.boolean().optional(),
@@ -62,6 +64,11 @@ export const PluginSchema = z
   .object({
     collections: z.record(z.string(), CollectionSchema).optional(),
     disabled: z.boolean().optional(),
+    healthAccess: z
+      .custom<NonNullable<TypesenseConfig['healthAccess']>>(
+        (value) => typeof value === 'function'
+      )
+      .optional(),
     settings: SettingsSchema.optional(),
     typesense: z.object({
       apiKey: z.string().min(1, 'API key is required'),

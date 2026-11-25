@@ -144,7 +144,9 @@ export const createAdvancedSearch = (
             displayName: settings.displayName ?? collection,
           })) ?? [],
       })
-    } catch {
+    } catch (error) {
+      request.payload.logger.error({ err: error, msg: 'Typesense advanced search failed' })
+
       return Response.json({ error: 'Advanced search failed' }, { status: 500 })
     }
   }

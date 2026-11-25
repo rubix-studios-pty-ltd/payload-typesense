@@ -1,3 +1,5 @@
+import { type PayloadRequest } from 'payload'
+
 /** Plugin */
 
 export type SearchMode = 'keyword' | 'semantic' | 'hybrid'
@@ -22,7 +24,7 @@ export type TypesenseCollectionConfig = {
 export type TypoTolerance = {
   numTypos?: 0 | 1 | 2
   minLengthOneTypo?: number
-  minLengthTwoTypos?: number
+  minLengthTwoTypo?: number
   typoTokensThreshold?: number
   numericalTokens?: boolean
   alphaNumericalTokens?: boolean
@@ -31,6 +33,7 @@ export type TypoTolerance = {
 export type TypesenseConfig = {
   collections?: Record<string, TypesenseCollectionConfig>
   disabled?: boolean
+  healthAccess?: (request: PayloadRequest) => boolean | Promise<boolean>
   settings?: {
     autoSync?: boolean
     batchSize?: number

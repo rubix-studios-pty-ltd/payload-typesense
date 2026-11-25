@@ -30,7 +30,6 @@ export const createSuggest = (
     const limit = Number(url.searchParams.get('limit') ?? 5)
 
     if (!q) return Response.json({ error: 'Query parameter "q" is required' }, { status: 400 })
-
     if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
       return Response.json({ error: 'Limit must be between 1 and 100' }, { status: 400 })
     }
@@ -56,7 +55,9 @@ export const createSuggest = (
       }
 
       return Response.json(response)
-    } catch {
+    } catch (error) {
+      request.payload.logger.error({ err: error, msg: 'Typesense suggestion failed' })
+
       return Response.json({ error: 'Suggest failed' }, { status: 500 })
     }
   }

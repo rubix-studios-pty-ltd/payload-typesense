@@ -73,7 +73,13 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
           .map((name) => name.trim())
           .filter(Boolean)
 
-        return getCollections(client, config, params.q, { ...params, collections, filters: {} })
+        return getCollections(
+          client,
+          config,
+          params.q,
+          { ...params, collections, filters: {} },
+          request.payload.logger
+        )
       }
 
       const settings = config.collections?.[collection]
@@ -108,13 +114,9 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
 
       return Response.json(response)
     } catch (error) {
-      return Response.json(
-        {
-          error: 'Search handler failed',
-          details: error instanceof Error ? error.message : 'Unknown error',
-        },
-        { status: 500 }
-      )
+      request.payload.logger.error({ err: error, msg: 'Typesense search failed' })
+
+      return Response.json({ error: 'Search handler failed' }, { status: 500 })
     }
   }
 }
