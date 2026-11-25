@@ -64,6 +64,7 @@ export const getCollections = async (
         .join(','),
     }
 
+    const revision = searchCache.revision
     const cached = searchCache.get(query, 'universal', cacheKey)
 
     if (cached) {
@@ -177,7 +178,7 @@ export const getCollections = async (
       search_time_ms: Math.max(...results.map((result) => result.search_time_ms)),
     }
 
-    if (results.every((result) => !('error' in result))) {
+    if (revision === searchCache.revision && results.every((result) => !('error' in result))) {
       searchCache.set(query, response, 'universal', cacheKey)
     }
 

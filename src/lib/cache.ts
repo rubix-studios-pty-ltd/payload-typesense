@@ -1,10 +1,13 @@
 import { type CacheEntry, type CacheOptions, type CacheStats } from '../types.js'
 
 export class SearchCache<T = unknown> {
-  private cache = new Map<string, CacheEntry<T>>()
   private readonly defaultTTL: number
   private readonly maxSize: number
+
+  private cache = new Map<string, CacheEntry<T>>()
+
   private stats: CacheStats = { hits: 0, misses: 0 }
+  private generation = 0
 
   constructor(options: CacheOptions = {}) {
     this.defaultTTL = options.ttl ?? 5 * 60 * 1000
@@ -16,6 +19,23 @@ export class SearchCache<T = unknown> {
 
     if (!Number.isSafeInteger(this.maxSize) || this.maxSize < 0) {
       throw new RangeError('Cache maxSize must be a non-negative integer')
+    }
+  }
+
+  get revision(): number {
+    return this.generation
+  }
+
+  invalidate(collection: string): void {
+    this.generation++
+
+    const prefix = `${this.normalize(collection)}:`
+    const universal = `${this.normalize()}:`
+
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(prefix) || key.startsWith(universal)) {
+        this.cache.delete(key)
+      }
     }
   }
 
@@ -98,6 +118,8 @@ export class SearchCache<T = unknown> {
   }
 
   clear(pattern?: RegExp | string): void {
+    this.generation++
+
     if (pattern === undefined) {
       this.cache.clear()
       return

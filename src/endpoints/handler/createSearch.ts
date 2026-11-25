@@ -85,9 +85,11 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
         ? settings.searchFields
         : ['title', 'content', 'description']
       const searchParams = buildParameters(config, fields, params)
+      const revision = searchCache.revision
       const cached = searchCache.get(params.q, collection, searchParams)
 
       const search = () => client.collections(collection).documents().search(searchParams)
+
       const results = cached ? (cached as Awaited<ReturnType<typeof search>>) : await search()
 
       const response = {
@@ -100,7 +102,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
           })) ?? [],
       }
 
-      if (!cached) {
+      if (!cached && revision === searchCache.revision) {
         searchCache.set(params.q, response, collection, searchParams)
       }
 
