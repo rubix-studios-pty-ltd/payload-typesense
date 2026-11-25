@@ -2,10 +2,12 @@ import { type PayloadHandler, type PayloadRequest } from 'payload'
 import type Typesense from 'typesense'
 
 import { searchCache } from '../../lib/cache.js'
-import { buildParameters, getCollectionName, getSearchMode } from '../../lib/search.js'
+import { buildParameters } from '../../lib/search.js'
 import { getErrors, validateParams } from '../../lib/validation.js'
 import { type TypesenseConfig } from '../../types.js'
+import { getCollection } from '../../utils/getCollection.js'
 import { getCollections } from '../../utils/getCollections.js'
+import { getMode } from '../../utils/getMode.js'
 
 export const createSearch = (client: Typesense.Client, config: TypesenseConfig): PayloadHandler => {
   return async (request: PayloadRequest): Promise<Response> => {
@@ -16,7 +18,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
 
     try {
       url = new URL(request.url)
-      collection = getCollectionName(url)
+      collection = getCollection(url)
     } catch {
       return Response.json({ error: 'Invalid request URL' }, { status: 400 })
     }
@@ -59,7 +61,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
     const params = validation.data
 
     try {
-      getSearchMode(config, params)
+      getMode(config, params)
     } catch (error) {
       return Response.json({ error: (error as Error).message }, { status: 400 })
     }
@@ -71,7 +73,13 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
           .map((name) => name.trim())
           .filter(Boolean)
 
-        return getCollections(client, config, params.q, { ...params, collections, filters: {} })
+        return getCollections(
+          client,
+          config,
+          params.q,
+          { ...params, collections, filters: {} },
+          request.payload.logger
+        )
       }
 
       const settings = config.collections?.[collection]
@@ -83,6 +91,7 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
         ? settings.searchFields
         : ['title', 'content', 'description']
       const searchParams = buildParameters(config, fields, params)
+      const revision = searchCache.revision
       const cached = searchCache.get(params.q, collection, searchParams)
 
       const search = () => client.collections(collection).documents().search(searchParams)
@@ -99,19 +108,15 @@ export const createSearch = (client: Typesense.Client, config: TypesenseConfig):
           })) ?? [],
       }
 
-      if (!cached) {
+      if (!cached && revision === searchCache.revision) {
         searchCache.set(params.q, response, collection, searchParams)
       }
 
       return Response.json(response)
     } catch (error) {
-      return Response.json(
-        {
-          error: 'Search handler failed',
-          details: error instanceof Error ? error.message : 'Unknown error',
-        },
-        { status: 500 }
-      )
+      request.payload.logger.error({ err: error, msg: 'Typesense search failed' })
+
+      return Response.json({ error: 'Search handler failed' }, { status: 500 })
     }
   }
 }

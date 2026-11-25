@@ -6,6 +6,7 @@ import {
   type TypesenseConfig,
 } from '../types.js'
 import { ensureCollection } from '../utils/ensureCollection.js'
+import { searchCache } from './cache.js'
 import { mapCollection, mapDoc } from './schema-mapper.js'
 
 export const syncDoc = async (
@@ -26,11 +27,16 @@ export const syncDoc = async (
     const schema = mapCollection(slug, config, vector)
     const { available } = await ensureCollection(client, slug, schema, vector)
 
-    if (!available) return
+    if (!available) {
+      console.error(`Typesense collection unavailable during synchronisation: ${slug}`)
+      return
+    }
 
     await client.collections(slug).documents().upsert(document)
   } catch {
-    // Avoid interrupting Payload document saves
+    console.error(`Failed to synchronise Typesense document in ${slug}`)
+  } finally {
+    searchCache.invalidate(slug)
   }
 }
 
@@ -41,7 +47,16 @@ export const deleteDoc = async (
 ): Promise<void> => {
   try {
     await client.collections(slug).documents(id).delete()
-  } catch {
-    // Avoid interrupting Payload document deletions
+  } catch (error) {
+    if (
+      !error ||
+      typeof error !== 'object' ||
+      !('httpStatus' in error) ||
+      error.httpStatus !== 404
+    ) {
+      console.error(`Failed to delete Typesense document in ${slug}`)
+    }
+  } finally {
+    searchCache.invalidate(slug)
   }
 }

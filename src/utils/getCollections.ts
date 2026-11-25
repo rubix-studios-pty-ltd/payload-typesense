@@ -1,9 +1,14 @@
+import { type Payload } from 'payload'
 import type Typesense from 'typesense'
 
 import { searchCache } from '../lib/cache.js'
-import { buildParameters, getSearchMode } from '../lib/search.js'
+import { buildParameters } from '../lib/search.js'
 import { type SearchParams, type TypesenseConfig } from '../types.js'
+import { getMode } from '../utils/getMode.js'
 import { getCompare } from './sortResults.js'
+
+const MAX_RESULT_WINDOW = 1000
+const MAX_PAGE_SIZE = 250
 
 export const getCollections = async (
   client: Typesense.Client,
@@ -16,7 +21,8 @@ export const getCollections = async (
     per_page: number
     sort_by?: string
     vector?: boolean
-  }
+  },
+  logger?: Payload['logger']
 ) => {
   try {
     const enabledCollections = Object.entries(config.collections ?? {}).filter(
@@ -29,7 +35,7 @@ export const getCollections = async (
     }
 
     const multiple = enabledCollections.length > 1
-    const mode = getSearchMode(config, options)
+    const mode = getMode(config, options)
 
     let compare: ReturnType<typeof getCompare> | undefined
 
@@ -44,8 +50,29 @@ export const getCollections = async (
       }
     }
 
-    const limit = multiple ? options.page * options.per_page : options.per_page
-    const perPage = Math.min(limit, 250)
+    const { page, per_page } = options
+
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isSafeInteger(per_page) ||
+      per_page < 1 ||
+      per_page > MAX_PAGE_SIZE
+    ) {
+      return Response.json({ error: 'Invalid pagination parameters' }, { status: 400 })
+    }
+
+    const window = page * per_page
+
+    if (window > MAX_RESULT_WINDOW) {
+      return Response.json(
+        { error: `Search result window cannot exceed ${MAX_RESULT_WINDOW}` },
+        { status: 400 }
+      )
+    }
+
+    const limit = multiple ? window : per_page
+    const perPage = Math.min(limit, MAX_PAGE_SIZE)
 
     const cacheKey = {
       ...options,
@@ -63,6 +90,7 @@ export const getCollections = async (
         .join(','),
     }
 
+    const revision = searchCache.revision
     const cached = searchCache.get(query, 'universal', cacheKey)
 
     if (cached) {
@@ -100,7 +128,12 @@ export const getCollections = async (
         let cutoff = results.search_cutoff
         let time = results.search_time_ms
 
-        while (multiple && hits.length < Math.min(limit, results.found) && !cutoff) {
+        while (
+          multiple &&
+          page < Math.ceil(limit / perPage) &&
+          hits.length < Math.min(limit, results.found) &&
+          !cutoff
+        ) {
           const next = await search(++page)
           const batch = next.hits ?? []
 
@@ -126,10 +159,12 @@ export const getCollections = async (
           search_time_ms: time,
         }
       } catch (error) {
+        logger?.error({ err: error, msg: `Typesense search failed for ${slug}` })
+
         return {
           collection: slug,
           displayName,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Collection search failed',
           found: 0,
           hits: [],
           icon,
@@ -176,18 +211,14 @@ export const getCollections = async (
       search_time_ms: Math.max(...results.map((result) => result.search_time_ms)),
     }
 
-    if (results.every((result) => !('error' in result))) {
+    if (revision === searchCache.revision && results.every((result) => !('error' in result))) {
       searchCache.set(query, response, 'universal', cacheKey)
     }
 
     return Response.json(response)
   } catch (error) {
-    return Response.json(
-      {
-        details: error instanceof Error ? error.message : 'Unknown error',
-        error: 'Universal search failed',
-      },
-      { status: 500 }
-    )
+    logger?.error({ err: error, msg: 'Typesense universal search failed' })
+
+    return Response.json({ error: 'Universal search failed' }, { status: 500 })
   }
 }

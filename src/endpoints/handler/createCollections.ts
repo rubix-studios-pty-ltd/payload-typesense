@@ -3,7 +3,7 @@ import { type PayloadHandler } from 'payload'
 import { type TypesenseConfig } from '../../types.js'
 
 export const createCollections = (config: TypesenseConfig): PayloadHandler => {
-  return (): Response => {
+  return (request): Response => {
     try {
       const enabled = Object.entries(config.collections ?? {})
         .filter(([, collection]) => collection?.enabled)
@@ -19,7 +19,9 @@ export const createCollections = (config: TypesenseConfig): PayloadHandler => {
         categorized: Boolean(config.settings?.categorized),
         collections: enabled,
       })
-    } catch {
+    } catch (error) {
+      request.payload.logger.error({ err: error, msg: 'Typesense collection listing failed' })
+
       return Response.json({ error: 'Failed to get collections' }, { status: 500 })
     }
   }

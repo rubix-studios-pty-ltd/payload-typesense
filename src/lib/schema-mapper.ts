@@ -89,6 +89,10 @@ export const mapDoc = (
     throw new Error("Document missing required 'id' field")
   }
 
+  if (doc._status === 'draft') {
+    return null
+  }
+
   const searchFields = config.searchFields?.length ? config.searchFields : defaultSearchFields
   const embedFields = vector?.enabled
     ? vector.embedFrom?.length
